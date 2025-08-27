@@ -1,0 +1,5 @@
+
+
+> @quai/shared@0.1.0 build /Users/mac/Desktop/CODES/HACKATHON/QUAI/packages/shared
+> tsc -p tsconfig.json
+

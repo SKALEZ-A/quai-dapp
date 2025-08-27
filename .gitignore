@@ -1,0 +1,12 @@
+# Node
+node_modules
+.DS_Store
+.env
+.env.local
+
+# Builds
+apps/**/.next
+apps/**/build
+apps/**/dist
+packages/**/dist
+coverage

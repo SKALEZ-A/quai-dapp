@@ -1,0 +1,10 @@
+
+
+> @quai/contracts@0.1.0 build /Users/mac/Desktop/CODES/HACKATHON/QUAI/packages/contracts
+> hardhat compile
+
+[33m[1mWARNING:[22m[39m You are currently using Node.js v23.11.0, which is not supported by Hardhat. This can lead to unexpected behavior. See https://hardhat.org/nodejs-versions
+
+
+Nothing to compile
+No need to generate any newer typings.
