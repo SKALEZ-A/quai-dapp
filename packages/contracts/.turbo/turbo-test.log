@@ -1,0 +1,20 @@
+
+
+> @quai/contracts@0.1.0 test /Users/mac/Desktop/CODES/HACKATHON/QUAI/packages/contracts
+> hardhat test
+
+[33m[1mWARNING:[22m[39m You are currently using Node.js v23.11.0, which is not supported by Hardhat. This can lead to unexpected behavior. See https://hardhat.org/nodejs-versions
+
+
+
+[0m[0m
+[0m  QNSController[0m
+  [32m  [32m✔[39m[0m[90m commit -> pending stored and event emitted[0m[31m (756ms)[0m
+  [32m  [32m✔[39m[0m[90m reveal clears pending and emits[0m
+  [32m  [32m✔[39m[0m[90m prevents duplicate commit for same hash[0m
+  [32m  [32m✔[39m[0m[90m reveal fails if expired[0m
+  [32m  [32m✔[39m[0m[90m reveal fails if no such commit[0m
+
+
+[92m [0m[32m 5 passing[0m[90m (832ms)[0m
+

@@ -1,6 +1,43 @@
 {
   "_format": "hh-sol-cache-2",
   "files": {
+    "/Users/mac/Desktop/CODES/HACKATHON/QUAI/packages/contracts/contracts/QNSController.sol": {
+      "lastModificationDate": 1756322713618,
+      "contentHash": "953ed78a21d720a2f1e09841b6b41cac",
+      "sourceName": "contracts/QNSController.sol",
+      "solcConfig": {
+        "version": "0.8.23",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.23"
+      ],
+      "artifacts": [
+        "QNSController"
+      ]
+    },
     "/Users/mac/Desktop/CODES/HACKATHON/QUAI/packages/contracts/contracts/QNSRegistry.sol": {
       "lastModificationDate": 1756317439405,
       "contentHash": "6eb8a358bbac680f6c1986bbaf7015eb",
@@ -163,6 +200,43 @@
         "UUPSUpgradeable"
       ]
     },
+    "/Users/mac/Desktop/CODES/HACKATHON/QUAI/node_modules/.pnpm/@openzeppelin+contracts@5.4.0/node_modules/@openzeppelin/contracts/access/IAccessControl.sol": {
+      "lastModificationDate": 1756317690964,
+      "contentHash": "def1e8f7b6cac577cf2600655bf3bdf8",
+      "sourceName": "@openzeppelin/contracts/access/IAccessControl.sol",
+      "solcConfig": {
+        "version": "0.8.23",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.8.4"
+      ],
+      "artifacts": [
+        "IAccessControl"
+      ]
+    },
     "/Users/mac/Desktop/CODES/HACKATHON/QUAI/node_modules/.pnpm/@openzeppelin+contracts-upgradeable@5.4.0_@openzeppelin+contracts@5.4.0/node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol": {
       "lastModificationDate": 1756317690580,
       "contentHash": "c28aaa25d083a9a55bd9ec9e0b785122",
@@ -240,43 +314,6 @@
       ],
       "artifacts": [
         "ERC165Upgradeable"
-      ]
-    },
-    "/Users/mac/Desktop/CODES/HACKATHON/QUAI/node_modules/.pnpm/@openzeppelin+contracts@5.4.0/node_modules/@openzeppelin/contracts/access/IAccessControl.sol": {
-      "lastModificationDate": 1756317690964,
-      "contentHash": "def1e8f7b6cac577cf2600655bf3bdf8",
-      "sourceName": "@openzeppelin/contracts/access/IAccessControl.sol",
-      "solcConfig": {
-        "version": "0.8.23",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        ">=0.8.4"
-      ],
-      "artifacts": [
-        "IAccessControl"
       ]
     },
     "/Users/mac/Desktop/CODES/HACKATHON/QUAI/node_modules/.pnpm/@openzeppelin+contracts@5.4.0/node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol": {
@@ -395,43 +432,6 @@
         "ERC1967Utils"
       ]
     },
-    "/Users/mac/Desktop/CODES/HACKATHON/QUAI/node_modules/.pnpm/@openzeppelin+contracts@5.4.0/node_modules/@openzeppelin/contracts/interfaces/IERC1967.sol": {
-      "lastModificationDate": 1756317690971,
-      "contentHash": "3c9577899f440b0c66e880c96e9250bb",
-      "sourceName": "@openzeppelin/contracts/interfaces/IERC1967.sol",
-      "solcConfig": {
-        "version": "0.8.23",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        ">=0.4.11"
-      ],
-      "artifacts": [
-        "IERC1967"
-      ]
-    },
     "/Users/mac/Desktop/CODES/HACKATHON/QUAI/node_modules/.pnpm/@openzeppelin+contracts@5.4.0/node_modules/@openzeppelin/contracts/proxy/beacon/IBeacon.sol": {
       "lastModificationDate": 1756317690966,
       "contentHash": "ee2e46607ed2be58bd554306d068acba",
@@ -545,6 +545,43 @@
         "StorageSlot"
       ]
     },
+    "/Users/mac/Desktop/CODES/HACKATHON/QUAI/node_modules/.pnpm/@openzeppelin+contracts@5.4.0/node_modules/@openzeppelin/contracts/interfaces/IERC1967.sol": {
+      "lastModificationDate": 1756317690971,
+      "contentHash": "3c9577899f440b0c66e880c96e9250bb",
+      "sourceName": "@openzeppelin/contracts/interfaces/IERC1967.sol",
+      "solcConfig": {
+        "version": "0.8.23",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.11"
+      ],
+      "artifacts": [
+        "IERC1967"
+      ]
+    },
     "/Users/mac/Desktop/CODES/HACKATHON/QUAI/node_modules/.pnpm/@openzeppelin+contracts@5.4.0/node_modules/@openzeppelin/contracts/utils/Errors.sol": {
       "lastModificationDate": 1756317690959,
       "contentHash": "6b5eac2b85500c3012977849cfd633d8",
@@ -580,43 +617,6 @@
       ],
       "artifacts": [
         "Errors"
-      ]
-    },
-    "/Users/mac/Desktop/CODES/HACKATHON/QUAI/packages/contracts/contracts/QNSController.sol": {
-      "lastModificationDate": 1756322713618,
-      "contentHash": "953ed78a21d720a2f1e09841b6b41cac",
-      "sourceName": "contracts/QNSController.sol",
-      "solcConfig": {
-        "version": "0.8.23",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.23"
-      ],
-      "artifacts": [
-        "QNSController"
       ]
     }
   }

@@ -1,16 +1,15 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { makeProvider, detectPelagus, getBlockNumber, requestAccounts } from "../src/lib/quai";
-import { MockBridgeProvider, type BridgeQuote } from "@shared/bridge";
+// Removed mock bridge UI; focusing on real RPC + wallet status
 
 export default function HomePage() {
   const [blockNumber, setBlockNumber] = useState<null | number>(null);
   const [pelagus, setPelagus] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [address, setAddress] = useState<string | null>(null);
-  const [quote, setQuote] = useState<BridgeQuote | null>(null);
-  const [txHash, setTxHash] = useState<string | null>(null);
-  const [form, setForm] = useState({ fromChainId: 150004, toChainId: 150004, token: "0x0000000000000000000000000000000000000000", amount: "1.0", addr: "" });
+  const [chainId, setChainId] = useState<string | null>(null);
+  const [balance, setBalance] = useState<string | null>(null);
 
   useEffect(() => {
     setPelagus(detectPelagus());
@@ -47,105 +46,38 @@ export default function HomePage() {
           {address && <p style={{ marginTop: 8 }}>Address: {address}</p>}
         </div>
       )}
-      {error ? <p style={{ color: "red" }}>Error: {error}</p> : <p>Block number: {blockNumber ?? "…"}</p>}
+      {error ? <p style={{ color: "red" }}>Error: {error}</p> : null}
 
       <section style={{ marginTop: 24, padding: 12, border: "1px solid #ddd", borderRadius: 8, maxWidth: 600 }}>
-        <h2>Bridge demo (Mock)</h2>
-        <div style={{ display: "grid", gap: 8 }}>
-          <label>
-            From Chain ID
-            <input
-              type="number"
-              value={form.fromChainId}
-              onChange={(e) => setForm({ ...form, fromChainId: Number(e.target.value) })}
-              style={{ width: "100%" }}
-            />
-          </label>
-          <label>
-            To Chain ID
-            <input
-              type="number"
-              value={form.toChainId}
-              onChange={(e) => setForm({ ...form, toChainId: Number(e.target.value) })}
-              style={{ width: "100%" }}
-            />
-          </label>
-          <label>
-            Token (address)
-            <input
-              type="text"
-              value={form.token}
-              onChange={(e) => setForm({ ...form, token: e.target.value })}
-              style={{ width: "100%" }}
-            />
-          </label>
-          <label>
-            Amount
-            <input
-              type="text"
-              value={form.amount}
-              onChange={(e) => setForm({ ...form, amount: e.target.value })}
-              style={{ width: "100%" }}
-            />
-          </label>
-          <label>
-            Recipient Address
-            <input
-              type="text"
-              placeholder="0x..."
-              value={form.addr}
-              onChange={(e) => setForm({ ...form, addr: e.target.value })}
-              style={{ width: "100%" }}
-            />
-          </label>
-          <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-            <button
-              onClick={async () => {
-                try {
-                  setError(null);
-                  setQuote(null);
-                  setTxHash(null);
-                  const provider = new MockBridgeProvider();
-                  const q = await provider.quote({ fromChainId: form.fromChainId, toChainId: form.toChainId, token: form.token, amount: form.amount, address: form.addr || address || "" });
-                  setQuote(q);
-                } catch (e: any) {
-                  setError(String(e?.message || e));
-                }
-              }}
-            >
-              Get Quote
-            </button>
-            <button
-              onClick={async () => {
-                try {
-                  setError(null);
-                  setTxHash(null);
-                  const provider = new MockBridgeProvider();
-                  const res = await provider.transfer({ fromChainId: form.fromChainId, toChainId: form.toChainId, token: form.token, amount: form.amount, address: form.addr || address || "" });
-                  setTxHash(res.txHash);
-                } catch (e: any) {
-                  setError(String(e?.message || e));
-                }
-              }}
-              disabled={!form.addr && !address}
-            >
-              Transfer (Mock)
-            </button>
-          </div>
+        <h2>Network</h2>
+        <div>
+          <p>Block number: {blockNumber ?? "…"}</p>
+          <p>Connected address: {address ?? "—"}</p>
+          <p>Chain ID: {chainId ?? "—"}</p>
+          <p>Balance (ETH): {balance ?? "—"}</p>
         </div>
-        {quote && (
-          <div style={{ marginTop: 12 }}>
-            <p>Fee: {quote.fee}</p>
-            <p>ETA (s): {quote.etaSeconds}</p>
-            <p>Min Out: {quote.minOut}</p>
-            <p>Route: {quote.route.join(" → ")}</p>
-          </div>
-        )}
-        {txHash && (
-          <p style={{ marginTop: 12 }}>
-            Tx Hash: <code>{txHash}</code>
-          </p>
-        )}
+        <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+          <button
+            onClick={async () => {
+              try {
+                setError(null);
+                const eth: any = (globalThis as any).ethereum;
+                if (!eth) throw new Error("No injected provider found");
+                const [addr] = await eth.request({ method: "eth_requestAccounts" });
+                setAddress(addr);
+                const id = await eth.request({ method: "eth_chainId" });
+                setChainId(String(parseInt(id, 16)));
+                const bal = await eth.request({ method: "eth_getBalance", params: [addr, "latest"] });
+                setBalance((Number(BigInt(bal)) / 1e18).toString());
+              } catch (e: any) {
+                setError(String(e?.message || e));
+              }
+            }}
+            style={{ padding: "6px 12px" }}
+          >
+            {address ? "Refresh Wallet Info" : "Connect Wallet"}
+          </button>
+        </div>
       </section>
     </main>
   );

@@ -16,7 +16,19 @@ export async function getBlockNumber(provider: any): Promise<number> {
 
 export function detectPelagus(): boolean {
   const eth = (globalThis as any)?.ethereum;
-  return Boolean(eth && eth.isPelagus);
+  if (!eth) return false;
+  // Direct flag
+  if (eth.isPelagus) return true;
+  // EIP-5749 style multi-injected providers
+  const providers: any[] = Array.isArray(eth.providers) ? eth.providers : [];
+  for (const p of providers) {
+    if (p?.isPelagus) return true;
+    const name = p?.providerInfo?.name || p?.name;
+    if (typeof name === "string" && name.toLowerCase().includes("pelagus")) return true;
+  }
+  // Some wallets namespace under window.pelagus
+  if ((globalThis as any)?.pelagus?.ethereum) return true;
+  return false;
 }
 
 export async function requestAccounts(): Promise<string[]> {

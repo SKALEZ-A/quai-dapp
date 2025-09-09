@@ -2,84 +2,6 @@
   "version": "3.4",
   "log": [
     {
-      "contracts/QNSController.sol:QNSController": {
-        "src": "contracts/QNSController.sol:6",
-        "version": {
-          "withMetadata": "0d619c2bcb589cbd4ae21bb3a5ed2bebb2435b1400fabcbe813f3d52b6cc0e8c",
-          "withoutMetadata": "c7d7a688547ca9cffa44cd3e0c16be1b5e103f148dbc88cfdf3bd55ab50dc59b",
-          "linkedWithoutMetadata": "c7d7a688547ca9cffa44cd3e0c16be1b5e103f148dbc88cfdf3bd55ab50dc59b"
-        },
-        "inherit": [],
-        "libraries": [],
-        "methods": [
-          "computeCommitHash(bytes32,address,bytes32,uint64)",
-          "commit(bytes32,address,bytes32,uint64)",
-          "reveal(bytes32,address,bytes32,uint64)",
-          "getPending(bytes32)"
-        ],
-        "linkReferences": [],
-        "errors": [],
-        "layout": {
-          "storage": [
-            {
-              "label": "_pending",
-              "offset": 0,
-              "slot": "0",
-              "type": "t_mapping(t_bytes32,t_struct(Pending)9_storage)",
-              "contract": "QNSController",
-              "src": "contracts/QNSController.sol:14"
-            }
-          ],
-          "types": {
-            "t_address": {
-              "label": "address",
-              "numberOfBytes": "20"
-            },
-            "t_bytes32": {
-              "label": "bytes32",
-              "numberOfBytes": "32"
-            },
-            "t_mapping(t_bytes32,t_struct(Pending)9_storage)": {
-              "label": "mapping(bytes32 => struct QNSController.Pending)",
-              "numberOfBytes": "32"
-            },
-            "t_struct(Pending)9_storage": {
-              "label": "struct QNSController.Pending",
-              "members": [
-                {
-                  "label": "owner",
-                  "type": "t_address",
-                  "offset": 0,
-                  "slot": "0"
-                },
-                {
-                  "label": "secret",
-                  "type": "t_bytes32",
-                  "offset": 0,
-                  "slot": "1"
-                },
-                {
-                  "label": "expiresAt",
-                  "type": "t_uint64",
-                  "offset": 0,
-                  "slot": "2"
-                }
-              ],
-              "numberOfBytes": "96"
-            },
-            "t_uint64": {
-              "label": "uint64",
-              "numberOfBytes": "8"
-            }
-          },
-          "layoutVersion": "1.2",
-          "flat": true,
-          "namespaces": {}
-        },
-        "solcVersion": "0.8.23"
-      }
-    },
-    {
       "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol:AccessControlUpgradeable": {
         "src": "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol:51",
         "inherit": [
@@ -674,6 +596,82 @@
         },
         "solcVersion": "0.8.23"
       },
+      "contracts/QNSController.sol:QNSController": {
+        "src": "contracts/QNSController.sol:6",
+        "version": {
+          "withMetadata": "0d619c2bcb589cbd4ae21bb3a5ed2bebb2435b1400fabcbe813f3d52b6cc0e8c",
+          "withoutMetadata": "c7d7a688547ca9cffa44cd3e0c16be1b5e103f148dbc88cfdf3bd55ab50dc59b",
+          "linkedWithoutMetadata": "c7d7a688547ca9cffa44cd3e0c16be1b5e103f148dbc88cfdf3bd55ab50dc59b"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "computeCommitHash(bytes32,address,bytes32,uint64)",
+          "commit(bytes32,address,bytes32,uint64)",
+          "reveal(bytes32,address,bytes32,uint64)",
+          "getPending(bytes32)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "label": "_pending",
+              "offset": 0,
+              "slot": "0",
+              "type": "t_mapping(t_bytes32,t_struct(Pending)1746_storage)",
+              "contract": "QNSController",
+              "src": "contracts/QNSController.sol:14"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address",
+              "numberOfBytes": "20"
+            },
+            "t_bytes32": {
+              "label": "bytes32",
+              "numberOfBytes": "32"
+            },
+            "t_mapping(t_bytes32,t_struct(Pending)1746_storage)": {
+              "label": "mapping(bytes32 => struct QNSController.Pending)",
+              "numberOfBytes": "32"
+            },
+            "t_struct(Pending)1746_storage": {
+              "label": "struct QNSController.Pending",
+              "members": [
+                {
+                  "label": "owner",
+                  "type": "t_address",
+                  "offset": 0,
+                  "slot": "0"
+                },
+                {
+                  "label": "secret",
+                  "type": "t_bytes32",
+                  "offset": 0,
+                  "slot": "1"
+                },
+                {
+                  "label": "expiresAt",
+                  "type": "t_uint64",
+                  "offset": 0,
+                  "slot": "2"
+                }
+              ],
+              "numberOfBytes": "96"
+            },
+            "t_uint64": {
+              "label": "uint64",
+              "numberOfBytes": "8"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": true,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.23"
+      },
       "contracts/QNSRegistry.sol:QNSRegistry": {
         "src": "contracts/QNSRegistry.sol:8",
         "version": {
@@ -709,7 +707,7 @@
               "label": "records",
               "offset": 0,
               "slot": "0",
-              "type": "t_mapping(t_bytes32,t_struct(Record)1762_storage)",
+              "type": "t_mapping(t_bytes32,t_struct(Record)1970_storage)",
               "contract": "QNSRegistry",
               "src": "contracts/QNSRegistry.sol:12"
             }
@@ -787,11 +785,11 @@
               "label": "uint64",
               "numberOfBytes": "8"
             },
-            "t_mapping(t_bytes32,t_struct(Record)1762_storage)": {
+            "t_mapping(t_bytes32,t_struct(Record)1970_storage)": {
               "label": "mapping(bytes32 => struct QNSRegistry.Record)",
               "numberOfBytes": "32"
             },
-            "t_struct(Record)1762_storage": {
+            "t_struct(Record)1970_storage": {
               "label": "struct QNSRegistry.Record",
               "members": [
                 {
