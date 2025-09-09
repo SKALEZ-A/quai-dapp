@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Profile {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  address      String   @unique
+  qnsName      String?  // optional QNS handle
+  displayName  String?
+  avatarUrl    String?
+  bio          String?
+
+  posts        Post[]
+  likes        Like[]
+  comments     Comment[]
+  following    Follow[] @relation("following")
+  followers    Follow[] @relation("followers")
+}
+
+model Post {
+  id           String    @id @default(cuid())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  authorId     String
+  author       Profile   @relation(fields: [authorId], references: [id])
+  cid          String    // IPFS CID of the post body
+  textPreview  String?   // cached preview/title for feed
+  zone         String?   // optional Quai zone identifier
+  txHash       String?   // optional on-chain anchoring tx
+
+  comments     Comment[]
+  likes        Like[]
+}
+
+model Comment {
+  id           String    @id @default(cuid())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  authorId     String
+  author       Profile   @relation(fields: [authorId], references: [id])
+  postId       String
+  post         Post      @relation(fields: [postId], references: [id])
+  cid          String    // IPFS CID of comment body
+  textPreview  String?
+  txHash       String?
+}
+
+model Like {
+  id           String    @id @default(cuid())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  profileId    String
+  profile      Profile   @relation(fields: [profileId], references: [id])
+  postId       String
+  post         Post      @relation(fields: [postId], references: [id])
+
+  @@unique([profileId, postId])
+}
+
+model Follow {
+  id           String    @id @default(cuid())
+  createdAt    DateTime  @default(now())
+  followerId   String
+  followingId  String
+  follower     Profile   @relation("followers", fields: [followerId], references: [id])
+  following    Profile   @relation("following", fields: [followingId], references: [id])
+
+  @@unique([followerId, followingId])
+}

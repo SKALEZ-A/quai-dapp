@@ -1,0 +1,9 @@
+# PORT for API server
+PORT=4000
+# Comma-separated list. Defaults to localhost if not set.
+ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/quai
+REDIS_URL=redis://localhost:6379
+WEB3_STORAGE_TOKEN=
+QUAI_RPC_URL=https://orchard.rpc.quai.network/cyprus1
+SOCIAL_CONTRACT_ADDRESS=0xYourDeployedSocialPosts

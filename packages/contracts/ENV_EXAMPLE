@@ -1,0 +1,11 @@
+# Private key for the deployer (no 0x prefix). Never commit real keys.
+PRIVATE_KEY=8d38113c18805d41701493531b98067a767bcde2d8af88d6d4763c39eab74802
+
+# Admin address for QNSRegistry initializer (defaults to deployer if unset)
+# ADMIN_ADDRESS=0xYourAdminEOA
+
+# Orchard testnet RPC for a target zone
+QUAI_RPC_URL=https://orchard.rpc.quai.network/cyprus1
+
+# Optional explorer API key for verification (placeholder)
+EXPLORER_API_KEY=

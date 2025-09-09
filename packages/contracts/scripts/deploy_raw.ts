@@ -1,27 +1,28 @@
-import { ethers, upgrades } from "hardhat";
+import { ethers } from "hardhat";
 import { config as dotenvConfig } from "dotenv";
 dotenvConfig();
 
 async function main() {
-  // Requires: PRIVATE_KEY (via hardhat.config), QUAI_RPC_URL; ADMIN_ADDRESS optional (falls back to deployer)
   const [deployer] = await ethers.getSigners();
   const deployerAddress = await deployer.getAddress();
   const admin = process.env.ADMIN_ADDRESS || deployerAddress;
 
   const Registry = await ethers.getContractFactory("QNSRegistry");
-  const registry = await upgrades.deployProxy(Registry, [admin], { kind: "uups" });
+  const registry = await Registry.deploy({});
   await registry.waitForDeployment();
+  const addr = await registry.getAddress();
+
+  const tx = await registry.initialize(admin);
+  await tx.wait();
+
   console.log("deployer:", deployerAddress);
   console.log("admin:", admin);
-  console.log("QNSRegistry:", await registry.getAddress());
-
-  const Social = await ethers.getContractFactory("SocialPosts");
-  const social = await Social.deploy();
-  await social.waitForDeployment();
-  console.log("SocialPosts:", await social.getAddress());
+  console.log("QNSRegistry (raw):", addr);
 }
 
 main().catch((err) => {
   console.error(err);
   process.exit(1);
 });
+
+

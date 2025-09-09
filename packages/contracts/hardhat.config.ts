@@ -5,6 +5,8 @@ import "@openzeppelin/hardhat-upgrades";
 import { HardhatUserConfig } from "hardhat/config";
 
 const QUAI_RPC_URL = process.env.QUAI_RPC_URL || "http://localhost:8545";
+const PRIVATE_KEY = process.env.PRIVATE_KEY || "";
+const CHAIN_ID = process.env.CHAIN_ID ? Number(process.env.CHAIN_ID) : 15000;
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -15,7 +17,9 @@ const config: HardhatUserConfig = {
   },
   networks: {
     quai: {
-      url: QUAI_RPC_URL
+      url: QUAI_RPC_URL,
+      chainId: CHAIN_ID,
+      accounts: PRIVATE_KEY ? ["0x" + PRIVATE_KEY.replace(/^0x/, "")] : undefined
     }
   }
 };
