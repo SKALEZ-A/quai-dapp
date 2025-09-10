@@ -3,3 +3,4 @@
 /* eslint-disable */
 export type { QNSController } from "./QNSController";
 export type { QNSRegistry } from "./QNSRegistry";
+export type { SocialPosts } from "./SocialPosts";

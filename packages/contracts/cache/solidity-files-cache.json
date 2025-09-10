@@ -618,6 +618,43 @@
       "artifacts": [
         "Errors"
       ]
+    },
+    "/Users/mac/Desktop/CODES/HACKATHON/QUAI/packages/contracts/contracts/SocialPosts.sol": {
+      "lastModificationDate": 1757460947548,
+      "contentHash": "830eff25e8d96cb07d5eda7adcd5f8eb",
+      "sourceName": "contracts/SocialPosts.sol",
+      "solcConfig": {
+        "version": "0.8.23",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.23"
+      ],
+      "artifacts": [
+        "SocialPosts"
+      ]
     }
   }
 }

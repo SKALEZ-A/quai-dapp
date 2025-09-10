@@ -73,6 +73,10 @@ declare module "hardhat/types/runtime" {
       name: "QNSRegistry",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.QNSRegistry__factory>;
+    getContractFactory(
+      name: "SocialPosts",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.SocialPosts__factory>;
 
     getContractAt(
       name: "AccessControlUpgradeable",
@@ -149,6 +153,11 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.QNSRegistry>;
+    getContractAt(
+      name: "SocialPosts",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.SocialPosts>;
 
     deployContract(
       name: "AccessControlUpgradeable",
@@ -210,6 +219,10 @@ declare module "hardhat/types/runtime" {
       name: "QNSRegistry",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.QNSRegistry>;
+    deployContract(
+      name: "SocialPosts",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.SocialPosts>;
 
     deployContract(
       name: "AccessControlUpgradeable",
@@ -286,6 +299,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.QNSRegistry>;
+    deployContract(
+      name: "SocialPosts",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.SocialPosts>;
 
     // default types
     getContractFactory(

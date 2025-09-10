@@ -84,11 +84,23 @@ EIP-712 (domain and types):
 - Types: `Post(author address, textHash bytes32, zone string, issuedAt uint256, nonce bytes32)`
 
 ## 5) Deploy contracts
+
+Option A — Hardhat (upgradeable flow):
 ```
 cd packages/contracts
 pnpm hardhat run scripts/deploy.ts --network quai
 ```
-- Output prints `SocialPosts:` address. Copy it into `apps/api/.env` as `SOCIAL_CONTRACT_ADDRESS`.
+
+Option B — Quais.js (direct deploy using SDK):
+Prereqs:
+- `packages/contracts/.env`: set `PRIVATE_KEY` (no 0x prefix) and `QUAI_RPC_URL`.
+- Compile to generate artifacts.
+```
+cd packages/contracts
+pnpm build
+pnpm deploy:quais
+```
+- Output prints JSON with `socialPosts` address. Copy it into `apps/api/.env` as `SOCIAL_CONTRACT_ADDRESS`.
 - Restart API/indexer after updating envs.
 
 ## 6) Testnet → Mainnet

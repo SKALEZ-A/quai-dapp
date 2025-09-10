@@ -3,3 +3,4 @@
 /* eslint-disable */
 export { QNSController__factory } from "./QNSController__factory";
 export { QNSRegistry__factory } from "./QNSRegistry__factory";
+export { SocialPosts__factory } from "./SocialPosts__factory";

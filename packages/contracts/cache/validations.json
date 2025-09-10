@@ -2,6 +2,31 @@
   "version": "3.4",
   "log": [
     {
+      "contracts/SocialPosts.sol:SocialPosts": {
+        "src": "contracts/SocialPosts.sol:4",
+        "version": {
+          "withMetadata": "cc2868cb618c8e64689850a7bd6791d7985d713d72d849a320a814ba39d439c8",
+          "withoutMetadata": "03741bc0fd8590495325888b29dea35f671932bd80a6a84d6ee9684129b5374f",
+          "linkedWithoutMetadata": "03741bc0fd8590495325888b29dea35f671932bd80a6a84d6ee9684129b5374f"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "anchorPost(string,string)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.23"
+      }
+    },
+    {
       "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol:AccessControlUpgradeable": {
         "src": "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol:51",
         "inherit": [

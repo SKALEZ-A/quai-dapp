@@ -36,3 +36,5 @@ export type { QNSController } from "./contracts/QNSController";
 export { QNSController__factory } from "./factories/contracts/QNSController__factory";
 export type { QNSRegistry } from "./contracts/QNSRegistry";
 export { QNSRegistry__factory } from "./factories/contracts/QNSRegistry__factory";
+export type { SocialPosts } from "./contracts/SocialPosts";
+export { SocialPosts__factory } from "./factories/contracts/SocialPosts__factory";

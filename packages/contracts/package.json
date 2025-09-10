@@ -6,7 +6,11 @@
     "build": "hardhat compile",
     "lint": "eslint .",
     "test": "hardhat test",
-    "typecheck": "echo \"(contracts) solidity typecheck via hardhat compile\""
+    "typecheck": "echo \"(contracts) solidity typecheck via hardhat compile\"",
+    "deploy:quais": "node scripts/deploy_quais.js"
+  },
+  "dependencies": {
+    "quais": "1.0.0-alpha.52"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
