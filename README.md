@@ -11,57 +11,66 @@ This monorepo follows the rules in `BUILD_RULES.md` to deliver a social dApp, QN
 ## Scripts
 Use `pnpm` with workspaces and Turborepo.
 
-```
+```bash
 pnpm i
 pnpm run build
 pnpm run dev
 ```
 
-See `BUILD_RULES.md` for step-by-step delivery. Kickoff tasks: A (Wallet & Provider), B (QNS skeleton), C (Bridge interface + mock).
-# quai-dapp
+## 🚀 Deployment
 
-## Social API — Local Setup
-
-1) Start infrastructure (Docker Desktop must be running):
-
-```
+### Local Development
+```bash
+# Start infrastructure
 docker compose up -d postgres redis
-```
 
-2) API env setup:
-
-Create `apps/api/.env` (you can copy from `apps/api/ENV_EXAMPLE`) and set:
-
-```
-PORT=4000
-ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/quai
-REDIS_URL=redis://localhost:6379
-# IPFS
-WEB3_STORAGE_TOKEN=your_web3_storage_token
-```
-
-3) Apply DB schema and generate client:
-
-```
+# API setup
 cd apps/api
+cp ENV_EXAMPLE .env
 pnpm run prisma:migrate -- --name init_social
 pnpm run prisma:generate
+
+# Start services
+pnpm run dev    # API
+pnpm run indexer # Background indexer
+cd ../web && pnpm run dev # Frontend
 ```
 
-4) Run the API:
+### Production Deployment
+See `docs/MAINNET_DEPLOYMENT.md` for complete mainnet deployment guide.
 
+**Quick Production Setup:**
+```bash
+# Deploy contracts to mainnet
+cd packages/contracts
+pnpm hardhat run scripts/deploy.ts --network quai
+
+# Start production services
+docker-compose -f docker-compose.prod.yml up -d
+
+# Deploy frontend (Vercel/Netlify)
+cd apps/web
+pnpm run build && # deploy build/ folder
 ```
-pnpm run dev
-# Endpoints
-# GET  http://localhost:4000/health
-# GET  http://localhost:4000/posts?limit=20
-# POST http://localhost:4000/posts { authorAddress, text, zone? }
-```
 
-Notes:
-- The IPFS helper currently uses `web3.storage` SDK. You need an API token.
-- In production, rotate secrets and avoid storing DB passwords in plain env when possible.
+## 📋 Project Status
 
-See also: `docs/RUNBOOK.md` for end-to-end setup and deployment steps.
+✅ **Completed:**
+- QNS contracts (Registry, Controller, Auction Manager, Reserved Names, NFT, Payment Resolver)
+- Social dApp with posts, NFT sharing, tipping UI
+- Event indexer for all contracts
+- Complete frontend for QNS and Social features
 
+🔄 **In Progress:**
+- Mainnet deployment setup
+- Production infrastructure configuration
+
+⏳ **Remaining:**
+- Bridge integration (deferred)
+- Encrypted DMs (XMTP integration)
+- Analytics and monitoring
+- Security audit
+
+See `BUILD_RULES.md` for detailed implementation roadmap.
+
+# quai-frontend
