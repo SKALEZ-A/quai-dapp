@@ -1,4 +1,0 @@
-# Mainnet env for HelloQuai deployment
-PRIVATE_KEY=8d38113c18805d41701493531b98067a767bcde2d8af88d6d4763c39eab74802
-QUAI_RPC_URL=https://rpc.quai.network/cyprus1
-CHAIN_ID=9
