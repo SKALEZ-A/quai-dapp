@@ -7,10 +7,18 @@
     "lint": "eslint .",
     "test": "hardhat test",
     "typecheck": "echo \"(contracts) solidity typecheck via hardhat compile\"",
-    "deploy:quais": "node scripts/deploy_quais.js"
+    "deploy:hello": "node scripts/deployHelloQuai.js",
+    "deploy:hello:testnet": "QUAI_RPC_URL=https://orchard.rpc.quai.network/cyprus1 CHAIN_ID=15000 node scripts/deployHelloQuai.js",
+    "deploy:hello:mainnet": "QUAI_RPC_URL=https://rpc.quai.network CHAIN_ID=9 node scripts/deployHelloQuai.js",
+    "deploy:qns": "node scripts/deployQNS.js --network cyprus1",
+    "deploy:qns:testnet": "npx hardhat run scripts/deployQNS.js --network cyprus1_testnet",
+    "deploy:qns:mainnet": "npx hardhat run scripts/deployQNS.js --network cyprus1",
+    "deploy:social": "node scripts/deploySocial.js --network cyprus1"
   },
   "dependencies": {
-    "quais": "1.0.0-alpha.52"
+    "quais": "^1.0.0-alpha.52",
+    "@quai/quais-upgrades": "^3.8.14",
+    "@quai/hardhat-deploy-metadata": "^1.0.8"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
@@ -20,6 +28,7 @@
     "dotenv": "^16.4.5",
     "hardhat": "^2.22.10",
     "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
     "typescript": "^5.5.4"
   }
 }

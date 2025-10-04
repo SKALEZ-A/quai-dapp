@@ -55,26 +55,21 @@ contract QNSNFT is Initializable, UUPSUpgradeable, ERC721Upgradeable, AccessCont
         _burn(tokenId);
     }
 
-    function transferFrom(address from, address to, uint256 tokenId) public override {
-        bytes32 node = tokenNodes[tokenId];
-        super.transferFrom(from, to, tokenId);
-        emit NameTransferred(node, from, to);
-    }
-
-    function safeTransferFrom(address from, address to, uint256 tokenId) public override {
-        bytes32 node = tokenNodes[tokenId];
-        super.safeTransferFrom(from, to, tokenId);
-        emit NameTransferred(node, from, to);
-    }
-
-    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public override {
-        bytes32 node = tokenNodes[tokenId];
-        super.safeTransferFrom(from, to, tokenId, data);
-        emit NameTransferred(node, from, to);
+    function _update(address to, uint256 tokenId, address auth) internal virtual override returns (address) {
+        address from = _ownerOf(tokenId);
+        address previousOwner = super._update(to, tokenId, auth);
+        
+        // Emit custom event if token exists
+        if (from != address(0) && to != address(0)) {
+            bytes32 node = tokenNodes[tokenId];
+            emit NameTransferred(node, from, to);
+        }
+        
+        return previousOwner;
     }
 
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        require(_exists(tokenId), "Token does not exist");
+        _requireOwned(tokenId);
 
         bytes32 node = tokenNodes[tokenId];
         // In a real implementation, this would generate metadata including the domain name

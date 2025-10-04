@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -53,9 +53,17 @@ const ChevronDownIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+const DEFAULT_PROFILE_IMG = "/assets/avatars/alice-chen.png";
+
 const Sidebar = () => {
   const currentUser = useCurrentUser();
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent hydration mismatch by only rendering user info on client
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const isActive = (path: string) => pathname === path;
 
@@ -97,18 +105,30 @@ const Sidebar = () => {
         </nav>
       </div>
       <div className="pt-6 border-t border-border">
-        <Link href="/dashboard/profile">
-          <div className="flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors hover:bg-surface" >
-              <div className="w-10 h-10 rounded-full bg-secondary overflow-hidden">
-                <img src={currentUser.profileImg} className="w-auto h-full" alt="Your Profile Image" />
-              </div>
-              <div className="flex flex-col flex-grow">
-                  <span className="font-medium text-text-primary">{currentUser.name}</span>
-                  <span className="text-sm text-text-secondary">@{currentUser.username}</span>
-              </div>
-              <ChevronDownIcon className="text-text-secondary" />
+        {mounted ? (
+          <Link href="/dashboard/profile">
+            <div className="flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors hover:bg-surface" >
+                <div className="w-10 h-10 rounded-full bg-secondary overflow-hidden">
+                  <img src={currentUser.profileImg} className="w-auto h-full" alt="Your Profile Image" />
+                </div>
+                <div className="flex flex-col flex-grow">
+                    <span className="font-medium text-text-primary">{currentUser.name}</span>
+                    <span className="text-sm text-text-secondary">@{currentUser.username}</span>
+                </div>
+                <ChevronDownIcon className="text-text-secondary" />
+            </div>
+          </Link>
+        ) : (
+          <div className="flex items-center gap-3 p-2 rounded-lg">
+            <div className="w-10 h-10 rounded-full bg-secondary overflow-hidden">
+              <img src={DEFAULT_PROFILE_IMG} className="w-auto h-full" alt="Profile" />
+            </div>
+            <div className="flex flex-col flex-grow">
+              <span className="font-medium text-text-primary">Loading...</span>
+              <span className="text-sm text-text-secondary">@guest</span>
+            </div>
           </div>
-        </Link>
+        )}
       </div>
     </aside>
   );

@@ -11,10 +11,6 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "next": "^14.2.5",
-    "quais": "1.0.0-alpha.52",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "@fortawesome/fontawesome-svg-core": "^7.0.1",
     "@fortawesome/free-brands-svg-icons": "^7.0.1",
     "@fortawesome/free-regular-svg-icons": "^7.0.1",
@@ -22,13 +18,18 @@
     "@fortawesome/react-fontawesome": "^3.0.2",
     "@tanstack/react-query": "latest",
     "@web3modal/wagmi": "^5.1.11",
+    "@wormhole-foundation/wormhole-connect": "^4.0.0",
+    "next": "^14.2.5",
+    "quais": "1.0.0-alpha.52",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "viem": "latest",
     "wagmi": "^2.16.9"
   },
   "devDependencies": {
+    "@types/node": "^22.14.0",
     "@types/react": "^19.1.12",
     "@types/react-dom": "^19.1.8",
-    "@types/node": "^22.14.0",
     "@vitest/coverage-v8": "^2.0.5",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.9.0",

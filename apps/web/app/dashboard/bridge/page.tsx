@@ -1,270 +1,305 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
+import dynamic from 'next/dynamic';
+import type { config, WormholeConnectTheme } from '@wormhole-foundation/wormhole-connect';
 
-// SVG Icon components (accept props for sizing/styling)
-const VolumeIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-    <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-const ChainsIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-const SuccessIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M22 4L12 14.01l-3-3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-const ChevronDownIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-    <path d="m6 9 6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-const EthIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-    <path d="M12 22.75L3.25 12L12 1.25L20.75 12L12 22.75Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
-    <path d="M12 17.75V1.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M12 17.75L3.25 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M12 17.75L20.75 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M3.25 12L12 22.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M20.75 12L12 22.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-const QuaiIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-    <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z" stroke="currentColor" strokeWidth="1.5"/>
-    <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" stroke="currentColor" strokeWidth="1.5"/>
-  </svg>
-);
-const ArrowRightIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-    <path d="M5 12h14m-7-7 7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-
-function statusClasses(color: 'green'|'amber'|'red') {
-  switch (color) {
-    case 'green': return 'bg-green-900/20 text-green-300';
-    case 'amber': return 'bg-amber-900/20 text-amber-300';
-    case 'red': return 'bg-red-900/20 text-red-300';
-  }
-}
-
-function BridgeStatusModal({ isOpen, onClose, status, amount, fromChain, toChain }: { isOpen: boolean; onClose: () => void; status: 'in_progress'|'completed'|'failed'; amount: string; fromChain: string; toChain: string; }) {
-  if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50">
-      <div className="bg-[#1A1A1A] rounded-xl p-8 max-w-sm w-full text-center flex flex-col items-center justify-between min-h-[350px]">
-        {status === 'in_progress' && (
-          <>
-            <p className="text-white text-lg sm:text-xl font-medium mb-8">Bridge in Progress</p>
-            <div className="flex items-center justify-center gap-4 text-gray-300 mb-6">
-              <span>{fromChain}</span>
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-              <span>{toChain}</span>
-            </div>
-            <p className="text-white text-2xl sm:text-3xl font-bold mb-8">{amount}</p>
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500 mb-8"></div>
-            <button onClick={onClose} className="py-3 px-6 rounded-lg bg-gradient-to-r from-[#8B1E3F] to-[#6C3B9E] text-white text-base font-medium hover:opacity-90 transition w-full">Cancel</button>
-          </>
-        )}
-        {status === 'completed' && (
-          <>
-            <svg className="w-16 h-16 text-green-500 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <p className="text-green-500 text-xl sm:text-2xl font-medium mb-4">Bridge Completed</p>
-            <p className="text-gray-300 text-base mb-8">Your funds have been bridged successfully</p>
-            <button onClick={onClose} className="py-3 px-6 rounded-lg bg-gradient-to-r from-[#8B1E3F] to-[#6C3B9E] text-white text-base font-medium hover:opacity-90 transition w-full">Back Home</button>
-          </>
-        )}
-        {status === 'failed' && (
-          <>
-            <svg className="w-16 h-16 text-red-500 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <p className="text-red-500 text-xl sm:text-2xl font-medium mb-4">Bridge Failed</p>
-            <p className="text-gray-300 text-base mb-8">There seems to be an issue with this transaction</p>
-            <div className="flex flex-col sm:flex-row gap-4 w-full">
-              <button className="flex-1 py-3 px-6 rounded-lg bg-gradient-to-r from-purple-700 to-purple-900 text-white text-base font-medium hover:opacity-90 transition">Retry</button>
-              <button onClick={onClose} className="flex-1 py-3 px-6 rounded-lg bg-gradient-to-r from-[#8B1E3F] to-[#6C3B9E] text-white text-base font-medium hover:opacity-90 transition">Back Home</button>
-            </div>
-          </>
-        )}
+// Import Wormhole Connect dynamically to avoid SSR issues
+const WormholeConnect = dynamic(
+  () => import('@wormhole-foundation/wormhole-connect'),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center min-h-[600px]">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
       </div>
-    </div>
-  );
-}
+    )
+  }
+);
 
 export default function DashboardBridgePage() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [bridgeStatus, setBridgeStatus] = useState<'in_progress'|'completed'|'failed'>('in_progress');
-  const [bridgeAmount] = useState('$2509.23');
-  const [fromChain, setFromChain] = useState('Ethereum');
-  const [toChain, setToChain] = useState('Quai');
-
-  const options = [
-    { value: 'Ethereum', label: 'Ethereum' },
-    { value: 'Quai', label: 'Quai Network' },
-  ];
-
-  const handleBridgeClick = () => {
-    setIsModalOpen(true);
-    setBridgeStatus('in_progress');
-    setTimeout(() => {
-      const success = Math.random() > 0.5;
-      setBridgeStatus(success ? 'completed' : 'failed');
-    }, 3000);
-  };
-
-  const recentTransactions = [
-    { date: '20-7-2025 14:29', fromChain: 'Quai', toChain: 'Eth', status: 'Pending', amount: '1,000 QUAI', fiatValue: '~ 8,837', statusColor: 'amber' as const },
-    { date: '20-7-2025 14:29', fromChain: 'Eth', toChain: 'Quai', status: 'Completed', amount: '2.5ETH', fiatValue: '~ 8,837', statusColor: 'green' as const },
-    { date: '20-7-2025 14:29', fromChain: 'Quai', toChain: 'Eth', status: 'Failed', amount: '5,000 QUAI', fiatValue: '~ 8,837', statusColor: 'red' as const },
-  ];
-
-  const handleFromChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const newFrom = event.target.value;
-    setFromChain(newFrom);
-    if (newFrom === toChain) {
-      const other = options.find(o => o.value !== newFrom);
-      if (other) setToChain(other.value);
+  // Wormhole Connect configuration for Quai Network
+  const wormholeConfig: config.WormholeConnectConfig = {
+    network: 'Mainnet',
+    
+    // Configure supported chains including major networks
+    chains: [
+      'Ethereum',
+      'Solana', 
+      'Polygon',
+      'Bsc',
+      'Avalanche',
+      'Base',
+      'Arbitrum',
+      'Optimism',
+      'Sui',
+      'Aptos'
+    ],
+    
+    // UI customization
+    ui: {
+      title: 'Quai Network Bridge',
+      defaultInputs: {
+        source: { chain: 'Ethereum' },
+        destination: { chain: 'Solana' }
+      }
+    },
+    
+    // Custom RPC endpoints (optional - add for better performance)
+    rpcs: {
+      // Ethereum: process.env.NEXT_PUBLIC_ETHEREUM_RPC,
+      // Solana: process.env.NEXT_PUBLIC_SOLANA_RPC,
+    },
+    
+    // Custom tokens configuration for $QUAI and $QI
+    tokensConfig: {
+      QUAI: {
+        symbol: 'QUAI',
+        name: 'Quai Token',
+        decimals: 18,
+        icon: '/assets/logo.png',
+        tokenId: {
+          chain: 'Ethereum',
+          address: '0x0000000000000000000000000000000000000000', // Update after NTT deployment
+        },
+      },
+      QI: {
+        symbol: 'QI',
+        name: 'Qi Token',
+        decimals: 18,
+        icon: '/assets/logo.png',
+        tokenId: {
+          chain: 'Ethereum',
+          address: '0x0000000000000000000000000000000000000000', // Update after NTT deployment
+        },
+      }
     }
   };
-  const handleToChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const newTo = event.target.value;
-    setToChain(newTo);
-    if (newTo === fromChain) {
-      const other = options.find(o => o.value !== newTo);
-      if (other) setFromChain(other.value);
-    }
+
+  // Custom theme matching your design - using correct Wormhole Connect theme structure
+  const wormholeTheme: WormholeConnectTheme = {
+    mode: 'dark',
+    primary: '#8B1E3F', // Your primary color - simple hex string
+    secondary: '#6C3B9E', // Your secondary color - simple hex string
+    background: 'dark', // PaletteMode type
+    text: '#EDEDED',
+    textSecondary: '#A0A0A0',
+    error: '#ef4444',
+    success: '#22c55e',
+    font: 'Space Grotesk, sans-serif'
   };
 
   return (
     <div className="flex flex-col gap-6">
       {/* Header */}
       <div className="text-left mb-2">
-        <h1 className="text-4xl font-extrabold font-space-grotesk mb-2 text-white">Bridge & Multi-Chain Assets</h1>
-        <p className="text-md text-gray-400">Seamlessly manage and transfer your assets across different chains</p>
+        <h1 className="text-4xl font-extrabold font-space-grotesk mb-2 text-white">
+          Bridge & Multi-Chain Assets
+        </h1>
+        <p className="text-md text-gray-400">
+          Seamlessly transfer your assets across 40+ blockchains powered by Wormhole
+        </p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div className="flex flex-col gap-3 bg-black rounded-md p-6">
-          <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gray-900 text-blue-600">
-            <VolumeIcon />
+      {/* Info Banner */}
+      <div className="bg-gradient-to-r from-[#8B1E3F]/10 to-[#6C3B9E]/10 border border-[#8B1E3F]/30 rounded-lg p-4">
+        <div className="flex items-start gap-3">
+          <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#8B1E3F]/20 flex items-center justify-center mt-0.5">
+            <svg className="w-4 h-4 text-[#8B1E3F]" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+            </svg>
           </div>
-          <span className="text-md text-gray-500">Volume Bridged (30d)</span>
-          <p className="text-2xl font-bold font-space-grotesk text-white">$1,928,829</p>
-        </div>
-        <div className="flex flex-col gap-3 bg-black rounded-md p-6">
-          <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gray-900 text-purple-600">
-            <ChainsIcon />
-          </div>
-          <span className="text-md text-gray-500">Chains interacted with</span>
-          <p className="text-2xl font-bold font-space-grotesk text-white">2</p>
-        </div>
-        <div className="flex flex-col gap-3 bg-black rounded-md p-6">
-          <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gray-900 text-green-600">
-            <SuccessIcon />
-          </div>
-          <span className="text-md text-gray-500">Transaction Success Rate</span>
-          <p className="text-2xl font-bold font-space-grotesk text-white">62.5%</p>
-        </div>
-      </div>
-
-      {/* Balances */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-0">
-        <div className="flex items-center gap-4 p-6 rounded-md bg-black">
-          <div className="w-12 h-12 flex-shrink-0"><EthIcon /></div>
-          <div className="flex flex-col">
-            <span className="text-gray-400 block mb-1">Ethereum</span>
-            <p className="text-2xl font-bold font-space-grotesk text-white">12.5 <small className="text-base text-gray-400">ETH</small></p>
-            <small className="text-gray-400">$43,839,832</small>
-          </div>
-        </div>
-        <div className="flex items-center gap-4 p-6 rounded-md bg-black">
-          <div className="w-12 h-12 flex-shrink-0"><QuaiIcon /></div>
-          <div className="flex flex-col">
-            <span className="text-gray-400 block mb-1">Quai Network</span>
-            <p className="text-2xl font-bold font-space-grotesk text-white">25,000 <small className="text-base text-gray-400">QUAI</small></p>
-            <small className="text-gray-400">$12,500,000</small>
+          <div className="flex-1">
+            <h3 className="text-sm font-semibold text-white mb-1">
+              Powered by Wormhole NTT
+            </h3>
+            <p className="text-xs text-gray-400">
+              Wormhole's Native Token Transfer (NTT) standard enables seamless, secure cross-chain transfers 
+              without wrapped assets. Your tokens ($QUAI & $QI) maintain their native properties across all supported chains.
+            </p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start mt-10">
-        {/* Bridge Form */}
-        <div>
-          <h3 className="text-2xl font-bold mb-6 text-white">Bridge Assets</h3>
-          <div className="bg-[#1A1A1A] rounded-xl p-6 flex flex-col gap-8">
-            <div className="flex flex-col sm:flex-row justify-between gap-6">
-              <div className="flex-1">
-                <label className="block text-gray-400 mb-2 text-xs">From</label>
-                <div className="relative">
-                  <select className="w-full appearance-none px-4 py-3 bg-black border border-gray-700 rounded-lg text-sm text-white cursor-pointer" value={fromChain} onChange={handleFromChange}>
-                    {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
-                    <ChevronDownIcon className="h-5 w-5" />
-                  </div>
-                </div>
-              </div>
-              <div className="flex-1">
-                <label className="block text-gray-400 mb-2 text-xs">To</label>
-                <div className="relative">
-                  <select className="w-full appearance-none px-4 py-3 bg-black border border-gray-700 rounded-lg text-sm text-white cursor-pointer" value={toChain} onChange={handleToChange}>
-                    {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
-                    <ChevronDownIcon className="h-5 w-5" />
-                  </div>
-                </div>
-              </div>
+      {/* Stats Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+        <div className="flex flex-col gap-2 bg-black/50 rounded-md p-4 border border-gray-800">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center bg-blue-900/30 text-blue-400">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
             </div>
-            <div className="flex flex-col">
-              <label className="block text-gray-400 mb-2 text-xs">You will send</label>
-              <div className="flex items-center bg-black border border-gray-700 rounded-lg p-3">
-                <span className="text-gray-400 text-sm">$0.00</span>
-                <input type="text" placeholder="ETH" className="w-full bg-transparent text-white text-right text-sm focus:outline-none" />
-              </div>
-            </div>
-            <div className="flex flex-col">
-              <label className="block text-gray-400 mb-2 text-xs">You would receive</label>
-              <div className="flex items-center bg-black border border-gray-700 rounded-lg p-3">
-                <span className="text-gray-400 text-sm">$0.00</span>
-                <input type="text" placeholder="QUAI" className="w-full bg-transparent text-white text-right text-sm focus:outline-none" />
-              </div>
-            </div>
-            <button onClick={handleBridgeClick} className="py-3 px-4 rounded-lg bg-gradient-to-r from-[#8B1E3F] to-[#6C3B9E] text-white text-base font-medium hover:opacity-90 transition">Bridge</button>
+            <span className="text-xs text-gray-500">Supported Chains</span>
           </div>
-          <BridgeStatusModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} status={bridgeStatus} amount={bridgeAmount} fromChain={fromChain} toChain={toChain} />
+          <p className="text-2xl font-bold font-space-grotesk text-white">40+</p>
         </div>
 
-        {/* Transactions */}
-        <div>
-          <h3 className="text-2xl font-bold mb-6 text-white">Bridge Transactions</h3>
-          <div className="flex flex-col gap-6">
-            {recentTransactions.map((t, i) => (
-              <div key={i} className="flex justify-between items-center p-4 bg-black rounded-lg">
-                <div className="flex flex-col">
-                  <span className="text-sm text-gray-400 mb-2">{t.date}</span>
-                  <div className="flex items-center gap-2">
-                    <QuaiIcon />
-                    <ArrowRightIcon />
-                    <EthIcon />
-                  </div>
-                </div>
-                <div className="text-right flex flex-col items-end">
-                  <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium mb-2 ${statusClasses(t.statusColor)}`}>{t.status}</span>
-                  <p className="font-medium text-white">{t.amount}</p>
-                  <small className="text-gray-400">{t.fiatValue}</small>
-                </div>
-              </div>
-            ))}
+        <div className="flex flex-col gap-2 bg-black/50 rounded-md p-4 border border-gray-800">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center bg-purple-900/30 text-purple-400">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <span className="text-xs text-gray-500">Total Volume</span>
           </div>
+          <p className="text-2xl font-bold font-space-grotesk text-white">$60B+</p>
+        </div>
+
+        <div className="flex flex-col gap-2 bg-black/50 rounded-md p-4 border border-gray-800">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center bg-green-900/30 text-green-400">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <span className="text-xs text-gray-500">Messages Relayed</span>
+          </div>
+          <p className="text-2xl font-bold font-space-grotesk text-white">1B+</p>
+        </div>
+      </div>
+
+      {/* Wormhole Connect Widget */}
+      <div className="bg-[#1A1A1A] rounded-xl p-6 border border-gray-800 min-h-[600px]">
+        <WormholeConnect 
+          config={wormholeConfig}
+          theme={wormholeTheme}
+        />
+      </div>
+
+      {/* Token Info Section */}
+      <div className="bg-gradient-to-r from-[#8B1E3F]/5 to-[#6C3B9E]/5 rounded-lg p-6 border border-gray-800">
+        <h3 className="text-lg font-semibold text-white mb-4">Bridge $QUAI & $QI</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex items-center gap-3 p-4 bg-black/30 rounded-lg">
+            <div className="w-12 h-12 rounded-full bg-[#8B1E3F]/20 flex items-center justify-center">
+              <span className="text-xl font-bold text-[#8B1E3F]">Q</span>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-white">$QUAI</p>
+              <p className="text-xs text-gray-400">Programmable store of value</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 p-4 bg-black/30 rounded-lg">
+            <div className="w-12 h-12 rounded-full bg-[#6C3B9E]/20 flex items-center justify-center">
+              <span className="text-xl font-bold text-[#6C3B9E]">Qi</span>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-white">$QI</p>
+              <p className="text-xs text-gray-400">Decentralized energy dollar</p>
+            </div>
+          </div>
+        </div>
+        <p className="text-xs text-gray-500 mt-4">
+          ⚠️ Note: Custom token support will be enabled after NTT deployment. Currently bridging standard tokens.
+        </p>
+      </div>
+
+      {/* Features Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+        <div className="bg-black/30 rounded-lg p-5 border border-gray-800">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-[#8B1E3F]/20 flex items-center justify-center">
+              <svg className="w-6 h-6 text-[#8B1E3F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-1">Secure & Trustless</h3>
+              <p className="text-sm text-gray-400">
+                Protected by Wormhole's Guardian network with 19+ validators ensuring maximum security
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-black/30 rounded-lg p-5 border border-gray-800">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-[#6C3B9E]/20 flex items-center justify-center">
+              <svg className="w-6 h-6 text-[#6C3B9E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-1">Fast Transfers</h3>
+              <p className="text-sm text-gray-400">
+                Native token transfers with automatic relaying for the best user experience
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-black/30 rounded-lg p-5 border border-gray-800">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-600/20 flex items-center justify-center">
+              <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-1">Low Fees</h3>
+              <p className="text-sm text-gray-400">
+                Competitive fees with no hidden costs - only pay network gas fees
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-black/30 rounded-lg p-5 border border-gray-800">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-600/20 flex items-center justify-center">
+              <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-1">Native Tokens</h3>
+              <p className="text-sm text-gray-400">
+                No wrapped tokens - your assets maintain their native properties across chains
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Help Section */}
+      <div className="bg-gradient-to-r from-[#8B1E3F]/5 to-[#6C3B9E]/5 rounded-lg p-6 border border-gray-800 mt-2">
+        <h3 className="text-lg font-semibold text-white mb-3">Need Help?</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <a 
+            href="https://wormhole.com/docs/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-sm text-gray-300 hover:text-white transition"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            Wormhole Documentation
+          </a>
+          <a 
+            href="https://discord.gg/wormholecrypto" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-sm text-gray-300 hover:text-white transition"
+          >
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0a12.64 12.64 0 0 0-.617-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.078.078 0 0 0 .084-.028a14.09 14.09 0 0 0 1.226-1.994a.076.076 0 0 0-.041-.106a13.107 13.107 0 0 1-1.872-.892a.077.077 0 0 1-.008-.128a10.2 10.2 0 0 0 .372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127a12.299 12.299 0 0 1-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028a19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.956-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.955-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.946 2.418-2.157 2.418z"/>
+            </svg>
+            Discord Support
+          </a>
+          <a 
+            href="https://qu.ai/docs" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-sm text-gray-300 hover:text-white transition"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Quai Docs
+          </a>
         </div>
       </div>
     </div>
