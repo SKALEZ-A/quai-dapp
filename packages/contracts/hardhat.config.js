@@ -50,7 +50,7 @@ module.exports = {
     // },
     // Testnet Orchard (Chain ID: 15000)
     cyprus1_testnet: {
-      url: "https://orchard.rpc.quai.network",
+      url: "https://orchard.rpc.quai.network/cyprus1",
       accounts: [CYPRUS1_PK],
       chainId: 15000,
     },

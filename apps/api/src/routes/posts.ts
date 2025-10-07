@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
-import { prisma } from "../db/client";
-import { uploadJson } from "../services/ipfs";
+import { prisma } from "../db/client.js";
+import { uploadJson } from "../services/ipfs.js";
 import { verifyTypedData, keccak256, toHex } from "viem";
 
 const router = Router();
@@ -98,5 +98,3 @@ router.post("/", async (req, res) => {
 });
 
 export default router;
-
-

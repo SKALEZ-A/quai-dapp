@@ -1,163 +1,475 @@
 "use client";
 import { useState, useEffect } from "react";
-import { requestAccounts } from "@/lib/quai";
+import { useSearchParams } from "next/navigation";
+import { useAccount } from 'wagmi';
+import { useWeb3Modal } from '@web3modal/wagmi/react';
+import { checkDomainAvailability, getDomainPrice, registerDomain, getUserDomains } from "@/lib/qns";
+import { BrowserProvider } from "quais";
 
 interface DomainInfo {
   name: string;
   available: boolean;
   price?: string;
-  isAuction?: boolean;
-  auctionEnd?: string;
+  priceDisplay?: string;
   owner?: string;
+  node?: string;
 }
 
 export default function QNSProfilePage() {
-  const [account, setAccount] = useState<string | null>(null);
+  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [domainInfo, setDomainInfo] = useState<DomainInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const [ownedDomains, setOwnedDomains] = useState<string[]>([]);
+  const [registering, setRegistering] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  
+  // Safe wallet hooks with error handling
+  let address: string | null = null;
+  let isConnected = false;
+  let open = () => {};
+
+  try {
+    const account = useAccount();
+    const modal = useWeb3Modal();
+
+    address = account.address || null;
+    isConnected = account.isConnected || false;
+    open = modal.open || (() => {});
+  } catch (error) {
+    console.warn('Wallet hooks failed to initialize:', error);
+  }
+
+  // Direct wallet connection for Quai
+  const [directAddress, setDirectAddress] = useState<string | null>(null);
+  const [directConnected, setDirectConnected] = useState(false);
 
   useEffect(() => {
-    checkWallet();
+    // Try to get wallet address directly using standard methods
+    const checkDirectWallet = async () => {
+      try {
+        const eth = (globalThis as any)?.ethereum;
+        if (eth) {
+          // First try to get existing accounts
+          try {
+            const accounts = await eth.request({ method: 'eth_accounts' });
+            if (accounts && accounts.length > 0) {
+              setDirectAddress(accounts[0]);
+              setDirectConnected(true);
+              return;
+            }
+          } catch (ethError) {
+            console.log('eth_accounts failed:', ethError);
+          }
+
+          // If no accounts, try to request them
+          try {
+            const accounts = await eth.request({ method: 'eth_requestAccounts' });
+            if (accounts && accounts.length > 0) {
+              setDirectAddress(accounts[0]);
+              setDirectConnected(true);
+            }
+          } catch (requestError) {
+            console.log('eth_requestAccounts failed:', requestError);
+          }
+        }
+      } catch (error) {
+        console.log('Direct wallet check failed:', error);
+      }
+    };
+
+    checkDirectWallet();
   }, []);
 
-  async function checkWallet() {
+  // Use direct connection if available, fallback to wagmi
+  const finalAddress = directAddress || address;
+  const finalConnected = directConnected || isConnected;
+
+  useEffect(() => {
+    // Check if there's a search query in URL params
+    const searchParam = searchParams.get('search');
+    if (searchParam) {
+      setSearchQuery(searchParam);
+      searchDomainByName(searchParam);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (finalConnected && finalAddress) {
+      loadUserDomains();
+    } else {
+      setOwnedDomains([]);
+    }
+  }, [finalConnected, finalAddress]);
+
+  async function loadUserDomains() {
+    if (!finalAddress) return;
     try {
-      const [addr] = await requestAccounts();
-      setAccount(addr);
-      // TODO: Fetch owned domains from contracts
+      const domains = await getUserDomains(finalAddress);
+      setOwnedDomains(domains);
     } catch (err) {
-      // Not connected
+      console.error("Failed to load user domains:", err);
     }
   }
 
   async function connect() {
     try {
-      const [addr] = await requestAccounts();
-      setAccount(addr);
+      await open();
     } catch (err) {
-      alert("Failed to connect wallet");
+      console.error("Failed to connect wallet:", err);
     }
   }
 
-  function calculateDomainPrice(name: string): { price: string; isAuction: boolean } {
-    const length = name.length;
-    if (length >= 3 && length <= 7) {
-      const basePrices = { 3: "20000 QI", 4: "10000 QI", 5: "5000 QI", 6: "5000 QI", 7: "5000 QI" } as const;
-      return { price: basePrices[length as 3 | 4 | 5 | 6 | 7], isAuction: true };
-    }
-    return { price: "100 QI", isAuction: false };
-  }
-
-  async function searchDomain() {
-    if (!searchQuery.trim()) return;
+  async function searchDomainByName(name: string) {
+    if (!name.trim()) return;
     setLoading(true);
     try {
-      const name = searchQuery.toLowerCase().trim();
-      const pricing = calculateDomainPrice(name);
-      const available = Math.random() > 0.3; // mock
-      setDomainInfo({ name, available, price: pricing.price, isAuction: pricing.isAuction, owner: available ? undefined : "0x1234...5678" });
+      console.log('Starting search for:', name);
+      const cleanName = name.toLowerCase().trim();
+      console.log('Clean name:', cleanName);
+      
+      // Check availability on blockchain
+      console.log('Checking domain availability...');
+      const availability = await checkDomainAvailability(cleanName);
+      console.log('Availability result:', availability);
+      
+      const pricing = getDomainPrice(cleanName);
+      console.log('Pricing:', pricing);
+      
+      const domainInfo = { 
+        name: cleanName, 
+        available: availability.available, 
+        price: pricing.price,
+        priceDisplay: pricing.display,
+        owner: availability.owner,
+        node: availability.node,
+      };
+      
+      console.log('Setting domain info:', domainInfo);
+      setDomainInfo(domainInfo);
+    } catch (error: any) {
+      console.error('Search error:', error);
+      alert(`Failed to search domain: ${error?.message || 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
   }
 
-  async function registerDomain() {
-    if (!account || !domainInfo) return;
-    if (domainInfo.isAuction) alert(`Starting auction for ${domainInfo.name}.qns`);
-    else alert(`Registering ${domainInfo.name}.qns for ${domainInfo.price}`);
+  async function searchDomain() {
+    await searchDomainByName(searchQuery);
+  }
+
+  async function handleRegisterDomain() {
+    if (!finalAddress || !domainInfo) {
+      console.log('Missing requirements:', { finalAddress, domainInfo });
+      alert("❌ Please connect your wallet and select a domain first.");
+      return;
+    }
+
+    console.log('Starting domain registration for:', domainInfo.name);
+    setRegistering(true);
+
+    try {
+      // Check if we're on the correct network first
+      const eth = (globalThis as any)?.ethereum;
+      if (!eth) {
+        alert("❌ Wallet not found. Please install Pelagus wallet.");
+        return;
+      }
+
+      // Check current network
+      console.log('Checking network...');
+      const chainId = await eth.request({ method: 'eth_chainId' });
+      console.log('Current chain ID:', chainId);
+
+      // Quai testnet chain ID is 15000 (0x3A98 in hex)
+      if (chainId !== '0x3a98' && chainId !== '15000') {
+        alert(`❌ Wrong network. Please switch to Quai Testnet (Chain ID: 15000) in your Pelagus wallet.`);
+        return;
+      }
+
+      console.log('Network check passed');
+
+      // Get signer with proper error handling
+      console.log('Creating provider and signer...');
+      const provider = new BrowserProvider(eth);
+      const signer = await provider.getSigner();
+
+      const signerAddress = await signer.getAddress();
+      console.log('Signer address:', signerAddress);
+
+      if (signerAddress.toLowerCase() !== finalAddress.toLowerCase()) {
+        console.warn('Signer address mismatch:', { signerAddress, finalAddress });
+        alert("❌ Wallet address mismatch. Please reconnect your wallet.");
+        return;
+      }
+
+      // Register domain on blockchain
+      console.log('Calling registerDomain function...');
+      const result = await registerDomain(domainInfo.name, signer);
+
+      console.log('Registration result:', result);
+
+      if (result.success) {
+        alert(`✅ Domain registered successfully!\n\n${domainInfo.name}.qns is now yours!\n\nTransaction: ${result.txHash?.slice(0, 10)}...`);
+
+        // Refresh domain info
+        await searchDomainByName(domainInfo.name);
+
+        // Refresh owned domains
+        await loadUserDomains();
+      } else {
+        console.error('Registration failed:', result.error);
+
+        // More specific error messages
+        let errorMsg = result.error || 'Unknown error';
+        if (errorMsg.includes('insufficient funds')) {
+          errorMsg = 'Insufficient QI balance. Get testnet QI from https://faucet.quai.network/';
+        } else if (errorMsg.includes('already registered')) {
+          errorMsg = 'Domain is already registered';
+        } else if (errorMsg.includes('reserved')) {
+          errorMsg = 'Domain name is reserved';
+        }
+
+        alert(`❌ Registration failed\n\n${errorMsg}`);
+      }
+    } catch (error: any) {
+      console.error('Registration error:', error);
+
+      let errorMessage = error?.message || 'Please try again';
+
+      // Better error handling for common issues
+      if (errorMessage.includes('User rejected')) {
+        errorMessage = 'Transaction was rejected in your wallet';
+      } else if (errorMessage.includes('insufficient funds')) {
+        errorMessage = 'Insufficient QI balance. Get testnet QI from https://faucet.quai.network/';
+      } else if (errorMessage.includes('network')) {
+        errorMessage = 'Network error. Please check your connection and try again.';
+      } else if (errorMessage.includes('missing revert data')) {
+        errorMessage = 'Contract interaction failed. Please check your wallet connection and try again.';
+      } else if (errorMessage.includes('nonce')) {
+        errorMessage = 'Transaction nonce error. Please reset your wallet or try again.';
+      }
+
+      alert(`❌ Registration failed\n\n${errorMessage}`);
+    } finally {
+      setRegistering(false);
+    }
   }
 
   return (
-    <main style={{ padding: 24, maxWidth: 800, margin: "0 auto" }}>
-      <h1>Quai Name Service (QNS)</h1>
-      <p>Register human-readable names on Quai Network</p>
+    <main className="py-6 max-w-6xl mx-auto">
+      <div className="mb-8">
+        <h1 className="font-space-grotesk text-4xl font-bold text-text-primary mb-2">Quai Name Service (QNS)</h1>
+        <p className="font-manrope text-gray-400">Register human-readable names on Quai Network</p>
+      </div>
 
-      <div style={{ marginBottom: 24 }}>
-        {account ? (
+      <div className="mb-8 bg-surface border border-border rounded-xl p-6">
+        {finalConnected && finalAddress ? (
           <div>
-            <span>Connected: {account.slice(0, 6)}...{account.slice(-4)}</span>
-            <div style={{ marginTop: 8, fontSize: 14, color: "#666" }}>
-              Your domains: {ownedDomains.length > 0 ? ownedDomains.join(", ") : "None"}
+            <div className="text-text-primary font-manrope">
+              <span className="text-gray-400">Connected:</span> <span className="font-mono text-primary">{finalAddress.slice(0, 10)}...{finalAddress.slice(-8)}</span>
+            </div>
+            <div className="mt-3 text-sm text-gray-400">
+              <span className="font-medium">Your domains:</span> {ownedDomains.length > 0 ? ownedDomains.join(", ") : "None"}
             </div>
           </div>
         ) : (
-          <button onClick={connect} style={{ padding: "8px 16px" }}>Connect Wallet</button>
+          <div className="flex items-center justify-between">
+            <p className="text-gray-400">Connect your wallet to manage and register domains</p>
+            <button onClick={connect} className="px-6 py-2.5 bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white font-space-grotesk font-medium rounded-lg transition-all">
+              Connect Wallet
+            </button>
+          </div>
         )}
       </div>
 
-      <div style={{ marginBottom: 32 }}>
-        <h2>Search Domain</h2>
-        <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-          <input type="text" placeholder="Enter domain name" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ flex: 1, padding: "8px 12px" }} onKeyDown={(e) => e.key === "Enter" && searchDomain()} />
-          <button onClick={searchDomain} disabled={loading || !searchQuery.trim()}>{loading ? "Searching..." : "Search"}</button>
+      <div className="mb-10">
+        <h2 className="font-space-grotesk text-2xl font-bold text-text-primary mb-4">Search Domain</h2>
+        <div className="flex gap-3 mb-6">
+          <input 
+            type="text" 
+            placeholder="hello" 
+            value={searchQuery} 
+            onChange={(e) => setSearchQuery(e.target.value)} 
+            className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-text-primary placeholder:text-gray-500 outline-none focus:border-primary transition-colors" 
+            onKeyDown={(e) => e.key === "Enter" && searchDomain()} 
+          />
+          <button 
+            onClick={searchDomain} 
+            disabled={loading || !searchQuery.trim()}
+            className="px-8 py-3 bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white font-space-grotesk font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? "Searching..." : "Search"}
+          </button>
         </div>
 
         {domainInfo && (
-          <div style={{ border: "1px solid #ddd", padding: 16, borderRadius: 8, backgroundColor: domainInfo.available ? "#f0f9ff" : "#fef2f2" }}>
-            <h3>{domainInfo.name}.qns</h3>
-            <div style={{ marginBottom: 8 }}>
-              <strong>Status:</strong>{" "}
-              <span style={{ color: domainInfo.available ? "#059669" : "#dc2626" }}>{domainInfo.available ? "Available" : "Taken"}</span>
+          <div className={`border-2 rounded-xl p-6 transition-all ${
+            domainInfo.available 
+              ? 'border-green-500/30 bg-green-500/5' 
+              : 'border-red-500/30 bg-red-500/5'
+          }`}>
+            <div className="mb-4">
+              <h3 className="font-space-grotesk text-3xl font-bold text-text-primary mb-2">
+                {domainInfo.name}<span className="text-primary">.qns</span>
+              </h3>
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400 font-medium">Status:</span>
+                <span className={`font-semibold ${
+                  domainInfo.available ? 'text-green-400' : 'text-red-400'
+                }`}>
+                  {domainInfo.available ? '✓ Available' : '✗ Taken'}
+                </span>
+              </div>
             </div>
+
             {domainInfo.available ? (
               <div>
-                <div style={{ marginBottom: 8 }}>
-                  <strong>Registration:</strong> {domainInfo.isAuction ? "Dutch Auction" : "Fixed Price"}
+                <div className="bg-surface/50 rounded-lg p-4 mb-4 space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Registration Type:</span>
+                    <span className="text-text-primary font-medium flex items-center gap-2">
+                      <span className="text-green-400">⚡</span> Instant Purchase
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Price:</span>
+                    <span className="text-primary font-bold text-2xl">{domainInfo.priceDisplay}</span>
+                  </div>
+                  <div className="pt-2 border-t border-border">
+                    <p className="text-xs text-gray-400">
+                      💡 Pay once, own forever. No renewal fees on testnet.
+                    </p>
+                  </div>
                 </div>
-                <div style={{ marginBottom: 16 }}>
-                  <strong>Price:</strong> {domainInfo.price}
-                  {domainInfo.isAuction && " (starting price, decreases over time)"}
-                </div>
-                <button onClick={registerDomain} disabled={!account} style={{ padding: "8px 16px", backgroundColor: "#059669", color: "white", border: "none", borderRadius: 4 }}>
-                  {domainInfo.isAuction ? "Start Auction" : "Register Domain"}
+                
+                <button 
+                  onClick={handleRegisterDomain} 
+                  disabled={!finalAddress || registering}
+                  className="w-full py-3 px-6 bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white font-space-grotesk font-semibold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {registering ? (
+                    <>
+                      <span className="animate-spin">⏳</span> Processing Transaction...
+                    </>
+                  ) : (
+                    <>
+                      <span>⚡</span> Buy Now for {domainInfo.priceDisplay}
+                    </>
+                  )}
                 </button>
-                {!account && <div style={{ marginTop: 8, fontSize: 14, color: "#666" }}>Connect wallet to register domains</div>}
+                
+                {!finalAddress && (
+                  <p className="mt-3 text-sm text-center text-gray-400">
+                    🔒 Connect your Pelagus wallet to purchase domains
+                  </p>
+                )}
+
+                {finalAddress && (
+                  <p className="mt-3 text-xs text-center text-gray-500">
+                    Transaction will be processed on Quai Testnet (Orchard)
+                  </p>
+                )}
               </div>
             ) : (
               <div>
-                <strong>Owner:</strong> {domainInfo.owner}
+                <div className="bg-surface/50 rounded-lg p-4 mb-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Owner:</span>
+                    <span className="text-text-primary font-mono text-sm">{domainInfo.owner?.slice(0, 10)}...{domainInfo.owner?.slice(-8)}</span>
+                  </div>
+                </div>
+                
+                <div className="bg-surface/30 rounded-lg p-4 border border-border">
+                  <p className="text-sm text-gray-400 mb-2">💡 This domain is registered</p>
+                  <p className="text-xs text-gray-500">
+                    You can make an offer to the owner through our marketplace (coming soon)
+                  </p>
+                </div>
               </div>
             )}
           </div>
         )}
       </div>
 
-      <div style={{ marginBottom: 32 }}>
-        <h2>Pricing</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-          <div style={{ border: "1px solid #ddd", padding: 16, borderRadius: 8 }}>
-            <h3>3-7 Characters</h3>
-            <ul style={{ margin: 0, paddingLeft: 20 }}>
-              <li>3 chars: 20,000 QI → 1,000 QI (auction)</li>
-              <li>4 chars: 10,000 QI → 500 QI (auction)</li>
-              <li>5-7 chars: 5,000 QI → 200 QI (auction)</li>
-            </ul>
-            <p style={{ fontSize: 14, color: "#666", marginTop: 8 }}>Dutch auctions decrease price over 7 days</p>
+      <div className="mb-10">
+        <h2 className="font-space-grotesk text-2xl font-bold text-text-primary mb-4">⚡ Simple Pricing</h2>
+        <div className="bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/20 rounded-xl p-6 mb-6">
+          <p className="text-text-primary mb-4 flex items-center gap-2">
+            <span className="text-2xl">💎</span>
+            <span className="font-semibold">Instant Purchase - No Auctions, No Waiting!</span>
+          </p>
+          <p className="text-sm text-gray-400">
+            Just like Ethereum Name Service (ENS), buy your domain instantly at fixed prices. Own it forever on Quai blockchain!
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-surface border border-border rounded-xl p-5 hover:border-primary transition-colors">
+            <div className="text-center">
+              <div className="text-3xl mb-2">💎</div>
+              <h3 className="font-space-grotesk text-lg font-bold text-primary mb-2">3 Characters</h3>
+              <p className="text-3xl font-bold text-text-primary mb-1">1,000</p>
+              <p className="text-sm text-gray-400">QI</p>
+              <p className="text-xs text-gray-500 mt-3">Ultra premium</p>
+            </div>
           </div>
-          <div style={{ border: "1px solid #ddd", padding: 16, borderRadius: 8 }}>
-            <h3>8+ Characters</h3>
-            <p>Fixed price: 100 QI</p>
-            <p style={{ fontSize: 14, color: "#666", marginTop: 8 }}>Direct registration with commit/reveal protection</p>
+          
+          <div className="bg-surface border border-border rounded-xl p-5 hover:border-primary transition-colors">
+            <div className="text-center">
+              <div className="text-3xl mb-2">💠</div>
+              <h3 className="font-space-grotesk text-lg font-bold text-primary mb-2">4 Characters</h3>
+              <p className="text-3xl font-bold text-text-primary mb-1">500</p>
+              <p className="text-sm text-gray-400">QI</p>
+              <p className="text-xs text-gray-500 mt-3">Premium</p>
+            </div>
+          </div>
+          
+          <div className="bg-surface border border-border rounded-xl p-5 hover:border-primary transition-colors">
+            <div className="text-center">
+              <div className="text-3xl mb-2">⭐</div>
+              <h3 className="font-space-grotesk text-lg font-bold text-primary mb-2">5-7 Characters</h3>
+              <p className="text-3xl font-bold text-text-primary mb-1">200</p>
+              <p className="text-sm text-gray-400">QI</p>
+              <p className="text-xs text-gray-500 mt-3">Standard</p>
+            </div>
+          </div>
+          
+          <div className="bg-surface border border-border rounded-xl p-5 hover:border-secondary transition-colors">
+            <div className="text-center">
+              <div className="text-3xl mb-2">⚡</div>
+              <h3 className="font-space-grotesk text-lg font-bold text-secondary mb-2">8+ Characters</h3>
+              <p className="text-3xl font-bold text-text-primary mb-1">100</p>
+              <p className="text-sm text-gray-400">QI</p>
+              <p className="text-xs text-gray-500 mt-3">Affordable</p>
+            </div>
           </div>
         </div>
       </div>
 
       <div>
-        <h2>Features</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
-          <div style={{ border: "1px solid #ddd", padding: 16, borderRadius: 8 }}>
-            <h4>🔒 Commit/Reveal</h4>
-            <p style={{ fontSize: 14 }}>Prevents front-running attacks on domain registrations</p>
+        <h2 className="font-space-grotesk text-2xl font-bold text-text-primary mb-4">Features</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-surface border border-border rounded-xl p-6 hover:border-primary transition-colors">
+            <h4 className="font-space-grotesk text-xl font-bold text-text-primary mb-2">🔒 Commit/Reveal</h4>
+            <p className="text-sm text-gray-400">
+              Prevents front-running attacks on domain registrations
+            </p>
           </div>
-          <div style={{ border: "1px solid #ddd", padding: 16, borderRadius: 8 }}>
-            <h4>💰 Qi Payments</h4>
-            <p style={{ fontSize: 14 }}>Resolve domains to Qi payment codes for easy transactions</p>
+          
+          <div className="bg-surface border border-border rounded-xl p-6 hover:border-primary transition-colors">
+            <h4 className="font-space-grotesk text-xl font-bold text-text-primary mb-2">💰 Qi Payments</h4>
+            <p className="text-sm text-gray-400">
+              Resolve domains to Qi payment codes for easy transactions
+            </p>
           </div>
-          <div style={{ border: "1px solid #ddd", padding: 16, borderRadius: 8 }}>
-            <h4>🌐 Cross-Chain</h4>
-            <p style={{ fontSize: 14 }}>Use your QNS domain across all Quai zones and networks</p>
+          
+          <div className="bg-surface border border-border rounded-xl p-6 hover:border-primary transition-colors">
+            <h4 className="font-space-grotesk text-xl font-bold text-text-primary mb-2">🌐 Cross-Chain</h4>
+            <p className="text-sm text-gray-400">
+              Use your QNS domain across all Quai zones and networks
+            </p>
           </div>
         </div>
       </div>

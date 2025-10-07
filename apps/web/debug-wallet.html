@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Wallet Connection Debug</title>
+</head>
+<body>
+    <h1>Wallet Connection Debug</h1>
+    <button id="connectBtn">Connect Wallet</button>
+    <div id="status"></div>
+    
+    <script>
+        const statusDiv = document.getElementById('status');
+        const connectBtn = document.getElementById('connectBtn');
+        
+        function updateStatus(message) {
+            statusDiv.innerHTML += '<p>' + message + '</p>';
+            console.log(message);
+        }
+        
+        updateStatus('Checking wallet availability...');
+        
+        // Check if ethereum is available
+        if (typeof window.ethereum !== 'undefined') {
+            updateStatus('✅ Ethereum provider found');
+            
+            // Check if it's Pelagus
+            if (window.ethereum.isPelagus) {
+                updateStatus('✅ Pelagus wallet detected');
+            } else {
+                updateStatus('⚠️ Ethereum provider found but not Pelagus');
+            }
+            
+            // Check available methods
+            if (window.ethereum.request) {
+                updateStatus('✅ eth_request method available');
+            } else {
+                updateStatus('❌ eth_request method not available');
+            }
+            
+            connectBtn.onclick = async () => {
+                try {
+                    updateStatus('🔄 Requesting accounts...');
+                    const accounts = await window.ethereum.request({ 
+                        method: 'eth_requestAccounts' 
+                    });
+                    updateStatus('✅ Connected: ' + accounts[0]);
+                } catch (error) {
+                    updateStatus('❌ Connection failed: ' + error.message);
+                }
+            };
+            
+        } else {
+            updateStatus('❌ No Ethereum provider found');
+            updateStatus('Please install Pelagus wallet');
+        }
+        
+        // Check for Web3Modal
+        if (typeof window.Web3Modal !== 'undefined') {
+            updateStatus('✅ Web3Modal found');
+        } else {
+            updateStatus('⚠️ Web3Modal not found');
+        }
+    </script>
+</body>
+</html>

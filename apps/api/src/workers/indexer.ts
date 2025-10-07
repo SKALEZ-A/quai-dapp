@@ -1,6 +1,6 @@
 import pino from "pino";
 import { JsonRpcProvider, Contract } from "quais";
-import { prisma } from "../db/client";
+import { prisma } from "../db/client.js";
 
 const SOCIAL_ABI = [
   "event PostCreated(address indexed author, string cid, string zone)",

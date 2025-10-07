@@ -16,9 +16,9 @@
     "deploy:social": "node scripts/deploySocial.js --network cyprus1"
   },
   "dependencies": {
-    "quais": "^1.0.0-alpha.52",
+    "@quai/hardhat-deploy-metadata": "^1.0.8",
     "@quai/quais-upgrades": "^3.8.14",
-    "@quai/hardhat-deploy-metadata": "^1.0.8"
+    "quais": "1.0.0-alpha.36"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",

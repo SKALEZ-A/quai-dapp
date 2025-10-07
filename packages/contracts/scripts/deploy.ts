@@ -81,7 +81,37 @@ async function main() {
   await social.waitForDeployment();
   console.log("SocialPosts:", await social.getAddress());
 
-  console.log("\nDeployment complete!");
+  // Deploy QNS Registrar (the bridge between users and minting)
+  console.log("\nDeploying QNS Registrar...");
+  const Registrar = await ethers.getContractFactory("QNSRegistrar");
+  const registrar = await upgrades.deployProxy(
+    Registrar,
+    [
+      admin,
+      await qnsNft.getAddress(),
+      await registry.getAddress(),
+      await reservedNames.getAddress(),
+      admin, // treasury (using admin wallet for now)
+    ],
+    { kind: "uups" }
+  );
+  await registrar.waitForDeployment();
+  console.log("QNSRegistrar:", await registrar.getAddress());
+
+  // Grant MINTER_ROLE to Registrar on QNSNFT
+  console.log("\n🔐 Setting up permissions...");
+  const MINTER_ROLE = ethers.keccak256(ethers.toUtf8Bytes("MINTER_ROLE"));
+  const tx1 = await qnsNft.grantRole(MINTER_ROLE, await registrar.getAddress());
+  await tx1.wait();
+  console.log("✅ MINTER_ROLE granted to Registrar");
+
+  // Grant ADMIN_ROLE to Registrar on Registry (so it can setOwner)
+  const ADMIN_ROLE_HASH = ethers.keccak256(ethers.toUtf8Bytes("ADMIN_ROLE"));
+  const tx2 = await registry.grantRole(ADMIN_ROLE_HASH, await registrar.getAddress());
+  await tx2.wait();
+  console.log("✅ ADMIN_ROLE granted to Registrar on Registry");
+
+  console.log("\n✅ Deployment complete!");
   console.log("Copy these addresses to your .env files:");
   console.log(`QNS_REGISTRY_ADDRESS=${await registry.getAddress()}`);
   console.log(`QNS_CONTROLLER_ADDRESS=${await controller.getAddress()}`);
@@ -91,6 +121,7 @@ async function main() {
   console.log(`PAYMENT_RESOLVER_ADDRESS=${await paymentResolver.getAddress()}`);
   console.log(`REVERSE_REGISTRAR_ADDRESS=${await reverseRegistrar.getAddress()}`);
   console.log(`SOCIAL_CONTRACT_ADDRESS=${await social.getAddress()}`);
+  console.log(`QNS_REGISTRAR_ADDRESS=${await registrar.getAddress()}`);
 }
 
 main().catch((err) => {

@@ -12,7 +12,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -55,7 +59,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -95,7 +103,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -135,7 +147,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -178,7 +194,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -215,7 +235,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -256,7 +280,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -295,7 +323,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -332,7 +364,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -369,7 +405,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -409,7 +449,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -446,7 +490,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -488,7 +536,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -525,7 +577,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -562,7 +618,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -599,7 +659,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -638,7 +702,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -675,7 +743,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -714,7 +786,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -753,7 +829,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -800,7 +880,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -841,7 +925,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -880,7 +968,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -920,7 +1012,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -960,7 +1056,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -997,7 +1097,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -1036,7 +1140,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -1073,7 +1181,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -1110,7 +1222,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -1151,7 +1267,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -1181,130 +1301,6 @@
         "QiPaymentResolver"
       ]
     },
-    "/Users/mac/Desktop/CODES/HACKATHON/QUAI_Rocster/QUAI/packages/contracts/contracts/QNSReservedNames.sol": {
-      "lastModificationDate": 1758555780724,
-      "contentHash": "c36a1908e2dba504b0dbc09b6c123b9f",
-      "sourceName": "contracts/QNSReservedNames.sol",
-      "solcConfig": {
-        "version": "0.8.23",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
-        "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol",
-        "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "QNSReservedNames"
-      ]
-    },
-    "/Users/mac/Desktop/CODES/HACKATHON/QUAI_Rocster/QUAI/packages/contracts/contracts/QNSRegistry.sol": {
-      "lastModificationDate": 1756317439405,
-      "contentHash": "6eb8a358bbac680f6c1986bbaf7015eb",
-      "sourceName": "contracts/QNSRegistry.sol",
-      "solcConfig": {
-        "version": "0.8.23",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
-        "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol",
-        "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "QNSRegistry"
-      ]
-    },
-    "/Users/mac/Desktop/CODES/HACKATHON/QUAI_Rocster/QUAI/packages/contracts/contracts/QNSNFT.sol": {
-      "lastModificationDate": 1759515809964,
-      "contentHash": "e89f794c0c037fc6a830796f3c727685",
-      "sourceName": "contracts/QNSNFT.sol",
-      "solcConfig": {
-        "version": "0.8.23",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
-        "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol",
-        "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol",
-        "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "QNSNFT"
-      ]
-    },
     "/Users/mac/Desktop/CODES/HACKATHON/QUAI_Rocster/QUAI/packages/contracts/contracts/QNSController.sol": {
       "lastModificationDate": 1756322713618,
       "contentHash": "953ed78a21d720a2f1e09841b6b41cac",
@@ -1316,7 +1312,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -1353,7 +1353,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -1390,7 +1394,11 @@
             "enabled": true,
             "runs": 200
           },
-          "evmVersion": "paris",
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
           "outputSelection": {
             "*": {
               "*": [
@@ -1414,6 +1422,358 @@
       ],
       "artifacts": [
         "HelloQuai"
+      ]
+    },
+    "/Users/mac/Desktop/CODES/HACKATHON/QUAI_Rocster/QUAI/packages/contracts/contracts/QNSRegistrarSimple.sol": {
+      "lastModificationDate": 1759651434852,
+      "contentHash": "f67e3f1b840a545e1a7ad603854af6ac",
+      "sourceName": "contracts/QNSRegistrarSimple.sol",
+      "solcConfig": {
+        "version": "0.8.23",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IQNSNFT",
+        "IQNSRegistry",
+        "IQNSReservedNames",
+        "QNSRegistrarSimple"
+      ]
+    },
+    "/Users/mac/Desktop/CODES/HACKATHON/QUAI_Rocster/QUAI/node_modules/.pnpm/@openzeppelin+contracts@5.4.0/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol": {
+      "lastModificationDate": 1759620747670,
+      "contentHash": "522ec023bce510c30dfbf61584f5a190",
+      "sourceName": "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+      "solcConfig": {
+        "version": "0.8.23",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC721.sol",
+        "./extensions/IERC721Metadata.sol",
+        "./utils/ERC721Utils.sol",
+        "../../utils/Context.sol",
+        "../../utils/Strings.sol",
+        "../../utils/introspection/ERC165.sol",
+        "../../interfaces/draft-IERC6093.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ERC721"
+      ]
+    },
+    "/Users/mac/Desktop/CODES/HACKATHON/QUAI_Rocster/QUAI/node_modules/.pnpm/@openzeppelin+contracts@5.4.0/node_modules/@openzeppelin/contracts/utils/Context.sol": {
+      "lastModificationDate": 1759620747644,
+      "contentHash": "67bfbc07588eb8683b3fd8f6f909563e",
+      "sourceName": "@openzeppelin/contracts/utils/Context.sol",
+      "solcConfig": {
+        "version": "0.8.23",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "Context"
+      ]
+    },
+    "/Users/mac/Desktop/CODES/HACKATHON/QUAI_Rocster/QUAI/node_modules/.pnpm/@openzeppelin+contracts@5.4.0/node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol": {
+      "lastModificationDate": 1759620747664,
+      "contentHash": "0906d06dca25210d4696dcef6dad2909",
+      "sourceName": "@openzeppelin/contracts/utils/introspection/ERC165.sol",
+      "solcConfig": {
+        "version": "0.8.23",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ERC165"
+      ]
+    },
+    "/Users/mac/Desktop/CODES/HACKATHON/QUAI_Rocster/QUAI/node_modules/.pnpm/@openzeppelin+contracts@5.4.0/node_modules/@openzeppelin/contracts/access/AccessControl.sol": {
+      "lastModificationDate": 1759620747575,
+      "contentHash": "d0e2c05f09a3aea7cd299bbd4a435ee2",
+      "sourceName": "@openzeppelin/contracts/access/AccessControl.sol",
+      "solcConfig": {
+        "version": "0.8.23",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IAccessControl.sol",
+        "../utils/Context.sol",
+        "../utils/introspection/ERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "AccessControl"
+      ]
+    },
+    "/Users/mac/Desktop/CODES/HACKATHON/QUAI_Rocster/QUAI/packages/contracts/contracts/QNSReservedNamesSimple.sol": {
+      "lastModificationDate": 1759622321181,
+      "contentHash": "df6dbd50275109e749f75e1c1f3ce39b",
+      "sourceName": "contracts/QNSReservedNamesSimple.sol",
+      "solcConfig": {
+        "version": "0.8.23",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/AccessControl.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "QNSReservedNamesSimple"
+      ]
+    },
+    "/Users/mac/Desktop/CODES/HACKATHON/QUAI_Rocster/QUAI/packages/contracts/contracts/QNSRegistrySimple.sol": {
+      "lastModificationDate": 1759622306060,
+      "contentHash": "fcf56594010c1f9b412827347cd3b123",
+      "sourceName": "contracts/QNSRegistrySimple.sol",
+      "solcConfig": {
+        "version": "0.8.23",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/AccessControl.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "QNSRegistrySimple"
+      ]
+    },
+    "/Users/mac/Desktop/CODES/HACKATHON/QUAI_Rocster/QUAI/packages/contracts/contracts/QNSNFTSimple.sol": {
+      "lastModificationDate": 1759651427494,
+      "contentHash": "e69c8f4f6782e020463f883655f7761e",
+      "sourceName": "contracts/QNSNFTSimple.sol",
+      "solcConfig": {
+        "version": "0.8.23",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "useLiteralContent": true
+          },
+          "evmVersion": "london",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+        "@openzeppelin/contracts/access/AccessControl.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "QNSNFTSimple"
       ]
     }
   }

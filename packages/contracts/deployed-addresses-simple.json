@@ -1,0 +1,14 @@
+{
+  "network": "cyprus1_testnet",
+  "chainId": 15000,
+  "deployer": "0x003DAC94805c77d7fD485cd415F8078414d171e4",
+  "admin": "0x003DAC94805c77d7fD485cd415F8078414d171e4",
+  "timestamp": "2025-10-05T08:06:20.823Z",
+  "version": "simple-non-upgradeable",
+  "contracts": {
+    "QNS_REGISTRY": "0x0047904d94645A46BA56Cf7E8c064cB823746cFf",
+    "QNS_NFT": "0x005382DebE72ee74d5D6E5a2D97Dc7bA2C16be12",
+    "QNS_RESERVED_NAMES": "0x0023272C07514D2D236f6c6895507DFd26442471",
+    "QNS_REGISTRAR": "0x00204d553264Bdb39f4A6C6c1325d9B4553E427b"
+  }
+}

@@ -3,6 +3,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiProvider } from 'wagmi';
 import { config } from '@/lib/config';
+import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -14,12 +16,33 @@ const queryClient = new QueryClient({
   },
 });
 
+// Dynamically import WagmiProvider to avoid SSR issues
+const DynamicWagmiProvider = dynamic(
+  () => Promise.resolve(WagmiProvider),
+  { ssr: false }
+);
+
 export function Providers({ children }: { children: React.ReactNode }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Prevent hydration mismatch by not rendering until mounted
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
+
   return (
-    <WagmiProvider config={config}>
+    <DynamicWagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         {children}
       </QueryClientProvider>
-    </WagmiProvider>
+    </DynamicWagmiProvider>
   );
 }

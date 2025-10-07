@@ -1,14 +1,18 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { getUserDomains } from '@/lib/qns';
 
 // SVG Icon Components
 const CopyIcon = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 const PostIcon = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 5v14m-7-7h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 const BridgeIcon = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.5 17H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M15.5 7H20a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M8 12h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 const BuyIcon = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+const DomainIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke="currentColor" strokeWidth="2"/></svg>;
+const SendIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+const SettingsIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/><path d="M12 1v6m0 6v6m9-9h-6m-6 0H3" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>;
 
 
 const recentPosts = [
@@ -20,6 +24,33 @@ const recentPosts = [
 const UserOverview = () => {
   const currentUser = useCurrentUser();
   const router = useRouter();
+  const [myDomains, setMyDomains] = useState<string[]>([]);
+  const [loadingDomains, setLoadingDomains] = useState(false);
+
+  useEffect(() => {
+    if (currentUser.address) {
+      loadDomains();
+    }
+  }, [currentUser.address]);
+
+  const loadDomains = async () => {
+    if (!currentUser.address) {
+      console.log("No user address available for loading domains");
+      return;
+    }
+    
+    console.log("Loading domains for address:", currentUser.address);
+    setLoadingDomains(true);
+    try {
+      const domains = await getUserDomains(currentUser.address);
+      console.log("Loaded domains:", domains);
+      setUserDomains(domains);
+    } catch (error) {
+      console.error("Error loading domains:", error);
+    } finally {
+      setLoadingDomains(false);
+    }
+  };
 
   const copyItem = async (item: string) => {
     try {
@@ -48,6 +79,9 @@ const UserOverview = () => {
                 <div className="flex flex-col">
                   <h2 className="text-2xl font-space-grotesk font-bold text-gray-50 mb-1">{currentUser.name}</h2>
                   <span className="text-base text-gray-400 text-sm">@{currentUser.username}</span>
+                  {currentUser.address && (
+                    <span className="text-xs text-gray-500 mt-1">Address: {currentUser.short_address}</span>
+                  )}
                 </div>
               </div>
 
@@ -108,6 +142,79 @@ const UserOverview = () => {
                   </button>
                 </div>
               </div>
+          </div>
+        </div>
+
+        {/* My QNS Domains Section */}
+        <div className="mt-8">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-space-grotesk font-semibold flex items-center gap-2">
+              <DomainIcon /> My QNS Domains
+            </h3>
+            <div className="flex gap-2">
+              <button 
+                onClick={loadDomains} 
+                disabled={loadingDomains}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-700 text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+              >
+                {loadingDomains ? "Loading..." : "Refresh"}
+              </button>
+              <button onClick={() => router.push('/qns/namesearch')} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-primary to-secondary text-white font-medium hover:opacity-90 transition-opacity">
+                <BuyIcon /> Buy Domain
+              </button>
+            </div>
+          </div>
+          
+          <div className="bg-black border border-gray-700 rounded-xl p-6">
+            {loadingDomains ? (
+              <div className="text-center py-8 text-gray-400">
+                <div className="animate-spin inline-block w-8 h-8 border-4 border-gray-600 border-t-primary rounded-full mb-2"></div>
+                <p>Loading your domains...</p>
+              </div>
+            ) : myDomains.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4">🌐</div>
+                <p className="text-gray-400 mb-4">You don't own any QNS domains yet</p>
+                <button onClick={() => router.push('/qns/namesearch')} className="px-6 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-medium hover:opacity-90 transition-opacity">
+                  Get Your First Domain
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {myDomains.map((domain, index) => (
+                  <div key={index} className="border border-gray-700 rounded-lg p-4 hover:border-primary transition-colors">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <DomainIcon />
+                        <span className="font-space-grotesk font-bold text-text-primary">{domain}<span className="text-primary">.qns</span></span>
+                      </div>
+                      <span className="text-xs px-2 py-1 bg-green-900/30 text-green-400 rounded">Active</span>
+                    </div>
+                    
+                    <div className="flex gap-2 mt-4">
+                      <button 
+                        onClick={() => copyItem(domain + '.qns')}
+                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-xs bg-gray-800 hover:bg-gray-700 rounded transition-colors text-gray-300"
+                      >
+                        <CopyIcon /> Copy
+                      </button>
+                      <button 
+                        onClick={() => alert('Transfer feature coming soon!')}
+                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-xs bg-gray-800 hover:bg-gray-700 rounded transition-colors text-gray-300"
+                      >
+                        <SendIcon /> Send
+                      </button>
+                      <button 
+                        onClick={() => alert('Domain settings coming soon!')}
+                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-xs bg-gray-800 hover:bg-primary/20 rounded transition-colors text-gray-300"
+                      >
+                        <SettingsIcon />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useAccount } from 'wagmi';
+import { useWeb3Modal } from '@web3modal/wagmi/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -13,9 +14,24 @@ const SearchIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 const QnsHeader = () => {
-  const { isConnected } = useAccount();
-  const currentUser = useCurrentUser();
   const router = useRouter();
+  
+  // Safe hooks with error handling
+  let isConnected = false;
+  let open = () => {};
+  let currentUser: any = { address: null, short_address: "Not connected" };
+  
+  try {
+    const account = useAccount();
+    const modal = useWeb3Modal();
+    const user = useCurrentUser();
+    
+    isConnected = account.isConnected || false;
+    open = modal.open || (() => {});
+    currentUser = user;
+  } catch (error) {
+    console.warn('Wallet hooks failed to initialize:', error);
+  }
   
   return (
     <header className="py-6 mb-10">
@@ -25,11 +41,18 @@ const QnsHeader = () => {
             </div>
             <div className="flex items-center gap-6">
                 <Link href="/qns/profile" className="text-text-secondary font-medium hover:text-text-primary">My Names</Link>
-                <button className="py-2.5 px-5 rounded-md font-medium bg-primary text-white text-sm">
+                <button 
+                  className="py-2.5 px-5 rounded-md font-medium bg-primary text-white text-sm"
+                  onClick={() => {
+                    if (!isConnected) {
+                      open();
+                    }
+                  }}
+                >
                     {isConnected && currentUser.address ? (
                         currentUser.short_address
                     ) : (
-                        <></>
+                        "Connect"
                     )}
                 </button>
             </div>

@@ -1,9 +1,10 @@
 import express from "express";
 import cors from "cors";
 import pino from "pino";
-import postsRouter from "./routes/posts";
-import engagementsRouter from "./routes/engagements";
-import { mountGraphQL } from "./graphql/server";
+import postsRouter from "./routes/posts.js";
+import engagementsRouter from "./routes/engagements.js";
+import domainsRouter from "./routes/domains.js";
+import { mountGraphQL } from "./graphql/server.js";
 
 const app = express();
 const logger = pino({ level: process.env.NODE_ENV === "production" ? "info" : "debug" });
@@ -28,6 +29,7 @@ app.get("/health", (_req, res) => {
 
 app.use("/posts", postsRouter);
 app.use("/engagements", engagementsRouter);
+app.use("/domains", domainsRouter);
 
 const port = Number(process.env.PORT || 4000);
 mountGraphQL(app).then(() => {

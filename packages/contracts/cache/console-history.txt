@@ -1,0 +1,25 @@
+sleep 10 && curl -s -I http://localhost:3000/dashboard/overview
+pwd
+node test-contract.js
+curl -s "https://orchard.rpc.quai.network/cyprus1" -X POST -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","method":"eth_call","params":[{"to":"0x005382DebE72ee74d5D6E5a2D97Dc7bA2C16be12","data":"0x1f1881f8"},"latest"],"id":1}'
+cd /Users/mac/Desktop/CODES/HACKATHON/QUAI_Rocster/QUAI
+exit
+curl -s "https://orchard.rpc.quai.network/cyprus1" -X POST -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","method":"eth_call","params":[{"to":"0x005382DebE72ee74d5D6E5a2D97Dc7bA2C16be12","data":"0x1f1881f8"},"latest"],"id":1}'
+"
+console.log('ownerOf(uint256):', getFunctionSelector('ownerOf(uint256)'));
+console.log('totalSupply():', getFunctionSelector('totalSupply()'));
+console.log('exists(bytes32):', getFunctionSelector('exists(bytes32)'));
+}
+  return '0x' + hash.substring(0, 8);
+  const hash = keccak256(signature);
+function getFunctionSelector(signature) {
+// Function to get function selector
+}
+  return hash.digest('hex');
+  hash.update(data);
+  const hash = crypto.createHash('sha3-256');
+function keccak256(data) {
+// Function to calculate keccak256 hash
+const crypto = require('crypto');
+cd /Users/mac/Desktop/CODES/HACKATHON/QUAI_Rocster/QUAI && node -e "
+curl -s "https://orchard.rpc.quai.network/cyprus1" -X POST -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","method":"eth_call","params":[{"to":"0x005382DebE72ee74d5D6E5a2D97Dc7bA2C16be12","data":"0x18160ddd"},"latest"],"id":1}' | jq
