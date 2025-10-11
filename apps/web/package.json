@@ -19,7 +19,6 @@
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@tanstack/react-query": "latest",
     "@web3modal/wagmi": "^5.1.11",
-    "@wormhole-foundation/wormhole-connect": "^4.0.0",
     "next": "^14.2.5",
     "pino-pretty": "^13.1.1",
     "quais": "1.0.0-alpha.52",

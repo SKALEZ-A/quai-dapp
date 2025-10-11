@@ -44,7 +44,7 @@ const UserOverview = () => {
     try {
       const domains = await getUserDomains(currentUser.address);
       console.log("Loaded domains:", domains);
-      setUserDomains(domains);
+      setMyDomains(domains);
     } catch (error) {
       console.error("Error loading domains:", error);
     } finally {

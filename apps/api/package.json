@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "nodemon --watch src --exec ts-node src/index.ts",
+    "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "lint": "eslint .",
@@ -11,16 +11,22 @@
     "test": "echo \"(api) no tests yet\"",
     "prisma:generate": "prisma generate --schema=./prisma/schema.prisma",
     "prisma:migrate": "prisma migrate dev --schema=./prisma/schema.prisma",
-    "indexer": "ts-node src/workers/indexer.ts"
+    "indexer": "tsx src/workers/indexer.ts"
   },
   "dependencies": {
     "@apollo/server": "^5.0.0",
+    "@as-integrations/express4": "^1.1.2",
+    "@types/multer": "^2.0.0",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
     "express": "^4.19.2",
     "graphql": "^16.11.0",
+    "multer": "^2.0.2",
+    "nft.storage": "^7.2.0",
     "pg": "^8.16.3",
     "pino": "^9.3.2",
+    "quais": "1.0.0-alpha.52",
     "viem": "^2.37.5",
     "web3.storage": "^4.5.5",
     "zod": "^3.23.8"
@@ -32,6 +38,7 @@
     "eslint": "^9.9.0",
     "nodemon": "^3.1.4",
     "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
     "typescript": "^5.5.4"
   }
 }

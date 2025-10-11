@@ -4,7 +4,8 @@ import { defineChain } from 'viem';
 import { quaiNetworkConfigs, createQuaiChain } from './quaiChains';
 
 // 1. Create Viem chain definitions from quaiNetworkConfigs
-const chains = quaiNetworkConfigs.map(createQuaiChain);
+const chainsList = quaiNetworkConfigs.map(createQuaiChain);
+const chains = [chainsList[0], ...chainsList.slice(1)] as const;
 
 // 2. Your WalletConnect projectId
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '0e5376d27efba595b9c6f53802fcad58';

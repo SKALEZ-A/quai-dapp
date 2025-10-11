@@ -12,14 +12,14 @@ function formatEther(value: bigint): string {
   return (Number(value) / 1e18).toFixed(4);
 }
 
-// Domain pricing based on length - Updated to match contract pricing
+// Domain pricing based on length - REDUCED for testing
 export const PRICING = {
-  3: { price: '0.1', display: '0.1 QI' },
-  4: { price: '0.05', display: '0.05 QI' },
-  5: { price: '0.02', display: '0.02 QI' },
-  6: { price: '0.02', display: '0.02 QI' },
-  7: { price: '0.02', display: '0.02 QI' },
-  default: { price: '0.01', display: '0.01 QI' },
+  3: { price: '10', display: '10 QI' },
+  4: { price: '5', display: '5 QI' },
+  5: { price: '2', display: '2 QI' },
+  6: { price: '2', display: '2 QI' },
+  7: { price: '2', display: '2 QI' },
+  default: { price: '1', display: '1 QI' },
 } as const;
 
 export function getDomainPrice(name: string): { price: string; display: string; needsAuction: boolean } {
@@ -36,6 +36,7 @@ export function getDomainPrice(name: string): { price: string; display: string; 
   
   return { ...PRICING.default, needsAuction };
 }
+
 
 // Convert domain name to node hash (namehash)
 export function nameToNode(name: string): string {
@@ -135,9 +136,25 @@ export async function registerDomain(
     const registrarContract = new Contract(CONTRACTS.QNS_REGISTRAR, QNS_REGISTRAR_ABI, signer);
     
     console.log('Getting price for domain:', name);
-    // Get price from contract
-    const price = await registrarContract.getPrice(name);
-    console.log('Domain price:', price.toString());
+    
+    // Use frontend pricing (reduced for testing)
+    const frontendPricing = getDomainPrice(name);
+    const price = BigInt(parseFloat(frontendPricing.price) * 1e18);
+    console.log('Using frontend pricing:', frontendPricing.display);
+    console.log('Domain price (wei):', price.toString());
+    console.log('Domain price (QI):', frontendPricing.display);
+    
+    // Verify signer has enough balance
+    const balance = await signer.provider.getBalance(await signer.getAddress());
+    console.log('Signer balance:', balance.toString());
+    console.log('Signer balance (QI):', (Number(balance) / 1e18).toFixed(4), 'QI');
+    
+    if (balance < price) {
+      return { 
+        success: false, 
+        error: `Insufficient balance. Need ${(Number(price) / 1e18).toFixed(0)} QI but have ${(Number(balance) / 1e18).toFixed(4)} QI. Get testnet QI from https://faucet.quai.network/` 
+      };
+    }
     
     console.log('Checking availability for node:', node);
     // Check availability
@@ -162,11 +179,19 @@ export async function registerDomain(
     }
     
     console.log('Sending registration transaction...');
-    // Register domain through registrar with explicit gas parameters for Quai Network
+    console.log('Transaction parameters:', {
+      name,
+      node,
+      price: price.toString(),
+      gasEstimate: gasEstimate.toString()
+    });
+    
+    // Register domain through registrar with custom price
+    // We'll send the reduced price and let the contract handle it
     const tx = await registrarContract.register(name, node, {
       value: price,
-      gasLimit: gasEstimate + BigInt(100000), // Increased buffer for Quai Network
-      gasPrice: BigInt(2000000000), // 2 gwei - Quai Network gas price
+      // Let Pelagus wallet determine optimal gas parameters
+      // gasLimit and gasPrice will be auto-calculated
     });
     
     console.log('Transaction sent:', tx.hash);

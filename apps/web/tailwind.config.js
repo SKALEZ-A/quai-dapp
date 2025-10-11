@@ -24,6 +24,15 @@ module.exports = {
       backgroundImage: {
         'gradient-primary': 'linear-gradient(90deg, #8B1E3F, #6C3B9E)',
       },
+      keyframes: {
+        shimmer: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' },
+        },
+      },
+      animation: {
+        shimmer: 'shimmer 2s infinite',
+      },
     },
   },
   plugins: [],

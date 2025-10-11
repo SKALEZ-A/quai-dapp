@@ -10,7 +10,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -39,6 +39,7 @@ model Post {
   author       Profile   @relation(fields: [authorId], references: [id])
   cid          String    // IPFS CID of the post body
   textPreview  String?   // cached preview/title for feed
+  imageCids    String[]  // Array of IPFS CIDs for images
   zone         String?   // optional Quai zone identifier
   txHash       String?   // optional on-chain anchoring tx
 

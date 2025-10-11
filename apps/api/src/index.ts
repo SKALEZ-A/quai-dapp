@@ -1,10 +1,11 @@
 import express from "express";
 import cors from "cors";
 import pino from "pino";
-import postsRouter from "./routes/posts.js";
-import engagementsRouter from "./routes/engagements.js";
-import domainsRouter from "./routes/domains.js";
-import { mountGraphQL } from "./graphql/server.js";
+import postsRouter from "./routes/posts";
+import engagementsRouter from "./routes/engagements";
+import domainsRouter from "./routes/domains";
+import healthRouter from "./routes/health";
+import { mountGraphQL } from "./graphql/server";
 
 const app = express();
 const logger = pino({ level: process.env.NODE_ENV === "production" ? "info" : "debug" });
@@ -12,6 +13,12 @@ const logger = pino({ level: process.env.NODE_ENV === "production" ? "info" : "d
 const defaultAllowed = ["http://localhost:3000", "http://127.0.0.1:3000"];
 const envAllowed = (process.env.ALLOWED_ORIGINS || "").split(",").map((s) => s.trim()).filter(Boolean);
 const allowed = envAllowed.length > 0 ? envAllowed : defaultAllowed;
+
+console.log("🔧 CORS Configuration:", {
+  environment: process.env.NODE_ENV,
+  allowedOrigins: allowed,
+  hasCustomOrigins: envAllowed.length > 0
+});
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
@@ -23,10 +30,7 @@ app.use(cors({
 }));
 app.use(express.json());
 
-app.get("/health", (_req, res) => {
-  res.json({ status: "ok" });
-});
-
+app.use("/health", healthRouter);
 app.use("/posts", postsRouter);
 app.use("/engagements", engagementsRouter);
 app.use("/domains", domainsRouter);

@@ -3,7 +3,11 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useSocial } from '@/hooks/useSocial';
 import CreatePostModal from '@/components/CreatePostModal';
+import ImageLightbox from '@/components/ImageLightbox';
+import ImageWithLoading from '@/components/ImageWithLoading';
+import { PostSkeletonList } from '@/components/PostSkeleton';
 
 // SVG Icons
 const ImageIcon = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="m21 15-5-5L5 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
@@ -15,62 +19,6 @@ const AddIcon = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none
 const ProfileIcon = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 
 
-const initialPosts = [
-    { 
-        id: 1, 
-        name: 'alice.quai', 
-        time: '3h', 
-        content: 'In 2019, this guy tricked 4 US companies into sending him $18M.\n\nThen he spent it on a Rolls Royce Cullinan, a Lamborghini Urus, and one Mercedes Benz G-Class AMG G55.\n\nFor months, he didn\'t get caught.\n\nUntil one tiny detail brought him down',
-        images: [
-            'https://static0.makeuseofimages.com/wordpress/wp-content/uploads/2024/08/some-3d-social-media-icons.jpg',
-            'https://static0.makeuseofimages.com/wordpress/wp-content/uploads/2024/08/some-3d-social-media-icons.jpg',
-            'https://static0.makeuseofimages.com/wordpress/wp-content/uploads/2024/08/some-3d-social-media-icons.jpg',
-            'https://static0.makeuseofimages.com/wordpress/wp-content/uploads/2024/08/some-3d-social-media-icons.jpg',
-        ],
-        likes: 300,
-        comments: 22,
-        reposts: 150,
-    },
-    { 
-        id: 2, 
-        name: 'alex.quai', 
-        time: '2m', 
-        content: 'just.minted the @alex.qns domain.....rate it 1-10!!',
-        images: [
-            'https://static0.makeuseofimages.com/wordpress/wp-content/uploads/2024/08/some-3d-social-media-icons.jpg',
-        ],
-        likes: 300,
-        comments: 22,
-        reposts: 150,
-    },
-    {
-        id: 3,
-        name: 'bob.quai',
-        time: '1h',
-        content: 'Loving these new views!',
-        images: [
-            'https://static0.makeuseofimages.com/wordpress/wp-content/uploads/2024/08/some-3d-social-media-icons.jpg',
-            'https://static0.makeuseofimages.com/wordpress/wp-content/uploads/2024/08/some-3d-social-media-icons.jpg',
-        ],
-        likes: 50,
-        comments: 5,
-        reposts: 2,
-    },
-    {
-        id: 4,
-        name: 'charlie.quai',
-        time: '5m',
-        content: 'A beautiful sunset.',
-        images: [
-            'https://static0.makeuseofimages.com/wordpress/wp-content/uploads/2024/08/some-3d-social-media-icons.jpg',
-            'https://static0.makeuseofimages.com/wordpress/wp-content/uploads/2024/08/some-3d-social-media-icons.jpg',
-            'https://static0.makeuseofimages.com/wordpress/wp-content/uploads/2024/08/some-3d-social-media-icons.jpg',
-        ],
-        likes: 120,
-        comments: 10,
-        reposts: 8,
-    },
-];
 
 const leaderboard = [
     { rank: 1, name: 'alice.quai', score: '300 posts' },
@@ -91,26 +39,30 @@ const trending = [
 ];
 
 const SocialActivity = () => {
-    const [posts, setPosts] = useState(initialPosts);
     const [activeTab, setActiveTab] = useState('For You');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isFabOpen, setIsFabOpen] = useState(false);
+    const [lightboxImages, setLightboxImages] = useState<string[]>([]);
+    const [lightboxIndex, setLightboxIndex] = useState(0);
+    const [isLightboxOpen, setIsLightboxOpen] = useState(false);
     const router = useRouter();
     const currentUser = useCurrentUser();
+    const { posts, isLoading, isCreatingPost, error, createPost, likePost, commentOnPost } = useSocial();
 
-    const handleCreatePost = (content: string, imageUrl?: string) => {
-        const newPost = {
-            id: posts.length + 1,
-            name: currentUser.username,
-            time: 'Just now',
-            content,
-            images: imageUrl ? [imageUrl] : [], // Use the imageUrl directly
-            likes: 0,
-            comments: 0,
-            reposts: 0,
-        };
-        setPosts(prevPosts => [newPost, ...prevPosts]);
-        setIsModalOpen(false);
+    const handleCreatePost = async (content: string, images?: File[]) => {
+        // Use fallback address if no wallet connected
+        const userAddress = currentUser.address || '0xe2f92e8f706997b021919a092437372b268a432d';
+
+        try {
+            await createPost(
+                { text: content, zone: 'cyprus-1', images },
+                userAddress
+            );
+            setIsModalOpen(false);
+        } catch (err) {
+            console.error('Failed to create post:', err);
+            // Error message is already set in useSocial hook, just show modal stays open
+        }
     };
 
     const getImageGridClasses = (imageCount: number) => {
@@ -142,6 +94,18 @@ const SocialActivity = () => {
                 return "h-52";
         }
     }
+
+    const openImageLightbox = (images: string[], index: number = 0) => {
+        setLightboxImages(images);
+        setLightboxIndex(index);
+        setIsLightboxOpen(true);
+    };
+
+    const closeImageLightbox = () => {
+        setIsLightboxOpen(false);
+        setLightboxImages([]);
+        setLightboxIndex(0);
+    };
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-6 h-[calc(100vh-60px)] mt-[-20px]">
@@ -177,38 +141,104 @@ const SocialActivity = () => {
                 </div>
 
                 <div className="flex flex-col gap-px bg-gray-700 rounded-lg overflow-y-scroll scrollbar-hide">
-                    {posts.map(post => (
-                        <div className="flex gap-4 bg-black p-6 cursor-pointer" key={post.id} onClick={() => router.push(`/dashboard/post/${post.id}`)}>
-                            <div className="w-12 h-12 rounded-full bg-gray-600 flex-shrink-0"></div>
-                            <div className="w-full">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <span className="font-bold">{post.name}</span>
-                                    <span className="text-gray-400 text-sm">{post.time}</span>
-                                </div>
-                                <p className="leading-relaxed mb-4">{post.content}</p>
-                                {post.images.length > 0 && (
-                                    <div className={`grid ${getImageGridClasses(post.images.length)} gap-2 rounded-xl overflow-hidden mb-4`}>
-                                        {post.images.map((imageUrl, index) => (
-                                            <img 
-                                                key={index} 
-                                                src={imageUrl} 
-                                                alt={`Post image ${index + 1}`} 
-                                                className={`w-full object-cover ${getImageHeightClass(post.images.length)} 
-                                                ${post.images.length === 3 && index === 0 ? 'h-[calc(2*52px+)]' : ''} 
-                                                `} // Special height for first image in 3-image layout
-                                            />
-                                        ))}
-                                    </div>
-                                )}
-                                <div className="flex gap-6 text-gray-400">
-                                    <button className="flex items-center gap-2 hover:text-red-500"><LikeIcon /> {post.likes}</button>
-                                    <button className="flex items-center gap-2 hover:text-green-500"><RepostIcon /> {post.reposts}</button>
-                                    <button className="flex items-center gap-2 hover:text-blue-500"><CommentIcon /> {post.comments}</button>
-                                    <button className="flex items-center hover:text-blue-500"><ShareIcon /></button>
-                                </div>
+                    {isLoading ? (
+                        <PostSkeletonList count={3} />
+                    ) : error ? (
+                        <div className="flex items-center justify-center p-8">
+                            <div className="text-red-400 text-center">
+                                <div className="text-lg font-medium mb-2">Error</div>
+                                <div>{error}</div>
+                                <button 
+                                    onClick={() => window.location.reload()} 
+                                    className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                                >
+                                    Retry
+                                </button>
                             </div>
                         </div>
-                    ))}
+                    ) : posts.length === 0 ? (
+                        <div className="flex items-center justify-center p-8">
+                            <div className="text-gray-400">No posts yet. Be the first to post!</div>
+                        </div>
+                    ) : (
+                        posts.map(post => (
+                            <div className="flex gap-4 bg-black p-6 cursor-pointer" key={post.id} onClick={() => router.push(`/dashboard/post/${post.id}`)}>
+                                <div className="w-12 h-12 rounded-full bg-gray-600 flex-shrink-0"></div>
+                                <div className="w-full">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <span className="font-bold">{post.author.name || `${post.author.address.slice(0, 6)}...${post.author.address.slice(-4)}`}</span>
+                                        <span className="text-gray-400 text-sm">{new Date(post.createdAt).toLocaleTimeString()}</span>
+                                    </div>
+                                    <p className="leading-relaxed mb-4">{post.textPreview}</p>
+                                    {post.imageCids && post.imageCids.length > 0 && (
+                                        <div className={`grid ${getImageGridClasses(post.imageCids.length)} gap-2 rounded-xl overflow-hidden mb-4`}>
+                                            {post.imageCids.map((cid, index) => {
+                                                // Handle both IPFS CIDs and local fallback CIDs
+                                                const imageUrl = cid.startsWith('local_') 
+                                                    ? `/api/placeholder?text=Image&cid=${cid}` // Fallback for local CIDs
+                                                    : `https://gateway.pinata.cloud/ipfs/${cid}`;
+                                                
+                                                return (
+                                                    <ImageWithLoading
+                                                        key={index}
+                                                        src={imageUrl}
+                                                        alt={`Post image ${index + 1}`}
+                                                        className={`w-full object-cover cursor-pointer hover:opacity-90 transition-opacity ${getImageHeightClass(post.imageCids!.length)}`}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            openImageLightbox(
+                                                                post.imageCids!.map(c => c.startsWith('local_') 
+                                                                    ? `/api/placeholder?text=Image&cid=${c}` 
+                                                                    : `https://gateway.pinata.cloud/ipfs/${c}`
+                                                                ),
+                                                                index
+                                                            );
+                                                        }}
+onError={(e) => {
+                                                            // Try multiple IPFS gateways as fallback
+                                                            const target = e.target as HTMLImageElement;
+                                                            const currentSrc = target.src;
+                                                            
+                                                            // Skip if it's already a local placeholder
+                                                            if (currentSrc.includes('placeholder') || cid.startsWith('local_')) {
+                                                                return; // Let component show error state
+                                                            }
+                                                            
+                                                            // Try fallback gateways
+                                                            if (currentSrc.includes('pinata.cloud')) {
+                                                                target.src = `https://ipfs.io/ipfs/${cid}`;
+                                                            } else if (currentSrc.includes('ipfs.io')) {
+                                                                target.src = `https://cloudflare-ipfs.com/ipfs/${cid}`;
+                                                            } else if (currentSrc.includes('cloudflare-ipfs.com')) {
+                                                                target.src = `https://dweb.link/ipfs/${cid}`;
+                                                            }
+                                                            // If dweb.link fails, don't set new src - let component show error state
+                                                        }}
+                                                    />
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                    <div className="flex gap-6 text-gray-400">
+                                        <button 
+                                            className="flex items-center gap-2 hover:text-red-500"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                if (currentUser.address) {
+                                                    likePost(currentUser.address, post.id);
+                                                }
+                                            }}
+                                        >
+                                            <LikeIcon /> {post.likes?.length || 0}
+                                        </button>
+                                        <button className="flex items-center gap-2 hover:text-green-500"><RepostIcon /> 0</button>
+                                        <button className="flex items-center gap-2 hover:text-blue-500"><CommentIcon /> {post.comments?.length || 0}</button>
+                                        <button className="flex items-center hover:text-blue-500"><ShareIcon /></button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    )}
                 </div>
             </main>
             
@@ -259,6 +289,14 @@ const SocialActivity = () => {
             </div>
 
             {isModalOpen && <CreatePostModal onClose={() => setIsModalOpen(false)} onCreatePost={handleCreatePost} />}
+            
+            {/* Image Lightbox */}
+            <ImageLightbox
+                images={lightboxImages}
+                currentIndex={lightboxIndex}
+                isOpen={isLightboxOpen}
+                onClose={closeImageLightbox}
+            />
         </div>
     );
 };

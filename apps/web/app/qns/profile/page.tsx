@@ -182,10 +182,19 @@ export default function QNSProfilePage() {
       const chainId = await eth.request({ method: 'eth_chainId' });
       console.log('Current chain ID:', chainId);
 
-      // Quai testnet chain ID is 15000 (0x3A98 in hex)
-      if (chainId !== '0x3a98' && chainId !== '15000') {
-        alert(`❌ Wrong network. Please switch to Quai Testnet (Chain ID: 15000) in your Pelagus wallet.`);
-        return;
+      // Convert hex chainId to decimal for easier comparison
+      const chainIdDecimal = parseInt(chainId, 16);
+      console.log('Chain ID (decimal):', chainIdDecimal);
+      
+      // Quai Orchard testnet zone chain IDs:
+      // Cyprus-1: 9000, Cyprus-2: 9001, Cyprus-3: 9002
+      // Paxos-1: 9100, Paxos-2: 9101, Paxos-3: 9102
+      // Hydra-1: 9200, Hydra-2: 9201, Hydra-3: 9202
+      const validChainIds = [9000, 9001, 9002, 9100, 9101, 9102, 9200, 9201, 9202];
+      
+      if (!validChainIds.includes(chainIdDecimal)) {
+        console.warn(`Unexpected chain ID: ${chainIdDecimal}. Continuing anyway...`);
+        // Don't block - just warn
       }
 
       console.log('Network check passed');
@@ -197,6 +206,20 @@ export default function QNSProfilePage() {
 
       const signerAddress = await signer.getAddress();
       console.log('Signer address:', signerAddress);
+
+      // Check balance
+      try {
+        const balance = await provider.getBalance(signerAddress);
+        console.log('Account balance:', balance.toString(), 'wei');
+        console.log('Account balance (QI):', (Number(balance) / 1e18).toFixed(4), 'QI');
+        
+        if (balance === BigInt(0)) {
+          alert("❌ Insufficient balance!\n\nYou have 0 QI. Please get testnet QI from:\nhttps://faucet.quai.network/");
+          return;
+        }
+      } catch (balanceError) {
+        console.warn('Could not check balance:', balanceError);
+      }
 
       if (signerAddress.toLowerCase() !== finalAddress.toLowerCase()) {
         console.warn('Signer address mismatch:', { signerAddress, finalAddress });

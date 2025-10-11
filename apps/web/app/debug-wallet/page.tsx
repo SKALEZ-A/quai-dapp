@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useAccount, useConnect, useDisconnect, useWeb3Modal } from 'wagmi';
+import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import { useWeb3Modal } from '@web3modal/wagmi/react';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 
 export default function DebugWalletPage() {
@@ -45,7 +46,7 @@ export default function DebugWalletPage() {
     try {
       open();
     } catch (error) {
-      addLog(`Web3Modal error: ${error.message}`);
+      addLog(`Web3Modal error: ${error instanceof Error ? error.message : String(error)}`);
     }
   };
 
@@ -56,7 +57,7 @@ export default function DebugWalletPage() {
       try {
         connect({ connector: selectedConnector });
       } catch (error) {
-        addLog(`Direct connection error: ${error.message}`);
+        addLog(`Direct connection error: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
   };
@@ -174,7 +175,7 @@ export default function DebugWalletPage() {
             </div>
             <div>
               <p><strong>Window Size:</strong> {typeof window !== 'undefined' ? `${window.innerWidth}x${window.innerHeight}` : 'N/A'}</p>
-              <p><strong>Web3 Available:</strong> {typeof window !== 'undefined' && window.ethereum ? '✅ Yes' : '❌ No'}</p>
+              <p><strong>Web3 Available:</strong> {typeof window !== 'undefined' && (window as any).ethereum ? '✅ Yes' : '❌ No'}</p>
             </div>
           </div>
         </div>

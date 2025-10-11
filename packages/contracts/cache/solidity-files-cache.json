@@ -1425,8 +1425,8 @@
       ]
     },
     "/Users/mac/Desktop/CODES/HACKATHON/QUAI_Rocster/QUAI/packages/contracts/contracts/QNSRegistrarSimple.sol": {
-      "lastModificationDate": 1759651434852,
-      "contentHash": "f67e3f1b840a545e1a7ad603854af6ac",
+      "lastModificationDate": 1759936804315,
+      "contentHash": "fbb1b3b7ce03f914cd4b73751f9efc1a",
       "sourceName": "contracts/QNSRegistrarSimple.sol",
       "solcConfig": {
         "version": "0.8.23",

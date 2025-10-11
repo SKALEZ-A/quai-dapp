@@ -1,8 +1,12 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { api } from '@/lib/api';
+import { generateCommentSignature, generateNonce } from '@/lib/signatures';
+import ImageLightbox from '@/components/ImageLightbox';
+import { Post, Comment, Like } from '@/lib/api';
 
 // Icons
 const CommentIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
@@ -11,66 +15,39 @@ const LikeIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="non
 const ShareIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8m-4-6-4-4-4 4m4-4v13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 const ArrowLeftIcon = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="m15 18-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 
-// Mock data similar to frontend
-type Post = {
-  id: string;
-  name: string;
-  time: string;
-  content: string;
-  images: string[];
-  likes: number;
-  comments: number;
-  reposts: number;
-};
-
-const allPosts: Post[] = [
-  {
-    id: '1',
-    name: 'alice.quai',
-    time: '3h',
-    content: 'In 2019, this guy tricked 4 US companies into sending him $18M.\n\nThen he spent it on a Rolls Royce Cullinan, a Lamborghini Urus, and one Mercedes Benz G-Class AMG G55.\n\nFor months, he didn\'t get caught.\n\nUntil one tiny detail brought him down',
-    images: [
-      'https://static0.makeuseofimages.com/wordpress/wp-content/uploads/2024/08/some-3d-social-media-icons.jpg',
-      'https://static0.makeuseofimages.com/wordpress/wp-content/uploads/2024/08/some-3d-social-media-icons.jpg',
-      'https://static0.makeuseofimages.com/wordpress/wp-content/uploads/2024/08/some-3d-social-media-icons.jpg',
-      'https://static0.makeuseofimages.com/wordpress/wp-content/uploads/2024/08/some-3d-social-media-icons.jpg',
-    ],
-    likes: 300,
-    comments: 22,
-    reposts: 150,
-  },
-  {
-    id: '2',
-    name: 'alex.quai',
-    time: '2m',
-    content: 'just.minted the @alex.qns domain.....rate it 1-10!!',
-    images: [
-      'https://static0.makeuseofimages.com/wordpress/wp-content/uploads/2024/08/some-3d-social-media-icons.jpg',
-    ],
-    likes: 300,
-    comments: 22,
-    reposts: 150,
-  },
-];
-
-type Comment = { id: number; postId: string; name: string; time: string; content: string; profileImg: string };
-const initialComments: Comment[] = [
-  { id: 1, postId: '1', name: 'user1.quai', time: '2h', content: 'Wow, what a story!', profileImg: 'https://via.placeholder.com/150/FF00FF/FFFFFF?text=U1' },
-  { id: 2, postId: '1', name: 'user2.quai', time: '1h', content: 'Need more details on that tiny detail!', profileImg: 'https://via.placeholder.com/150/00FFFF/000000?text=U2' },
-  { id: 3, postId: '2', name: 'user3.quai', time: '1m', content: '9/10, awesome domain!', profileImg: 'https://via.placeholder.com/150/800000/FFFFFF?text=U3' },
-];
-
 export default function DashboardPostDetailPage({ params }: { params: { postId: string } }) {
   const router = useRouter();
   const currentUser = useCurrentUser();
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
+  const [likes, setLikes] = useState<Like[]>([]);
   const [newCommentText, setNewCommentText] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isCommenting, setIsCommenting] = useState(false);
+  const [isLiking, setIsLiking] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [lightboxImages, setLightboxImages] = useState<string[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   useEffect(() => {
-    const found = allPosts.find(p => p.id === params.postId) || null;
-    setPost(found);
-    setComments(initialComments.filter(c => c.postId === params.postId));
+    const fetchPost = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const response = await api.getPostById(params.postId);
+        setPost(response.post);
+        setComments(response.post.comments || []);
+        setLikes(response.post.likes || []);
+      } catch (err) {
+        console.error('Failed to fetch post:', err);
+        setError('Failed to load post');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPost();
   }, [params.postId]);
 
   const getImageGridClasses = (imageCount: number) => {
@@ -82,6 +59,7 @@ export default function DashboardPostDetailPage({ params }: { params: { postId: 
       default: return 'grid-cols-1';
     }
   };
+
   const getImageHeightClass = (imageCount: number) => {
     switch (imageCount) {
       case 1: return 'h-80';
@@ -92,28 +70,137 @@ export default function DashboardPostDetailPage({ params }: { params: { postId: 
     }
   };
 
-  const handleAddComment = () => {
-    if (!newCommentText.trim() || !post) return;
-    const next: Comment = {
-      id: comments.length + 1,
-      postId: post.id,
-      name: currentUser.username,
-      time: 'Just now',
-      content: newCommentText.trim(),
-      profileImg: currentUser.profileImg,
-    };
-    setComments(prev => [...prev, next]);
-    setNewCommentText('');
+  const openImageLightbox = (images: string[], index: number = 0) => {
+    setLightboxImages(images);
+    setLightboxIndex(index);
+    setIsLightboxOpen(true);
   };
 
-  if (!post) {
+  const closeImageLightbox = () => {
+    setIsLightboxOpen(false);
+    setLightboxImages([]);
+    setLightboxIndex(0);
+  };
+
+  const handleLike = async () => {
+    if (!post || isLiking) return;
+    
+    // Use fallback address if no wallet connected
+    const userAddress = currentUser.address || '0xe2f92e8f706997b021919a092437372b268a432d';
+
+    try {
+      setIsLiking(true);
+      
+      // Check if user already liked this post
+      const userLiked = likes.some(like => 
+        like.profile?.address?.toLowerCase() === userAddress.toLowerCase()
+      );
+
+      if (userLiked) {
+        // Unlike the post
+        await api.unlikePost(userAddress, post.id);
+        setLikes(prev => prev.filter(like => 
+          like.profile?.address?.toLowerCase() !== userAddress.toLowerCase()
+        ));
+      } else {
+        // Like the post
+        await api.likePost(userAddress, post.id);
+        const newLike: Like = {
+          id: `temp_${Date.now()}`,
+          profileId: `temp_${Date.now()}`,
+      postId: post.id,
+          profile: {
+            id: `temp_${Date.now()}`,
+            address: userAddress,
+            qnsName: null,
+            displayName: null,
+            avatarUrl: null,
+            bio: null,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          }
+        };
+        setLikes(prev => [...prev, newLike]);
+      }
+    } catch (err) {
+      console.error('Failed to toggle like:', err);
+    } finally {
+      setIsLiking(false);
+    }
+  };
+
+  const handleAddComment = async () => {
+    if (!newCommentText.trim() || !post || isCommenting) return;
+    
+    // Use fallback address if no wallet connected
+    const userAddress = currentUser.address || '0xe2f92e8f706997b021919a092437372b268a432d';
+
+    try {
+      setIsCommenting(true);
+      
+      const issuedAt = Date.now();
+      const nonce = generateNonce();
+      
+      // Generate signature for comment
+      const signature = await generateCommentSignature(
+        {
+          author: userAddress,
+          postId: post.id,
+          text: newCommentText.trim(),
+          issuedAt,
+          nonce,
+        },
+        userAddress,
+        undefined // TODO: Pass wagmi signer when available
+      );
+
+      const response = await api.commentOnPost({
+        authorAddress: userAddress,
+        postId: post.id,
+        text: newCommentText.trim(),
+        signature,
+        issuedAt,
+        nonce,
+      });
+
+      // Add comment to local state
+      setComments(prev => [...prev, response.comment]);
+    setNewCommentText('');
+    } catch (err) {
+      console.error('Failed to add comment:', err);
+    } finally {
+      setIsCommenting(false);
+    }
+  };
+
+  if (isLoading) {
     return (
       <div className="p-6">
-        <button onClick={() => router.back()} className="text-gray-400 hover:text-white mb-4"><ArrowLeftIcon /></button>
-        <div className="text-white">Loading post or post not found...</div>
+        <button onClick={() => router.back()} className="text-gray-400 hover:text-white mb-4">
+          <ArrowLeftIcon />
+        </button>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-gray-400">Loading post...</div>
+        </div>
       </div>
     );
   }
+
+  if (error || !post) {
+    return (
+      <div className="p-6">
+        <button onClick={() => router.back()} className="text-gray-400 hover:text-white mb-4">
+          <ArrowLeftIcon />
+        </button>
+        <div className="text-red-400">{error || 'Post not found'}</div>
+      </div>
+    );
+  }
+
+  const userAddress = currentUser.address || '0xe2f92e8f706997b021919a092437372b268a432d';
+  const userLiked = likes.some(like => 
+    like.profile?.address?.toLowerCase() === userAddress.toLowerCase()
+  );
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-6 h-[calc(100vh-60px)] mt-[-20px]">
@@ -129,30 +216,81 @@ export default function DashboardPostDetailPage({ params }: { params: { postId: 
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-gray-600 flex-shrink-0 overflow-hidden"></div>
             <div>
-              <span className="font-bold block">{post.name}</span>
-              <span className="text-gray-400 text-sm">{post.time}</span>
+              <span className="font-bold block">
+                {post.author.qnsName || post.author.displayName || 
+                 `${post.author.address.slice(0, 6)}...${post.author.address.slice(-4)}`}
+              </span>
+              <span className="text-gray-400 text-sm">
+                {new Date(post.createdAt).toLocaleString()}
+              </span>
             </div>
           </div>
-          <p className="leading-relaxed whitespace-pre-line text-lg mb-4">{post.content}</p>
-          {post.images.length > 0 && (
-            <div className={`grid ${getImageGridClasses(post.images.length)} gap-2 rounded-xl overflow-hidden mb-4`}>
-              {post.images.map((imageUrl, index) => (
-                <img key={index} src={imageUrl} alt={`Post image ${index + 1}`} className={`w-full object-cover ${getImageHeightClass(post.images.length)}`} />
-              ))}
+          
+          <p className="leading-relaxed whitespace-pre-line text-lg mb-4">
+            {post.textPreview}
+          </p>
+          
+          {post.imageCids && post.imageCids.length > 0 && (
+            <div className={`grid ${getImageGridClasses(post.imageCids.length)} gap-2 rounded-xl overflow-hidden mb-4`}>
+              {post.imageCids.map((cid, index) => {
+                const imageUrl = cid.startsWith('local_') 
+                  ? `/api/placeholder?text=Image&cid=${cid}`
+                  : `https://${cid}.ipfs.nftstorage.link`;
+                
+                return (
+                  <img 
+                    key={index} 
+                    src={imageUrl}
+                    alt={`Post image ${index + 1}`} 
+                    className={`w-full object-cover cursor-pointer hover:opacity-90 transition-opacity ${getImageHeightClass(post.imageCids.length)}`}
+                    onClick={() => openImageLightbox(
+                      post.imageCids!.map(c => c.startsWith('local_') 
+                        ? `/api/placeholder?text=Image&cid=${c}` 
+                        : `https://${c}.ipfs.nftstorage.link`
+                      ),
+                      index
+                    )}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = `/api/placeholder?text=Image+Not+Available&cid=${cid}`;
+                    }}
+                  />
+                );
+              })}
             </div>
           )}
 
           <div className="flex justify-around border-y border-gray-700 py-3 text-gray-400 my-4">
-            <span className="flex items-center gap-1"><span className="font-bold text-white">{post.likes}</span> Likes</span>
-            <span className="flex items-center gap-1"><span className="font-bold text-white">{post.reposts}</span> Reposts</span>
-            <span className="flex items-center gap-1"><span className="font-bold text-white">{post.comments}</span> Comments</span>
+            <span className="flex items-center gap-1">
+              <span className="font-bold text-white">{likes.length}</span> Likes
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="font-bold text-white">0</span> Reposts
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="font-bold text-white">{comments.length}</span> Comments
+            </span>
           </div>
 
           <div className="flex justify-around text-gray-400">
-            <button className="flex items-center gap-2 hover:text-red-500 p-2 rounded-full hover:bg-gray-800 transition-colors duration-200"><LikeIcon /></button>
-            <button className="flex items-center gap-2 hover:text-green-500 p-2 rounded-full hover:bg-gray-800 transition-colors duration-200"><RepostIcon /></button>
-            <button className="flex items-center gap-2 hover:text-blue-500 p-2 rounded-full hover:bg-gray-800 transition-colors duration-200"><CommentIcon /></button>
-            <button className="flex items-center hover:text-blue-500 p-2 rounded-full hover:bg-gray-800 transition-colors duration-200"><ShareIcon /></button>
+            <button 
+              onClick={handleLike}
+              disabled={isLiking}
+              className={`flex items-center gap-2 p-2 rounded-full hover:bg-gray-800 transition-colors duration-200 ${
+                userLiked ? 'text-red-500' : 'hover:text-red-500'
+              } ${isLiking ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              <LikeIcon />
+            </button>
+            <button className="flex items-center gap-2 hover:text-green-500 p-2 rounded-full hover:bg-gray-800 transition-colors duration-200">
+              <RepostIcon />
+            </button>
+            <button className="flex items-center gap-2 hover:text-blue-500 p-2 rounded-full hover:bg-gray-800 transition-colors duration-200">
+              <CommentIcon />
+            </button>
+            <button className="flex items-center hover:text-blue-500 p-2 rounded-full hover:bg-gray-800 transition-colors duration-200">
+              <ShareIcon />
+            </button>
           </div>
         </div>
 
@@ -167,10 +305,15 @@ export default function DashboardPostDetailPage({ params }: { params: { postId: 
               placeholder="Post your reply!"
               value={newCommentText}
               onChange={(e) => setNewCommentText(e.target.value)}
+              disabled={isCommenting}
             />
             <div className="absolute top-3 right-2">
-              <button onClick={handleAddComment} className="bg-gradient-to-r from-[#8B1E3F] to-[#6C3B9E] text-white py-2 px-5 rounded-full font-medium text-sm disabled:opacity-50" disabled={!newCommentText.trim()}>
-                Reply
+              <button 
+                onClick={handleAddComment} 
+                disabled={!newCommentText.trim() || isCommenting}
+                className="bg-gradient-to-r from-[#8B1E3F] to-[#6C3B9E] text-white py-2 px-5 rounded-full font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isCommenting ? 'Posting...' : 'Reply'}
               </button>
             </div>
           </div>
@@ -181,25 +324,37 @@ export default function DashboardPostDetailPage({ params }: { params: { postId: 
             comments.map(comment => (
               <div className="flex gap-4 bg-black p-6" key={comment.id}>
                 <div className="w-10 h-10 rounded-full bg-gray-600 flex-shrink-0 overflow-hidden">
-                  <img src={comment.profileImg} className="w-auto h-full" alt={`${comment.name}'s profile`} />
+                  <img 
+                    src={comment.author?.avatarUrl || '/assets/avatars/alice-chen.png'} 
+                    className="w-auto h-full" 
+                    alt={`${comment.author?.qnsName || comment.author?.address || 'User'}'s profile`} 
+                  />
                 </div>
                 <div className="w-full">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="font-bold">{comment.name}</span>
-                    <span className="text-gray-400 text-sm">{comment.time}</span>
+                    <span className="font-bold">
+                      {comment.author?.qnsName || comment.author?.displayName || 
+                       `${comment.author?.address.slice(0, 6)}...${comment.author?.address.slice(-4)}`}
+                    </span>
+                    <span className="text-gray-400 text-sm">
+                      {new Date(comment.createdAt).toLocaleTimeString()}
+                    </span>
                   </div>
-                  <p className="leading-relaxed text-gray-300">{comment.content}</p>
+                  <p className="leading-relaxed text-gray-300">
+                    {comment.textPreview}
+                  </p>
                 </div>
               </div>
             ))
           ) : (
-            <div className="bg-black p-6 text-center text-gray-500">No comments yet. Be the first to reply!</div>
+            <div className="bg-black p-6 text-center text-gray-500">
+              No comments yet. Be the first to reply!
+            </div>
           )}
         </div>
       </main>
 
       <aside className="hidden lg:flex flex-col gap-6 overflow-y-auto h-full scrollbar-hide bg-black rounded-xl p-6">
-        {/* Placeholder sidebar content */}
         <div>
           <h4 className="text-xl mb-6">Trending</h4>
           <ul className="list-none border border-gray-700 rounded-xl p-6">
@@ -212,6 +367,14 @@ export default function DashboardPostDetailPage({ params }: { params: { postId: 
           </ul>
         </div>
       </aside>
+
+      {/* Image Lightbox */}
+      <ImageLightbox
+        images={lightboxImages}
+        currentIndex={lightboxIndex}
+        isOpen={isLightboxOpen}
+        onClose={closeImageLightbox}
+      />
     </div>
   );
 }

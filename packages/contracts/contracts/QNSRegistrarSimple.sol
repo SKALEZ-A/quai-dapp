@@ -56,12 +56,12 @@ contract QNSRegistrarSimple {
         reservedNames = IQNSReservedNames(_reservedNames);
         treasury = _treasury;
         
-        // Set default pricing (in wei)
-        pricing[3] = 1000 ether;  // 1,000 QI
-        pricing[4] = 500 ether;   // 500 QI
-        pricing[5] = 200 ether;   // 200 QI
-        pricing[6] = 200 ether;   // 200 QI
-        pricing[7] = 200 ether;   // 200 QI
+        // Set default pricing (in wei) - Reduced for testing
+        pricing[3] = 10000000000000000000;  // 10 QI (10 * 10^18)
+        pricing[4] = 5000000000000000000;   // 5 QI (5 * 10^18)
+        pricing[5] = 2000000000000000000;   // 2 QI (2 * 10^18)
+        pricing[6] = 2000000000000000000;   // 2 QI (2 * 10^18)
+        pricing[7] = 2000000000000000000;   // 2 QI (2 * 10^18)
     }
     
     function getPrice(string calldata name) public view returns (uint256) {
@@ -69,7 +69,7 @@ contract QNSRegistrarSimple {
         if (pricing[length] > 0) {
             return pricing[length];
         }
-        return 100 ether; // Default 100 QI for 8+ chars
+        return 1000000000000000000; // Default 1 QI for 8+ chars (1 * 10^18)
     }
     
     function register(

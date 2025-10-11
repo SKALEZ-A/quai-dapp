@@ -1,8 +1,8 @@
 import { ApolloServer } from "@apollo/server";
-import { expressMiddleware } from "@apollo/server/express4";
+import { expressMiddleware } from "@as-integrations/express4";
 import bodyParser from "body-parser";
 import { gql } from "graphql-tag";
-import { prisma } from "../db/client.js";
+import { prisma } from "../db/client";
 import type { Express } from "express";
 
 const typeDefs = gql`

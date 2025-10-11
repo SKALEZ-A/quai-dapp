@@ -4,6 +4,11 @@ PORT=4000
 ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/quai
 REDIS_URL=redis://localhost:6379
-WEB3_STORAGE_TOKEN=
+
+# Pinata IPFS Service (Free 1GB tier)
+# Get your keys from: https://app.pinata.cloud/
+PINATA_API_KEY=your_pinata_api_key_here
+PINATA_SECRET_KEY=your_pinata_secret_key_here
+
 QUAI_RPC_URL=https://orchard.rpc.quai.network/cyprus1
 SOCIAL_CONTRACT_ADDRESS=0xYourDeployedSocialPosts

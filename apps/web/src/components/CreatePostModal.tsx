@@ -7,18 +7,20 @@ const ImageIcon = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="no
 
 interface CreatePostModalProps {
   onClose: () => void;
-  onCreatePost: (content: string, image?: string) => void;
+  onCreatePost: (content: string, images?: File[]) => void;
 }
 
 const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onCreatePost }) => {
   const [postContent, setPostContent] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handlePost = () => {
-    if (postContent.trim() || imagePreview) {
-      onCreatePost(postContent, imagePreview || undefined);
+    if (postContent.trim() || imageFile) {
+      const images = imageFile ? [imageFile] : undefined;
+      onCreatePost(postContent, images);
     }
   };
   
@@ -34,6 +36,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onCreatePost
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
@@ -44,6 +47,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onCreatePost
 
   const handleRemoveImage = () => {
     setImagePreview(null);
+    setImageFile(null);
     if(fileInputRef.current) {
         fileInputRef.current.value = "";
     }

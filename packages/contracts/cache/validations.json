@@ -2,6 +2,540 @@
   "version": "3.4",
   "log": [
     {
+      "contracts/QNSRegistrarSimple.sol:IQNSNFT": {
+        "src": "contracts/QNSRegistrarSimple.sol:4",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "mint(bytes32,address,string)",
+          "exists(bytes32)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.23"
+      },
+      "contracts/QNSRegistrarSimple.sol:IQNSRegistry": {
+        "src": "contracts/QNSRegistrarSimple.sol:9",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "setOwner(bytes32,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.23"
+      },
+      "contracts/QNSRegistrarSimple.sol:IQNSReservedNames": {
+        "src": "contracts/QNSRegistrarSimple.sol:13",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "isReserved(bytes32)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.23"
+      },
+      "contracts/QNSRegistrarSimple.sol:QNSRegistrarSimple": {
+        "src": "contracts/QNSRegistrarSimple.sol:22",
+        "version": {
+          "withMetadata": "a6f2adf38ede83bf26ea64c0eb3d5d5a028e5615631c81eb061df433e4cef59b",
+          "withoutMetadata": "3710663a7bda77fe8c6fe997d73e41b2983669dfb2250106edc69df9716d6e4b",
+          "linkedWithoutMetadata": "3710663a7bda77fe8c6fe997d73e41b2983669dfb2250106edc69df9716d6e4b"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "(address,address,address,address)",
+          "getPrice(string)",
+          "register(string,bytes32)",
+          "available(bytes32)",
+          "updatePricing(uint256,uint256)",
+          "setPaused(bool)",
+          "updateTreasury(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "QNSRegistrarSimple",
+            "src": "contracts/QNSRegistrarSimple.sol:47"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "label": "qnsNFT",
+              "offset": 0,
+              "slot": "0",
+              "type": "t_contract(IQNSNFT)20",
+              "contract": "QNSRegistrarSimple",
+              "src": "contracts/QNSRegistrarSimple.sol:23"
+            },
+            {
+              "label": "registry",
+              "offset": 0,
+              "slot": "1",
+              "type": "t_contract(IQNSRegistry)28",
+              "contract": "QNSRegistrarSimple",
+              "src": "contracts/QNSRegistrarSimple.sol:24"
+            },
+            {
+              "label": "reservedNames",
+              "offset": 0,
+              "slot": "2",
+              "type": "t_contract(IQNSReservedNames)36",
+              "contract": "QNSRegistrarSimple",
+              "src": "contracts/QNSRegistrarSimple.sol:25"
+            },
+            {
+              "label": "admin",
+              "offset": 0,
+              "slot": "3",
+              "type": "t_address",
+              "contract": "QNSRegistrarSimple",
+              "src": "contracts/QNSRegistrarSimple.sol:27"
+            },
+            {
+              "label": "treasury",
+              "offset": 0,
+              "slot": "4",
+              "type": "t_address",
+              "contract": "QNSRegistrarSimple",
+              "src": "contracts/QNSRegistrarSimple.sol:28"
+            },
+            {
+              "label": "paused",
+              "offset": 20,
+              "slot": "4",
+              "type": "t_bool",
+              "contract": "QNSRegistrarSimple",
+              "src": "contracts/QNSRegistrarSimple.sol:29"
+            },
+            {
+              "label": "pricing",
+              "offset": 0,
+              "slot": "5",
+              "type": "t_mapping(t_uint256,t_uint256)",
+              "contract": "QNSRegistrarSimple",
+              "src": "contracts/QNSRegistrarSimple.sol:32"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address",
+              "numberOfBytes": "20"
+            },
+            "t_bool": {
+              "label": "bool",
+              "numberOfBytes": "1"
+            },
+            "t_contract(IQNSNFT)20": {
+              "label": "contract IQNSNFT",
+              "numberOfBytes": "20"
+            },
+            "t_contract(IQNSRegistry)28": {
+              "label": "contract IQNSRegistry",
+              "numberOfBytes": "20"
+            },
+            "t_contract(IQNSReservedNames)36": {
+              "label": "contract IQNSReservedNames",
+              "numberOfBytes": "20"
+            },
+            "t_mapping(t_uint256,t_uint256)": {
+              "label": "mapping(uint256 => uint256)",
+              "numberOfBytes": "32"
+            },
+            "t_uint256": {
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": true,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.23"
+      }
+    },
+    {
+      "contracts/QNSRegistrarSimple.sol:IQNSNFT": {
+        "src": "contracts/QNSRegistrarSimple.sol:4",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "mint(bytes32,address,string)",
+          "exists(bytes32)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.23"
+      },
+      "contracts/QNSRegistrarSimple.sol:IQNSRegistry": {
+        "src": "contracts/QNSRegistrarSimple.sol:9",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "setOwner(bytes32,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.23"
+      },
+      "contracts/QNSRegistrarSimple.sol:IQNSReservedNames": {
+        "src": "contracts/QNSRegistrarSimple.sol:13",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "isReserved(bytes32)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.23"
+      },
+      "contracts/QNSRegistrarSimple.sol:QNSRegistrarSimple": {
+        "src": "contracts/QNSRegistrarSimple.sol:22",
+        "version": {
+          "withMetadata": "adbef653f51ff350181d76caed2aafe42f4c5f0d81551519e25a0add31b9d7d8",
+          "withoutMetadata": "bf44967bb820aa16ee17f2d0f07c57f96fb01687efa5d86e5fbea8102039fb59",
+          "linkedWithoutMetadata": "bf44967bb820aa16ee17f2d0f07c57f96fb01687efa5d86e5fbea8102039fb59"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "(address,address,address,address)",
+          "getPrice(string)",
+          "register(string,bytes32)",
+          "available(bytes32)",
+          "updatePricing(uint256,uint256)",
+          "setPaused(bool)",
+          "updateTreasury(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "QNSRegistrarSimple",
+            "src": "contracts/QNSRegistrarSimple.sol:47"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "label": "qnsNFT",
+              "offset": 0,
+              "slot": "0",
+              "type": "t_contract(IQNSNFT)20",
+              "contract": "QNSRegistrarSimple",
+              "src": "contracts/QNSRegistrarSimple.sol:23"
+            },
+            {
+              "label": "registry",
+              "offset": 0,
+              "slot": "1",
+              "type": "t_contract(IQNSRegistry)28",
+              "contract": "QNSRegistrarSimple",
+              "src": "contracts/QNSRegistrarSimple.sol:24"
+            },
+            {
+              "label": "reservedNames",
+              "offset": 0,
+              "slot": "2",
+              "type": "t_contract(IQNSReservedNames)36",
+              "contract": "QNSRegistrarSimple",
+              "src": "contracts/QNSRegistrarSimple.sol:25"
+            },
+            {
+              "label": "admin",
+              "offset": 0,
+              "slot": "3",
+              "type": "t_address",
+              "contract": "QNSRegistrarSimple",
+              "src": "contracts/QNSRegistrarSimple.sol:27"
+            },
+            {
+              "label": "treasury",
+              "offset": 0,
+              "slot": "4",
+              "type": "t_address",
+              "contract": "QNSRegistrarSimple",
+              "src": "contracts/QNSRegistrarSimple.sol:28"
+            },
+            {
+              "label": "paused",
+              "offset": 20,
+              "slot": "4",
+              "type": "t_bool",
+              "contract": "QNSRegistrarSimple",
+              "src": "contracts/QNSRegistrarSimple.sol:29"
+            },
+            {
+              "label": "pricing",
+              "offset": 0,
+              "slot": "5",
+              "type": "t_mapping(t_uint256,t_uint256)",
+              "contract": "QNSRegistrarSimple",
+              "src": "contracts/QNSRegistrarSimple.sol:32"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address",
+              "numberOfBytes": "20"
+            },
+            "t_bool": {
+              "label": "bool",
+              "numberOfBytes": "1"
+            },
+            "t_contract(IQNSNFT)20": {
+              "label": "contract IQNSNFT",
+              "numberOfBytes": "20"
+            },
+            "t_contract(IQNSRegistry)28": {
+              "label": "contract IQNSRegistry",
+              "numberOfBytes": "20"
+            },
+            "t_contract(IQNSReservedNames)36": {
+              "label": "contract IQNSReservedNames",
+              "numberOfBytes": "20"
+            },
+            "t_mapping(t_uint256,t_uint256)": {
+              "label": "mapping(uint256 => uint256)",
+              "numberOfBytes": "32"
+            },
+            "t_uint256": {
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": true,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.23"
+      }
+    },
+    {
+      "contracts/QNSRegistrarSimple.sol:IQNSNFT": {
+        "src": "contracts/QNSRegistrarSimple.sol:4",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "mint(bytes32,address,string)",
+          "exists(bytes32)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.23"
+      },
+      "contracts/QNSRegistrarSimple.sol:IQNSRegistry": {
+        "src": "contracts/QNSRegistrarSimple.sol:9",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "setOwner(bytes32,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.23"
+      },
+      "contracts/QNSRegistrarSimple.sol:IQNSReservedNames": {
+        "src": "contracts/QNSRegistrarSimple.sol:13",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "isReserved(bytes32)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.23"
+      },
+      "contracts/QNSRegistrarSimple.sol:QNSRegistrarSimple": {
+        "src": "contracts/QNSRegistrarSimple.sol:22",
+        "version": {
+          "withMetadata": "e8c5c49a8ca104fc3815c325651d0ed222b0a2963b977f7033593c0c1b5f4bb1",
+          "withoutMetadata": "9574001ab1c5b0030fd639618812fd2271be39560c8b71478800de8bef15a4ae",
+          "linkedWithoutMetadata": "9574001ab1c5b0030fd639618812fd2271be39560c8b71478800de8bef15a4ae"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "(address,address,address,address)",
+          "getPrice(string)",
+          "register(string,bytes32)",
+          "available(bytes32)",
+          "updatePricing(uint256,uint256)",
+          "setPaused(bool)",
+          "updateTreasury(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "QNSRegistrarSimple",
+            "src": "contracts/QNSRegistrarSimple.sol:47"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "label": "qnsNFT",
+              "offset": 0,
+              "slot": "0",
+              "type": "t_contract(IQNSNFT)20",
+              "contract": "QNSRegistrarSimple",
+              "src": "contracts/QNSRegistrarSimple.sol:23"
+            },
+            {
+              "label": "registry",
+              "offset": 0,
+              "slot": "1",
+              "type": "t_contract(IQNSRegistry)28",
+              "contract": "QNSRegistrarSimple",
+              "src": "contracts/QNSRegistrarSimple.sol:24"
+            },
+            {
+              "label": "reservedNames",
+              "offset": 0,
+              "slot": "2",
+              "type": "t_contract(IQNSReservedNames)36",
+              "contract": "QNSRegistrarSimple",
+              "src": "contracts/QNSRegistrarSimple.sol:25"
+            },
+            {
+              "label": "admin",
+              "offset": 0,
+              "slot": "3",
+              "type": "t_address",
+              "contract": "QNSRegistrarSimple",
+              "src": "contracts/QNSRegistrarSimple.sol:27"
+            },
+            {
+              "label": "treasury",
+              "offset": 0,
+              "slot": "4",
+              "type": "t_address",
+              "contract": "QNSRegistrarSimple",
+              "src": "contracts/QNSRegistrarSimple.sol:28"
+            },
+            {
+              "label": "paused",
+              "offset": 20,
+              "slot": "4",
+              "type": "t_bool",
+              "contract": "QNSRegistrarSimple",
+              "src": "contracts/QNSRegistrarSimple.sol:29"
+            },
+            {
+              "label": "pricing",
+              "offset": 0,
+              "slot": "5",
+              "type": "t_mapping(t_uint256,t_uint256)",
+              "contract": "QNSRegistrarSimple",
+              "src": "contracts/QNSRegistrarSimple.sol:32"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address",
+              "numberOfBytes": "20"
+            },
+            "t_bool": {
+              "label": "bool",
+              "numberOfBytes": "1"
+            },
+            "t_contract(IQNSNFT)20": {
+              "label": "contract IQNSNFT",
+              "numberOfBytes": "20"
+            },
+            "t_contract(IQNSRegistry)28": {
+              "label": "contract IQNSRegistry",
+              "numberOfBytes": "20"
+            },
+            "t_contract(IQNSReservedNames)36": {
+              "label": "contract IQNSReservedNames",
+              "numberOfBytes": "20"
+            },
+            "t_mapping(t_uint256,t_uint256)": {
+              "label": "mapping(uint256 => uint256)",
+              "numberOfBytes": "32"
+            },
+            "t_uint256": {
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": true,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.23"
+      }
+    },
+    {
       "@openzeppelin/contracts/access/AccessControl.sol:AccessControl": {
         "src": "@openzeppelin/contracts/access/AccessControl.sol:49",
         "inherit": [
