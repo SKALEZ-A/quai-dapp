@@ -1,0 +1,18 @@
+#!/bin/bash
+# Auto-generated script to update .env with deployed addresses
+
+ENV_FILE="apps/web/.env"
+
+echo "Updating $ENV_FILE with deployed contract addresses..."
+
+# Backup existing .env
+cp $ENV_FILE $ENV_FILE.backup
+
+# Update addresses
+sed -i '' 's|NEXT_PUBLIC_QNS_REGISTRAR_ADDRESS=.*|NEXT_PUBLIC_QNS_REGISTRAR_ADDRESS=0x00204d553264Bdb39f4A6C6c1325d9B4553E427b|' $ENV_FILE
+sed -i '' 's|NEXT_PUBLIC_QNS_NFT_ADDRESS=.*|NEXT_PUBLIC_QNS_NFT_ADDRESS=0x005382DebE72ee74d5D6E5a2D97Dc7bA2C16be12|' $ENV_FILE
+sed -i '' 's|NEXT_PUBLIC_QNS_REGISTRY_ADDRESS=.*|NEXT_PUBLIC_QNS_REGISTRY_ADDRESS=0x0047904d94645A46BA56Cf7E8c064cB823746cFf|' $ENV_FILE
+sed -i '' 's|NEXT_PUBLIC_QNS_RESERVED_NAMES_ADDRESS=.*|NEXT_PUBLIC_QNS_RESERVED_NAMES_ADDRESS=0x0023272C07514D2D236f6c6895507DFd26442471|' $ENV_FILE
+
+echo "✅ Addresses updated!"
+echo "Backup saved to $ENV_FILE.backup"

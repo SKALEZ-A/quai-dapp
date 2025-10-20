@@ -31,12 +31,12 @@ const SocialProfile: React.FC = () => {
   const currentUser = useCurrentUser();
   const router = useRouter();
 
-  const handleCreatePost = (content: string, imageUrl?: string) => {
+  const handleCreatePost = (content: string, images?: File[]) => {
     const newPost = {
       id: posts.length + 1,
       time: 'Just now',
       content,
-      images: imageUrl ? [imageUrl] : [],
+      images: images ? images.map(f => URL.createObjectURL(f)) : [],
       likes: 0,
       comments: 0,
       reposts: 0,

@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api';
 import { generatePostSignature, generateCommentSignature, generateNonce } from '@/lib/signatures';
 import { useAccount } from 'wagmi';
 
 export interface SocialPost {
   id: string;
-  textPreview: string;
+  textPreview?: string;
   cid: string;
   imageCids?: string[];
   author: {
@@ -36,20 +36,41 @@ export function useSocial() {
   const [error, setError] = useState<string | null>(null);
   const { address } = useAccount();
 
-  // Fetch posts from API
-  const fetchPosts = async () => {
+  // Fetch posts from API with retry logic
+  const fetchPosts = useCallback(async (retryCount = 0) => {
     try {
       setIsLoading(true);
       setError(null);
+      
+      console.log('🔄 Fetching posts... (attempt:', retryCount + 1, ')');
       const response = await api.getPosts(20);
-      setPosts(response.posts || []);
+      
+      if (response && response.posts) {
+        console.log('✅ Posts loaded successfully:', response.posts.length);
+        setPosts(response.posts);
+      } else {
+        console.warn('⚠️ No posts in response:', response);
+        setPosts([]);
+      }
     } catch (err) {
-      console.error('Failed to fetch posts:', err);
-      setError('Failed to load posts');
+      console.error('❌ Failed to fetch posts:', err);
+      
+      // Retry once if it's a network error
+      if (retryCount === 0 && err instanceof Error && (
+        err.message.includes('Failed to fetch') || 
+        err.message.includes('NetworkError') ||
+        err.message.includes('fetch')
+      )) {
+        console.log('🔄 Retrying fetch after network error...');
+        setTimeout(() => fetchPosts(1), 1000);
+        return;
+      }
+      
+      setError(`Failed to load posts: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   // Create a new post
   const createPost = async (postData: CreatePostData, authorAddress: string) => {
@@ -176,10 +197,22 @@ export function useSocial() {
     }
   };
 
-  // Load posts on mount
+  // Load posts on mount and when address changes
   useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [address, fetchPosts]);
+
+  // Refresh posts when page becomes visible (user comes back to tab)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && address) {
+        fetchPosts();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [address, fetchPosts]);
 
   return {
     posts,
@@ -192,3 +225,4 @@ export function useSocial() {
     commentOnPost,
   };
 }
+

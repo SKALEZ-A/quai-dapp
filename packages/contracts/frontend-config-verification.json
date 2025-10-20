@@ -1,0 +1,66 @@
+{
+  "timestamp": "2025-10-18T10:23:04.029Z",
+  "deployment": {
+    "QNS_REGISTRY": "0x0047904d94645A46BA56Cf7E8c064cB823746cFf",
+    "QNS_NFT": "0x005382DebE72ee74d5D6E5a2D97Dc7bA2C16be12",
+    "QNS_RESERVED_NAMES": "0x0023272C07514D2D236f6c6895507DFd26442471",
+    "QNS_REGISTRAR": "0x00204d553264Bdb39f4A6C6c1325d9B4553E427b"
+  },
+  "frontend": null,
+  "env": null,
+  "mismatches": [
+    {
+      "contract": "QNS_REGISTRAR",
+      "location": "frontend",
+      "expected": "0x00204d553264Bdb39f4A6C6c1325d9B4553E427b",
+      "actual": null
+    },
+    {
+      "contract": "QNS_REGISTRAR",
+      "location": "env",
+      "expected": "0x00204d553264Bdb39f4A6C6c1325d9B4553E427b",
+      "actual": null
+    },
+    {
+      "contract": "QNS_NFT",
+      "location": "frontend",
+      "expected": "0x005382DebE72ee74d5D6E5a2D97Dc7bA2C16be12",
+      "actual": null
+    },
+    {
+      "contract": "QNS_NFT",
+      "location": "env",
+      "expected": "0x005382DebE72ee74d5D6E5a2D97Dc7bA2C16be12",
+      "actual": null
+    },
+    {
+      "contract": "QNS_REGISTRY",
+      "location": "frontend",
+      "expected": "0x0047904d94645A46BA56Cf7E8c064cB823746cFf",
+      "actual": null
+    },
+    {
+      "contract": "QNS_REGISTRY",
+      "location": "env",
+      "expected": "0x0047904d94645A46BA56Cf7E8c064cB823746cFf",
+      "actual": null
+    },
+    {
+      "contract": "QNS_RESERVED_NAMES",
+      "location": "frontend",
+      "expected": "0x0023272C07514D2D236f6c6895507DFd26442471",
+      "actual": null
+    },
+    {
+      "contract": "QNS_RESERVED_NAMES",
+      "location": "env",
+      "expected": "0x0023272C07514D2D236f6c6895507DFd26442471",
+      "actual": null
+    }
+  ],
+  "recommendations": [
+    "Update .env file with deployed addresses",
+    "Update contracts.ts with deployed addresses",
+    "Restart development server"
+  ]
+}

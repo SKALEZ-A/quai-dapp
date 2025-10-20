@@ -7,6 +7,9 @@
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
+// Debug: Log the API URL being used
+console.log('🔧 API_URL configured as:', API_URL);
+
 // Types
 export interface Profile {
   id: string;
@@ -21,6 +24,7 @@ export interface Post {
   id: string;
   cid: string;
   textPreview?: string;
+  imageCids?: string[];
   zone?: string;
   createdAt: string;
   author: Profile;
@@ -32,6 +36,7 @@ export interface Like {
   id: string;
   profileId: string;
   postId: string;
+  profile?: Profile;
 }
 
 export interface Comment {
@@ -83,12 +88,25 @@ export async function getPosts(params?: {
 
   const url = `${API_URL}/posts${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
   
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch posts: ${response.statusText}`);
-  }
+  console.log('🔍 Fetching posts from:', url);
+  
+  try {
+    const response = await fetch(url);
+    console.log('📡 Response status:', response.status, response.statusText);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ API Error Response:', errorText);
+      throw new Error(`Failed to fetch posts: ${response.statusText} - ${errorText}`);
+    }
 
-  return response.json();
+    const data = await response.json();
+    console.log('✅ Posts fetched successfully:', data.posts?.length || 0, 'posts');
+    return data;
+  } catch (error) {
+    console.error('❌ Network error fetching posts:', error);
+    throw error;
+  }
 }
 
 /**

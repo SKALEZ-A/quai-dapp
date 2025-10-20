@@ -47,7 +47,7 @@ const SocialActivity = () => {
     const [isLightboxOpen, setIsLightboxOpen] = useState(false);
     const router = useRouter();
     const currentUser = useCurrentUser();
-    const { posts, isLoading, isCreatingPost, error, createPost, likePost, commentOnPost } = useSocial();
+    const { posts, isLoading, isCreatingPost, error, createPost, likePost, commentOnPost, fetchPosts } = useSocial();
 
     const handleCreatePost = async (content: string, images?: File[]) => {
         // Use fallback address if no wallet connected
@@ -149,7 +149,7 @@ const SocialActivity = () => {
                                 <div className="text-lg font-medium mb-2">Error</div>
                                 <div>{error}</div>
                                 <button 
-                                    onClick={() => window.location.reload()} 
+                                    onClick={() => fetchPosts()} 
                                     className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
                                 >
                                     Retry
@@ -166,7 +166,7 @@ const SocialActivity = () => {
                                 <div className="w-12 h-12 rounded-full bg-gray-600 flex-shrink-0"></div>
                                 <div className="w-full">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <span className="font-bold">{post.author.name || `${post.author.address.slice(0, 6)}...${post.author.address.slice(-4)}`}</span>
+                                        <span className="font-bold">{post.author.displayName || post.author.qnsName || `${post.author.address.slice(0, 6)}...${post.author.address.slice(-4)}`}</span>
                                         <span className="text-gray-400 text-sm">{new Date(post.createdAt).toLocaleTimeString()}</span>
                                     </div>
                                     <p className="leading-relaxed mb-4">{post.textPreview}</p>
