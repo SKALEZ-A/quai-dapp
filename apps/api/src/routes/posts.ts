@@ -32,24 +32,29 @@ const createPostSchema = z.object({
 });
 
 router.get("/", async (req, res) => {
-  const limit = Math.min(Math.max(Number(req.query.limit ?? 20), 1), 100);
-  const cursor = typeof req.query.cursor === "string" ? req.query.cursor : undefined;
-  const authorAddress = typeof req.query.authorAddress === "string" ? req.query.authorAddress.toLowerCase() : undefined;
+  try {
+    const limit = Math.min(Math.max(Number(req.query.limit ?? 20), 1), 100);
+    const cursor = typeof req.query.cursor === "string" ? req.query.cursor : undefined;
+    const authorAddress = typeof req.query.authorAddress === "string" ? req.query.authorAddress.toLowerCase() : undefined;
 
-  const where = authorAddress
-    ? { author: { address: authorAddress } }
-    : undefined;
+    const where = authorAddress
+      ? { author: { address: authorAddress } }
+      : undefined;
 
-  const posts = await prisma.post.findMany({
-    take: limit,
-    ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
-    where,
-    orderBy: { createdAt: "desc" },
-    include: { author: true, likes: true, comments: true },
-  });
+    const posts = await prisma.post.findMany({
+      take: limit,
+      ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
+      where,
+      orderBy: { createdAt: "desc" },
+      include: { author: true, likes: true, comments: true },
+    });
 
-  const nextCursor = posts.length === limit ? posts[posts.length - 1].id : null;
-  res.json({ posts, nextCursor });
+    const nextCursor = posts.length === limit ? posts[posts.length - 1].id : null;
+    res.json({ posts, nextCursor });
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    res.status(500).json({ error: 'Failed to fetch posts' });
+  }
 });
 
 // Get single post by ID

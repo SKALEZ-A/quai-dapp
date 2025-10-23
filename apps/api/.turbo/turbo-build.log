@@ -1,5 +1,5 @@
 
 
-> api@0.1.0 build /Users/mac/Desktop/CODES/HACKATHON/QUAI/apps/api
+> api@0.1.0 build /Users/mac/Desktop/CODES/HACKATHON/QUAI_Rocster/QUAI/apps/api
 > tsc -p tsconfig.json
 

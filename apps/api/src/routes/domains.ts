@@ -1,5 +1,5 @@
 import express from 'express';
-import { Contract, keccak256, toUtf8Bytes, parseEther } from 'quais';
+import { Contract, keccak256, toUtf8Bytes, parseQuai } from 'quais';
 import { JsonRpcProvider } from 'quais';
 
 const router = express.Router();
@@ -148,7 +148,7 @@ router.post('/register', async (req, res) => {
     console.log('Registration price:', price.toString());
     
     // Register domain
-    const tx = await registrarWithSigner.register(name, node, { value: price });
+    const tx = await (registrarWithSigner as any).register(name, node, { value: price });
     console.log('Transaction sent:', tx.hash);
     
     const receipt = await tx.wait();

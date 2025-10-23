@@ -5,6 +5,7 @@ import { useAccount } from 'wagmi';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
 import { checkDomainAvailability, getDomainPrice, registerDomain, getUserDomains } from "@/lib/qns";
 import { BrowserProvider } from "quais";
+import { getOnchainPrice } from "@/lib/qns";
 
 interface DomainInfo {
   name: string;
@@ -13,6 +14,8 @@ interface DomainInfo {
   priceDisplay?: string;
   owner?: string;
   node?: string;
+  onchainPriceWei?: string;
+  onchainPriceDisplay?: string;
 }
 
 export default function QNSProfilePage() {
@@ -133,16 +136,33 @@ export default function QNSProfilePage() {
       const availability = await checkDomainAvailability(cleanName);
       console.log('Availability result:', availability);
       
+      // Fetch on-chain price (read-only provider via window.ethereum if available)
+      let onchainPriceDisplay = undefined as string | undefined;
+      let onchainPriceWei = undefined as string | undefined;
+      try {
+        const eth = (globalThis as any)?.ethereum;
+        if (eth) {
+          const provider = new BrowserProvider(eth);
+          const { priceWei, priceDisplay } = await getOnchainPrice(cleanName, provider);
+          onchainPriceDisplay = priceDisplay;
+          onchainPriceWei = priceWei.toString();
+        }
+      } catch (priceError) {
+        console.warn('Could not fetch on-chain price:', priceError);
+      }
+      
       const pricing = getDomainPrice(cleanName);
-      console.log('Pricing:', pricing);
+      console.log('Local pricing (fallback):', pricing);
       
       const domainInfo = { 
         name: cleanName, 
         available: availability.available, 
         price: pricing.price,
-        priceDisplay: pricing.display,
+        priceDisplay: onchainPriceDisplay || pricing.display,
         owner: availability.owner,
         node: availability.node,
+        onchainPriceWei,
+        onchainPriceDisplay,
       };
       
       console.log('Setting domain info:', domainInfo);
@@ -159,62 +179,91 @@ export default function QNSProfilePage() {
     await searchDomainByName(searchQuery);
   }
 
+  const [registrationStatus, setRegistrationStatus] = useState<string>('');
+  const [registrationError, setRegistrationError] = useState<string>('');
+
   async function handleRegisterDomain() {
     if (!finalAddress || !domainInfo) {
       console.log('Missing requirements:', { finalAddress, domainInfo });
-      alert("❌ Please connect your wallet and select a domain first.");
+      setRegistrationError("Please connect your wallet and select a domain first.");
       return;
     }
 
     console.log('Starting domain registration for:', domainInfo.name);
     setRegistering(true);
+    setRegistrationError('');
+    setRegistrationStatus('Initializing...');
 
     try {
       // Check if we're on the correct network first
       const eth = (globalThis as any)?.ethereum;
       if (!eth) {
-        alert("❌ Wallet not found. Please install Pelagus wallet.");
+        setRegistrationError("Wallet not found. Please install Pelagus wallet.");
+        setRegistering(false);
+        return;
+      }
+
+      // Ensure wallet is unlocked and connected
+      setRegistrationStatus('Checking wallet connection...');
+      try {
+        const accounts = await eth.request({ method: 'eth_accounts' });
+        if (!accounts || accounts.length === 0) {
+          setRegistrationError("Wallet not connected. Please connect your wallet first.");
+          setRegistering(false);
+          return;
+        }
+        console.log('Wallet accounts:', accounts);
+      } catch (accountError) {
+        console.error('Failed to get accounts:', accountError);
+        setRegistrationError("Failed to access wallet. Please ensure your wallet is unlocked.");
+        setRegistering(false);
         return;
       }
 
       // Check current network
-      console.log('Checking network...');
+      setRegistrationStatus('Checking network...');
       const chainId = await eth.request({ method: 'eth_chainId' });
-      console.log('Current chain ID:', chainId);
-
-      // Convert hex chainId to decimal for easier comparison
       const chainIdDecimal = parseInt(chainId, 16);
       console.log('Chain ID (decimal):', chainIdDecimal);
       
-      // Quai Orchard testnet zone chain IDs:
-      // Cyprus-1: 9000, Cyprus-2: 9001, Cyprus-3: 9002
-      // Paxos-1: 9100, Paxos-2: 9101, Paxos-3: 9102
-      // Hydra-1: 9200, Hydra-2: 9201, Hydra-3: 9202
+      // Quai Orchard testnet zone chain IDs
       const validChainIds = [9000, 9001, 9002, 9100, 9101, 9102, 9200, 9201, 9202];
       
       if (!validChainIds.includes(chainIdDecimal)) {
         console.warn(`Unexpected chain ID: ${chainIdDecimal}. Continuing anyway...`);
-        // Don't block - just warn
       }
 
-      console.log('Network check passed');
-
       // Get signer with proper error handling
-      console.log('Creating provider and signer...');
+      setRegistrationStatus('Connecting to wallet...');
       const provider = new BrowserProvider(eth);
+      
+      // Verify provider is connected
+      const network = await provider.getNetwork();
+      console.log('Provider network:', {
+        chainId: network.chainId.toString(),
+        name: network.name
+      });
+      
       const signer = await provider.getSigner();
-
       const signerAddress = await signer.getAddress();
       console.log('Signer address:', signerAddress);
+      
+      // Verify signer has a provider
+      if (!signer.provider) {
+        setRegistrationError("Signer not properly connected to provider. Please reconnect your wallet.");
+        setRegistering(false);
+        return;
+      }
 
       // Check balance
+      setRegistrationStatus('Checking balance...');
       try {
         const balance = await provider.getBalance(signerAddress);
-        console.log('Account balance:', balance.toString(), 'wei');
         console.log('Account balance (QI):', (Number(balance) / 1e18).toFixed(4), 'QI');
         
         if (balance === BigInt(0)) {
-          alert("❌ Insufficient balance!\n\nYou have 0 QI. Please get testnet QI from:\nhttps://faucet.quai.network/");
+          setRegistrationError("Insufficient balance! You have 0 QI. Get testnet QI from: https://faucet.quai.network/");
+          setRegistering(false);
           return;
         }
       } catch (balanceError) {
@@ -223,17 +272,26 @@ export default function QNSProfilePage() {
 
       if (signerAddress.toLowerCase() !== finalAddress.toLowerCase()) {
         console.warn('Signer address mismatch:', { signerAddress, finalAddress });
-        alert("❌ Wallet address mismatch. Please reconnect your wallet.");
+        setRegistrationError("Wallet address mismatch. Please reconnect your wallet.");
+        setRegistering(false);
         return;
       }
 
-      // Register domain on blockchain
+      // Register domain on blockchain with progress callback
       console.log('Calling registerDomain function...');
-      const result = await registerDomain(domainInfo.name, signer);
+      const result = await registerDomain(domainInfo.name, signer, {
+        maxRetries: 3,
+        validateFirst: true,
+        onProgress: (status: string) => {
+          console.log('Progress:', status);
+          setRegistrationStatus(status);
+        }
+      });
 
       console.log('Registration result:', result);
 
       if (result.success) {
+        setRegistrationStatus('Success! Domain registered.');
         alert(`✅ Domain registered successfully!\n\n${domainInfo.name}.qns is now yours!\n\nTransaction: ${result.txHash?.slice(0, 10)}...`);
 
         // Refresh domain info
@@ -243,40 +301,18 @@ export default function QNSProfilePage() {
         await loadUserDomains();
       } else {
         console.error('Registration failed:', result.error);
-
-        // More specific error messages
-        let errorMsg = result.error || 'Unknown error';
-        if (errorMsg.includes('insufficient funds')) {
-          errorMsg = 'Insufficient QI balance. Get testnet QI from https://faucet.quai.network/';
-        } else if (errorMsg.includes('already registered')) {
-          errorMsg = 'Domain is already registered';
-        } else if (errorMsg.includes('reserved')) {
-          errorMsg = 'Domain name is reserved';
-        }
-
-        alert(`❌ Registration failed\n\n${errorMsg}`);
+        const errorMsg = result.error || 'Unknown error';
+        setRegistrationError(errorMsg);
       }
     } catch (error: any) {
       console.error('Registration error:', error);
-
-      let errorMessage = error?.message || 'Please try again';
-
-      // Better error handling for common issues
-      if (errorMessage.includes('User rejected')) {
-        errorMessage = 'Transaction was rejected in your wallet';
-      } else if (errorMessage.includes('insufficient funds')) {
-        errorMessage = 'Insufficient QI balance. Get testnet QI from https://faucet.quai.network/';
-      } else if (errorMessage.includes('network')) {
-        errorMessage = 'Network error. Please check your connection and try again.';
-      } else if (errorMessage.includes('missing revert data')) {
-        errorMessage = 'Contract interaction failed. Please check your wallet connection and try again.';
-      } else if (errorMessage.includes('nonce')) {
-        errorMessage = 'Transaction nonce error. Please reset your wallet or try again.';
-      }
-
-      alert(`❌ Registration failed\n\n${errorMessage}`);
+      const errorMessage = error?.message || 'Please try again';
+      setRegistrationError(errorMessage);
     } finally {
       setRegistering(false);
+      if (!registrationError) {
+        setTimeout(() => setRegistrationStatus(''), 3000);
+      }
     }
   }
 
@@ -358,7 +394,7 @@ export default function QNSProfilePage() {
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-gray-400">Price:</span>
-                    <span className="text-primary font-bold text-2xl">{domainInfo.priceDisplay}</span>
+                    <span className="text-primary font-bold text-2xl">{domainInfo.onchainPriceDisplay || domainInfo.priceDisplay}</span>
                   </div>
                   <div className="pt-2 border-t border-border">
                     <p className="text-xs text-gray-400">
@@ -367,6 +403,26 @@ export default function QNSProfilePage() {
                   </div>
                 </div>
                 
+                {/* Registration Status */}
+                {registrationStatus && (
+                  <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                    <p className="text-sm text-blue-400 flex items-center gap-2">
+                      <span className="animate-pulse">⏳</span>
+                      {registrationStatus}
+                    </p>
+                  </div>
+                )}
+
+                {/* Registration Error */}
+                {registrationError && (
+                  <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+                    <p className="text-sm text-red-400 flex items-center gap-2">
+                      <span>❌</span>
+                      {registrationError}
+                    </p>
+                  </div>
+                )}
+
                 <button 
                   onClick={handleRegisterDomain} 
                   disabled={!finalAddress || registering}
@@ -389,7 +445,7 @@ export default function QNSProfilePage() {
                   </p>
                 )}
 
-                {finalAddress && (
+                {finalAddress && !registering && !registrationStatus && (
                   <p className="mt-3 text-xs text-center text-gray-500">
                     Transaction will be processed on Quai Testnet (Orchard)
                   </p>

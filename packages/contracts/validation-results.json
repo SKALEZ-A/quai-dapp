@@ -1,0 +1,66 @@
+{
+  "timestamp": "2025-10-18T10:22:57.612Z",
+  "network": "cyprus1_testnet",
+  "chainId": 15000,
+  "contracts": {
+    "QNS_NFT": {
+      "address": "0x005382DebE72ee74d5D6E5a2D97Dc7bA2C16be12",
+      "deployed": true,
+      "accessible": true,
+      "hasCode": true,
+      "metadata": {
+        "name": "Quai Name Service",
+        "symbol": "QNS",
+        "totalSupply": "3"
+      }
+    },
+    "QNS_REGISTRY": {
+      "address": "0x0047904d94645A46BA56Cf7E8c064cB823746cFf",
+      "deployed": true,
+      "accessible": true,
+      "hasCode": true
+    },
+    "QNS_RESERVED_NAMES": {
+      "address": "0x0023272C07514D2D236f6c6895507DFd26442471",
+      "deployed": true,
+      "accessible": true,
+      "hasCode": true
+    },
+    "QNS_REGISTRAR": {
+      "address": "0x00204d553264Bdb39f4A6C6c1325d9B4553E427b",
+      "deployed": true,
+      "accessible": true,
+      "hasCode": true
+    }
+  },
+  "references": {
+    "nft": {
+      "expected": "0x005382DebE72ee74d5D6E5a2D97Dc7bA2C16be12",
+      "actual": "0x005382DebE72ee74d5D6E5a2D97Dc7bA2C16be12",
+      "matches": true
+    },
+    "registry": {
+      "expected": "0x0047904d94645A46BA56Cf7E8c064cB823746cFf",
+      "actual": "0x0047904d94645A46BA56Cf7E8c064cB823746cFf",
+      "matches": true
+    },
+    "reservedNames": {
+      "expected": "0x0023272C07514D2D236f6c6895507DFd26442471",
+      "actual": "0x0023272C07514D2D236f6c6895507DFd26442471",
+      "matches": true
+    }
+  },
+  "issues": [],
+  "warnings": [],
+  "testResults": {
+    "getPrice": {
+      "success": false,
+      "error": "quais.formatEther is not a function"
+    },
+    "available": {
+      "success": true,
+      "available": true
+    }
+  },
+  "overallStatus": "healthy"
+}

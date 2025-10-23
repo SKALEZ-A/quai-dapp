@@ -13,7 +13,8 @@ export const CONTRACTS = {
   SOCIAL_POSTS: process.env.NEXT_PUBLIC_SOCIAL_CONTRACT_ADDRESS || '0x004362b17499d3e7FEc9Da9eFA2bcBd2d3D1D910',
 } as const;
 
-export const RPC_URL = process.env.NEXT_PUBLIC_QUAI_TESTNET_RPC || 'https://orchard.rpc.quai.network/cyprus1';
+// RPC URL should be base URL only - usePathing will add /cyprus1 automatically
+export const RPC_URL = process.env.NEXT_PUBLIC_QUAI_TESTNET_RPC || 'https://orchard.rpc.quai.network';
 
 // Contract ABIs - minimal interfaces for needed functions
 export const QNS_REGISTRY_ABI = [
@@ -53,4 +54,13 @@ export const QNS_REGISTRAR_ABI = [
   "function getPrice(string calldata name) external view returns (uint256)",
   "function available(bytes32 node) external view returns (bool)",
   "function registerBatch(string[] calldata names, bytes32[] calldata nodes) external payable returns (uint256[])",
+] as const;
+
+// QiPaymentResolver ABI - for resolving domain names to addresses
+export const QI_PAYMENT_RESOLVER_ABI = [
+  "function resolveNode(bytes32 node) external view returns (string memory qiCode, address primaryAddress, string[] memory supportedChains, bool active)",
+  "function resolveQiCode(string calldata qiCode) external view returns (bytes32 node, address primaryAddress, string[] memory supportedChains, bool active)",
+  "function getChainAddress(bytes32 node, string calldata chain) external view returns (address)",
+  "function isActive(bytes32 node) external view returns (bool)",
+  "function getPaymentRecord(bytes32 node) external view returns (string memory qiCode, address primaryAddress, bool active)",
 ] as const;

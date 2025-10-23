@@ -9,3 +9,6 @@ apps/**/build
 apps/**/dist
 packages/**/dist
 coverage
+
+# Turbo cache
+.turbo

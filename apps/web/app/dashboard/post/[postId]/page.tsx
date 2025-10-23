@@ -6,6 +6,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { api } from '@/lib/api';
 import { generateCommentSignature, generateNonce } from '@/lib/signatures';
 import ImageLightbox from '@/components/ImageLightbox';
+import ImageWithLoading from '@/components/ImageWithLoading';
 import { Post, Comment, Like } from '@/lib/api';
 
 // Icons
@@ -112,12 +113,10 @@ export default function DashboardPostDetailPage({ params }: { params: { postId: 
           profile: {
             id: `temp_${Date.now()}`,
             address: userAddress,
-            qnsName: null,
-            displayName: null,
-            avatarUrl: null,
-            bio: null,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+            qnsName: undefined,
+            displayName: undefined,
+            avatarUrl: undefined,
+            bio: undefined,
           }
         };
         setLikes(prev => [...prev, newLike]);
@@ -233,26 +232,41 @@ export default function DashboardPostDetailPage({ params }: { params: { postId: 
           {post.imageCids && post.imageCids.length > 0 && (
             <div className={`grid ${getImageGridClasses(post.imageCids.length)} gap-2 rounded-xl overflow-hidden mb-4`}>
               {post.imageCids.map((cid, index) => {
+                // Use the same image URL logic as the dashboard page
                 const imageUrl = cid.startsWith('local_') 
-                  ? `/api/placeholder?text=Image&cid=${cid}`
-                  : `https://${cid}.ipfs.nftstorage.link`;
+                  ? `/api/placeholder?text=Image&cid=${cid}` // Fallback for local CIDs
+                  : `https://gateway.pinata.cloud/ipfs/${cid}`;
                 
                 return (
-                  <img 
+                  <ImageWithLoading
                     key={index} 
                     src={imageUrl}
                     alt={`Post image ${index + 1}`} 
-                    className={`w-full object-cover cursor-pointer hover:opacity-90 transition-opacity ${getImageHeightClass(post.imageCids.length)}`}
+                    className={`w-full object-cover cursor-pointer hover:opacity-90 transition-opacity ${getImageHeightClass(post.imageCids?.length || 0)}`}
                     onClick={() => openImageLightbox(
                       post.imageCids!.map(c => c.startsWith('local_') 
                         ? `/api/placeholder?text=Image&cid=${c}` 
-                        : `https://${c}.ipfs.nftstorage.link`
+                        : `https://gateway.pinata.cloud/ipfs/${c}`
                       ),
                       index
                     )}
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      target.src = `/api/placeholder?text=Image+Not+Available&cid=${cid}`;
+                      const currentSrc = target.src;
+                      
+                      // Skip if it's already a local placeholder
+                      if (currentSrc.includes('/api/placeholder')) {
+                        return;
+                      }
+                      
+                      // Try multiple IPFS gateways as fallback
+                      if (currentSrc.includes('gateway.pinata.cloud')) {
+                        target.src = `https://${cid}.ipfs.w3s.link`;
+                      } else if (currentSrc.includes('ipfs.w3s.link')) {
+                        target.src = `https://${cid}.ipfs.cloudflare-ipfs.com`;
+                      } else {
+                        target.src = `/api/placeholder?text=Image+Not+Available&cid=${cid}`;
+                      }
                     }}
                   />
                 );
