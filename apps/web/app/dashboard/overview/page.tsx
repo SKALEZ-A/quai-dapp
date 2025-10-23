@@ -71,7 +71,7 @@ const UserOverview = () => {
 
   return (
     <div className="min-h-screen text-gray-100 font-sans">
-      <div className="flex flex-col gap-6 max-w-7xl mx-auto">
+      <div className="flex flex-col gap-6 max-w-7xl mx-auto px-4 lg:px-0">
         
 
         {/* Overview Main Content */}
@@ -80,13 +80,13 @@ const UserOverview = () => {
           <div className="">
             <div className="">
               {/* Profile Card */}
-              <div className="flex items-center gap-5">
-                <div className="w-20 h-20 rounded-full bg-gray-700 flex-shrink-0 overflow-hidden">
+              <div className="flex items-center gap-3 lg:gap-5">
+                <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-gray-700 flex-shrink-0 overflow-hidden">
                   <img src={currentUser.profileImg} className="w-auto h-full" alt={currentUser.name} />
                 </div>
                 <div className="flex flex-col">
-                  <h2 className="text-2xl font-space-grotesk font-bold text-gray-50 mb-1">{currentUser.name}</h2>
-                  <span className="text-base text-gray-400 text-sm">@{currentUser.username}</span>
+                  <h2 className="text-xl lg:text-2xl font-space-grotesk font-bold text-gray-50 mb-1">{currentUser.name}</h2>
+                  <span className="text-sm lg:text-base text-gray-400">@{currentUser.username}</span>
                   {currentUser.address && (
                     <span className="text-xs text-gray-500 mt-1">Address: {currentUser.short_address}</span>
                   )}
@@ -96,18 +96,18 @@ const UserOverview = () => {
               {/* Wallet Address Card */}
               <div className=" py-6 md:py-8">
                   {/* <h3 className="text-lg font-semibold mb-4 hidden">Wallet Address</h3>  Hidden as per design */}
-                  <div className="flex justify-between items-center text-sm mb-4">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center text-sm mb-4 gap-2">
                       <span className="text-gray-400">Wallet Address</span>
                       <div className="flex items-center gap-2 bg-gray-800 px-2 py-1 rounded-md font-mono text-xs">
-                          {currentUser.short_address}
-                          <button className="text-gray-400 hover:text-gray-100 transition-colors" onClick={() => copyItem(currentUser.address ?? "")}><CopyIcon /></button>
+                          <span className="truncate">{currentUser.short_address}</span>
+                          <button className="text-gray-400 hover:text-gray-100 transition-colors flex-shrink-0" onClick={() => copyItem(currentUser.address ?? "")}><CopyIcon /></button>
                       </div>
                   </div>
-                  <div className="flex justify-between items-center text-sm">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center text-sm gap-2">
                       <span className="text-gray-400">Synq Payment Code</span>
                       <div className="flex items-center gap-2 bg-gray-800 px-2 py-1 rounded-md font-mono text-xs">
-                          {currentUser.username}
-                          <button className="text-gray-400 hover:text-gray-100 transition-colors" onClick={() => copyItem(currentUser.username)}><CopyIcon /></button>
+                          <span className="truncate">{currentUser.username}</span>
+                          <button className="text-gray-400 hover:text-gray-100 transition-colors flex-shrink-0" onClick={() => copyItem(currentUser.username)}><CopyIcon /></button>
                       </div>
                   </div>
               </div>
@@ -117,9 +117,9 @@ const UserOverview = () => {
           {/* Wallet Balance Card */}
           <div className="">
             <h2 className="font-space-grotesk font-bold text-xl mb-4">Wallet Balance</h2>
-              <div className="bg-black border border-gray-700 rounded-xl py-8 p-6 flex flex-col md:flex-row justify-between items-start pb-8 mb-6 border-b border-gray-700">
+              <div className="bg-black border border-gray-700 rounded-xl py-8 p-6 flex flex-col md:flex-row justify-between items-start pb-8 mb-6">
                   <div className="flex flex-col mb-4 md:mb-0">
-                      <span className="text-gray-400 text-base mb-2 text-sm">Quai (Qi)</span>
+                      <span className="text-gray-400 text-sm mb-2">Quai (Qi)</span>
                       {balanceLoading ? (
                         <div className="flex items-center gap-2">
                           <div className="animate-spin inline-block w-4 h-4 border-2 border-gray-600 border-t-primary rounded-full"></div>
@@ -154,17 +154,17 @@ const UserOverview = () => {
               <h3 className="text-xl font-semibold mb-4">Quick Action</h3>
               <div className="">
                 <div className="mb-4">
-                  <button onClick={() => router.push('/dashboard/social')} className="h-[80px] w-full flex flex-col items-center justify-center gap-2 p-4 rounded-lg bg-[#b12c5b] text-gray-50 font-medium hover:opacity-90 transition-opacity text-sm">
+                  <button onClick={() => router.push('/dashboard/social')} className="h-[70px] lg:h-[80px] w-full flex flex-col items-center justify-center gap-2 p-4 rounded-lg bg-[#b12c5b] text-gray-50 font-medium hover:opacity-90 transition-opacity text-sm">
                     <PostIcon />
                     Post
                   </button>
                 </div>
-                <div className="flex space-x-4">
-                  <button onClick={() => router.push('/dashboard/bridge')} className="w-1/2 h-[80px] flex flex-col items-center justify-center gap-2 p-4 rounded-lg bg-[#000000] text-gray-50 font-medium hover:opacity-90 transition-opacity text-sm">
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
+                  <button onClick={() => router.push('/dashboard/bridge')} className="w-full sm:w-1/2 h-[70px] lg:h-[80px] flex flex-col items-center justify-center gap-2 p-4 rounded-lg bg-[#000000] text-gray-50 font-medium hover:opacity-90 transition-opacity text-sm">
                     <BridgeIcon />
                     Bridge
                   </button>
-                  <button onClick={() => router.push('/qns/profile')} className="w-1/2 h-[80px] flex flex-col items-center justify-center gap-2 p-4 rounded-lg bg-[#3366ff] text-gray-50 font-medium hover:opacity-90 transition-opacity text-sm">
+                  <button onClick={() => router.push('/qns/profile')} className="w-full sm:w-1/2 h-[70px] lg:h-[80px] flex flex-col items-center justify-center gap-2 p-4 rounded-lg bg-[#3366ff] text-gray-50 font-medium hover:opacity-90 transition-opacity text-sm">
                     <BuyIcon />
                     Buy QNS
                   </button>
@@ -179,18 +179,18 @@ const UserOverview = () => {
             <h3 className="text-xl font-space-grotesk font-semibold flex items-center gap-2">
               <DomainIcon /> My QNS Domains
             </h3>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <button 
                 onClick={() => {
                   setDomainsLoaded(false);
                   loadDomains();
                 }} 
                 disabled={loadingDomains}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-700 text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+                className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-gray-700 text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
               >
                 {loadingDomains ? "Loading..." : "Refresh"}
               </button>
-              <button onClick={() => router.push('/qns/namesearch')} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-primary to-secondary text-white font-medium hover:opacity-90 transition-opacity">
+              <button onClick={() => router.push('/qns/namesearch')} className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-primary to-secondary text-white font-medium hover:opacity-90 transition-opacity">
                 <BuyIcon /> Buy Domain
               </button>
             </div>
@@ -222,7 +222,7 @@ const UserOverview = () => {
                       <span className="text-xs px-2 py-1 bg-green-900/30 text-green-400 rounded">Active</span>
                     </div>
                     
-                    <div className="flex gap-2 mt-4">
+                    <div className="flex flex-col sm:flex-row gap-2 mt-4">
                       <button 
                         onClick={() => copyItem(domain + '.qns')}
                         className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-xs bg-gray-800 hover:bg-gray-700 rounded transition-colors text-gray-300"
@@ -251,9 +251,9 @@ const UserOverview = () => {
 
         {/* Social Activity Card */}
         <div className="mt-8">
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
             <h3 className="text-xl font-semibold">Social Activity</h3>
-            <button onClick={() => router.push('/dashboard/social')} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-pink-700 text-gray-50 font-medium">
+            <button onClick={() => router.push('/dashboard/social')} className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-pink-700 text-gray-50 font-medium">
                 <PostIcon /> Post
             </button>
           </div>

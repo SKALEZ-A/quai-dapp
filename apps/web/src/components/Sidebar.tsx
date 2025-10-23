@@ -52,6 +52,16 @@ const ChevronDownIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <path d="m6 9 6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
+const MenuIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+const CloseIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
 
 const DEFAULT_PROFILE_IMG = "/assets/avatars/alice-chen.png";
 
@@ -59,6 +69,7 @@ const Sidebar = () => {
   const currentUser = useCurrentUser();
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Prevent hydration mismatch by only rendering user info on client
   useEffect(() => {
@@ -67,26 +78,57 @@ const Sidebar = () => {
 
   const isActive = (path: string) => pathname === path;
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
   return (
-    <aside className="bg-black border-r border-border flex flex-col justify-between py-8 px-6">
+    <>
+      {/* Mobile Menu Button */}
+      <button
+        onClick={toggleMobileMenu}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-black border border-border rounded-lg text-white hover:bg-surface transition-colors"
+      >
+        <MenuIcon />
+      </button>
+
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={closeMobileMenu}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`
+        bg-black border-r border-border flex flex-col justify-between py-8 px-6
+        fixed lg:static inset-y-0 left-0 z-50 w-80 lg:w-auto
+        transform transition-transform duration-300 ease-in-out
+        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
       <div className="">
         <img src="/assets/logo.png" alt="Synq Logo" className="h-8 mb-12 px-2" />
         <nav className="space-y-8"> {/* Added space-y for consistent margin */}
           <div className="mb-8"> {/* Grouping for dashboard nav */}
             <h2 className="text-xs text-text-secondary font-medium tracking-wider mb-4 px-2">DASHBOARD</h2>
-            <Link href="/dashboard/social" className={`flex items-center gap-3 py-3 px-2 rounded-lg text-text-secondary font-medium transition-all duration-200 ease-in-out hover:bg-surface hover:text-text-primary ${isActive('/dashboard/social') ? 'bg-primary text-text-primary' : ''}`}>
+            <Link href="/dashboard/social" onClick={closeMobileMenu} className={`flex items-center gap-3 py-3 px-2 rounded-lg text-text-secondary font-medium transition-all duration-200 ease-in-out hover:bg-surface hover:text-text-primary ${isActive('/dashboard/social') ? 'bg-primary text-text-primary' : ''}`}>
               <ActivityIcon className="w-5 h-5" />
               <span>Social Activity</span>
             </Link>
-            <Link href="/qns/profile" className={`flex items-center gap-3 py-3 px-2 rounded-lg text-text-secondary font-medium transition-all duration-200 ease-in-out hover:bg-surface hover:text-text-primary ${isActive('/qns/profile') ? 'bg-primary text-text-primary' : ''}`}>
+            <Link href="/qns/profile" onClick={closeMobileMenu} className={`flex items-center gap-3 py-3 px-2 rounded-lg text-text-secondary font-medium transition-all duration-200 ease-in-out hover:bg-surface hover:text-text-primary ${isActive('/qns/profile') ? 'bg-primary text-text-primary' : ''}`}>
               <QnsIcon className="w-5 h-5" />
               <span>QNS</span>
             </Link>
-            <Link href="/dashboard/bridge" className={`flex items-center gap-3 py-3 px-2 rounded-lg text-text-secondary font-medium transition-all duration-200 ease-in-out hover:bg-surface hover:text-text-primary ${isActive('/dashboard/bridge') ? 'bg-primary text-text-primary' : ''}`}>
+            <Link href="/dashboard/bridge" onClick={closeMobileMenu} className={`flex items-center gap-3 py-3 px-2 rounded-lg text-text-secondary font-medium transition-all duration-200 ease-in-out hover:bg-surface hover:text-text-primary ${isActive('/dashboard/bridge') ? 'bg-primary text-text-primary' : ''}`}>
               <BridgeIcon className="w-5 h-5" />
               <span>Bridge</span>
             </Link>
-            <Link href="/dashboard/overview" className={`flex items-center gap-3 py-3 px-2 rounded-lg text-text-secondary font-medium transition-all duration-200 ease-in-out hover:bg-surface hover:text-text-primary ${isActive('/dashboard/overview') ? 'bg-primary text-text-primary' : ''}`}>
+            <Link href="/dashboard/overview" onClick={closeMobileMenu} className={`flex items-center gap-3 py-3 px-2 rounded-lg text-text-secondary font-medium transition-all duration-200 ease-in-out hover:bg-surface hover:text-text-primary ${isActive('/dashboard/overview') ? 'bg-primary text-text-primary' : ''}`}>
               <UserIcon className="w-5 h-5" />
               <span>User Overview</span>
             </Link>
@@ -97,7 +139,7 @@ const Sidebar = () => {
           </div>
           <div> {/* Grouping for other nav */}
             <h2 className="text-xs text-text-secondary font-medium tracking-wider mb-4 px-2">OTHER</h2>
-            <Link href="/dashboard/settings" className={`flex items-center gap-3 py-3 px-2 rounded-lg text-text-secondary font-medium transition-all duration-200 ease-in-out hover:bg-surface hover:text-text-primary ${isActive('/dashboard/settings') ? 'bg-primary text-text-primary' : ''}`}>
+            <Link href="/dashboard/settings" onClick={closeMobileMenu} className={`flex items-center gap-3 py-3 px-2 rounded-lg text-text-secondary font-medium transition-all duration-200 ease-in-out hover:bg-surface hover:text-text-primary ${isActive('/dashboard/settings') ? 'bg-primary text-text-primary' : ''}`}>
               <SettingsIcon className="w-5 h-5" />
               <span>Settings</span>
             </Link>
@@ -106,7 +148,7 @@ const Sidebar = () => {
       </div>
       <div className="pt-6 border-t border-border">
         {mounted ? (
-          <Link href="/dashboard/profile">
+          <Link href="/dashboard/profile" onClick={closeMobileMenu}>
             <div className="flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors hover:bg-surface" >
                 <div className="w-10 h-10 rounded-full bg-secondary overflow-hidden">
                   <img src={currentUser.profileImg} className="w-auto h-full" alt="Your Profile Image" />
@@ -130,7 +172,8 @@ const Sidebar = () => {
           </div>
         )}
       </div>
-    </aside>
+      </aside>
+    </>
   );
 };
 

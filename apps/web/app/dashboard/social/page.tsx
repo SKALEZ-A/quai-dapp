@@ -109,7 +109,7 @@ const SocialActivity = () => {
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-6 h-[calc(100vh-60px)] mt-[-20px]">
-            <main className="flex flex-col gap-4 overflow-y-scroll pr-6 lg:pr-0 scrollbar-hide relative">
+            <main className="flex flex-col gap-4 overflow-y-scroll pr-0 lg:pr-6 scrollbar-hide relative">
                 <div className="flex border-b border-gray-700">
                     <button 
                         className={`py-4 px-6 text-base font-medium relative ${activeTab === 'For You' ? 'text-white' : 'text-gray-400'}`} 
@@ -127,17 +127,17 @@ const SocialActivity = () => {
                     </button>
                 </div>
                 
-                <div className="flex items-center gap-4 bg-black p-4 rounded-lg cursor-pointer" onClick={() => setIsModalOpen(true)}>
-                            <div className="w-12 h-12 rounded-full bg-gray-600 flex-shrink-0 overflow-hidden">
+                <div className="flex items-center gap-3 lg:gap-4 bg-black p-3 lg:p-4 rounded-lg cursor-pointer" onClick={() => setIsModalOpen(true)}>
+                            <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-gray-600 flex-shrink-0 overflow-hidden">
                                 <img src={currentUser.profileImg} className="w-auto h-full" alt="Your Profile Image" />
                             </div>
                     <div className="flex-grow flex items-center rounded-lg px-2">
-                       <span className="py-3 text-gray-400 text-base">Got an Alpha?</span>
+                       <span className="py-3 text-gray-400 text-sm lg:text-base">Got an Alpha?</span>
                        <div className="ml-auto text-gray-400">
                            <ImageIcon />
                        </div>
                     </div>
-                    <button className="bg-gradient-to-r from-[#8B1E3F] to-[#6C3B9E] text-white py-2 px-5 rounded-full font-medium text-sm">Post</button>
+                    <button className="bg-gradient-to-r from-[#8B1E3F] to-[#6C3B9E] text-white py-2 px-3 lg:px-5 rounded-full font-medium text-xs lg:text-sm">Post</button>
                 </div>
 
                 <div className="flex flex-col gap-px bg-gray-700 rounded-lg overflow-y-scroll scrollbar-hide">
@@ -162,14 +162,14 @@ const SocialActivity = () => {
                         </div>
                     ) : (
                         posts.map(post => (
-                            <div className="flex gap-4 bg-black p-6 cursor-pointer" key={post.id} onClick={() => router.push(`/dashboard/post/${post.id}`)}>
-                                <div className="w-12 h-12 rounded-full bg-gray-600 flex-shrink-0"></div>
+                            <div className="flex gap-3 lg:gap-4 bg-black p-4 lg:p-6 cursor-pointer" key={post.id} onClick={() => router.push(`/dashboard/post/${post.id}`)}>
+                                <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-gray-600 flex-shrink-0"></div>
                                 <div className="w-full">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <span className="font-bold">{post.author.displayName || post.author.qnsName || `${post.author.address.slice(0, 6)}...${post.author.address.slice(-4)}`}</span>
-                                        <span className="text-gray-400 text-sm">{new Date(post.createdAt).toLocaleTimeString()}</span>
+                                        <span className="font-bold text-sm lg:text-base">{post.author.displayName || post.author.qnsName || `${post.author.address.slice(0, 6)}...${post.author.address.slice(-4)}`}</span>
+                                        <span className="text-gray-400 text-xs lg:text-sm">{new Date(post.createdAt).toLocaleTimeString()}</span>
                                     </div>
-                                    <p className="leading-relaxed mb-4">{post.textPreview}</p>
+                                    <p className="leading-relaxed mb-4 text-sm lg:text-base">{post.textPreview}</p>
                                     {post.imageCids && post.imageCids.length > 0 && (
                                         <div className={`grid ${getImageGridClasses(post.imageCids.length)} gap-2 rounded-xl overflow-hidden mb-4`}>
                                             {post.imageCids.map((cid, index) => {
@@ -219,9 +219,9 @@ onError={(e) => {
                                             })}
                                         </div>
                                     )}
-                                    <div className="flex gap-6 text-gray-400">
+                                    <div className="flex gap-4 lg:gap-6 text-gray-400">
                                         <button 
-                                            className="flex items-center gap-2 hover:text-red-500"
+                                            className="flex items-center gap-1 lg:gap-2 hover:text-red-500 text-xs lg:text-sm"
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 if (currentUser.address) {
@@ -231,9 +231,9 @@ onError={(e) => {
                                         >
                                             <LikeIcon /> {post.likes?.length || 0}
                                         </button>
-                                        <button className="flex items-center gap-2 hover:text-green-500"><RepostIcon /> 0</button>
-                                        <button className="flex items-center gap-2 hover:text-blue-500"><CommentIcon /> {post.comments?.length || 0}</button>
-                                        <button className="flex items-center hover:text-blue-500"><ShareIcon /></button>
+                                        <button className="flex items-center gap-1 lg:gap-2 hover:text-green-500 text-xs lg:text-sm"><RepostIcon /> 0</button>
+                                        <button className="flex items-center gap-1 lg:gap-2 hover:text-blue-500 text-xs lg:text-sm"><CommentIcon /> {post.comments?.length || 0}</button>
+                                        <button className="flex items-center hover:text-blue-500 text-xs lg:text-sm"><ShareIcon /></button>
                                     </div>
                                 </div>
                             </div>
@@ -274,16 +274,16 @@ onError={(e) => {
                 </div>
             </aside>
             
-            <div className={`fixed bottom-6 right-12 flex flex-col-reverse items-center gap-4 ${isFabOpen ? 'open' : ''}`}>
+            <div className={`fixed bottom-4 right-4 lg:bottom-6 lg:right-12 flex flex-col-reverse items-center gap-4 ${isFabOpen ? 'open' : ''}`}>
                  <div className={`flex flex-col-reverse gap-4 transition-all duration-300 ease-in-out ${isFabOpen ? 'opacity-100 translate-y-0 visible' : 'opacity-0 translate-y-2 invisible'}`}>
-                    <button className="w-12 h-12 rounded-full bg-gray-800 text-white border border-gray-700 flex items-center justify-center shadow-lg hover:bg-gray-700" title="Create Post" onClick={() => { setIsModalOpen(true); setIsFabOpen(false); }}>
+                    <button className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-gray-800 text-white border border-gray-700 flex items-center justify-center shadow-lg hover:bg-gray-700" title="Create Post" onClick={() => { setIsModalOpen(true); setIsFabOpen(false); }}>
                         <AddIcon />
                     </button>
-                    <button className="w-12 h-12 rounded-full bg-gray-800 text-white border border-gray-700 flex items-center justify-center shadow-lg hover:bg-gray-700" title="View Profile" onClick={() => router.push('/dashboard/profile')}>
+                    <button className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-gray-800 text-white border border-gray-700 flex items-center justify-center shadow-lg hover:bg-gray-700" title="View Profile" onClick={() => router.push('/dashboard/profile')}>
                         <ProfileIcon />
                     </button>
                 </div>
-                <button className={`w-14 h-14 rounded-full bg-gradient-to-r from-[#8B1E3F] to-[#6C3B9E] text-white flex items-center justify-center shadow-xl transition-transform duration-200 ease-in-out ${isFabOpen ? 'rotate-45 scale-105' : 'scale-100'}`} onClick={() => setIsFabOpen(!isFabOpen)}>
+                <button className={`w-12 h-12 lg:w-14 lg:h-14 rounded-full bg-gradient-to-r from-[#8B1E3F] to-[#6C3B9E] text-white flex items-center justify-center shadow-xl transition-transform duration-200 ease-in-out ${isFabOpen ? 'rotate-45 scale-105' : 'scale-100'}`} onClick={() => setIsFabOpen(!isFabOpen)}>
                     <AddIcon />
                 </button>
             </div>
