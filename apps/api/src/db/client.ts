@@ -26,13 +26,6 @@ export const prisma = new PrismaClient({
     },
   },
   log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
-  // Fix connection pool issues
-  __internal: {
-    engine: {
-      connectTimeout: 60000, // 60 seconds
-      queryTimeout: 30000,   // 30 seconds
-    },
-  },
 });
 
 // Add connection error handling

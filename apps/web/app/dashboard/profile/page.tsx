@@ -1,48 +1,57 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar as faCalendarRegular } from '@fortawesome/free-regular-svg-icons';
 import { faPen } from '@fortawesome/free-solid-svg-icons';
 import CreatePostModal from '@/components/CreatePostModal';
 import EditProfileModal from '@/components/EditProfileModal';
+import ImageWithLoading from '@/components/ImageWithLoading';
+import { PostSkeletonList } from '@/components/PostSkeleton';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useSocial } from '@/hooks/useSocial';
 
 const CommentIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 const RepostIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 const LikeIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 const ShareIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8m-4-6-4-4-4 4m4-4v13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 
-const initialPosts = [
-  { id: 1, time: '2m', content: 'just.minted the @alex.quai domain.....rate it 1-10!!', images: [] as string[], likes: 300, comments: 22, reposts: 150 },
-  { id: 2, time: '3h', content: "In 2019, this guy tricked 4 US companies into sending him $18M.\n\nThen he spent it on a Rolls Royce Cullinan, a Lamborghini Urus, and one Mercedes Benz G-Class AMG G55.\n\nFor months, he didn't get caught.\n\nUntil one tiny detail brought him down", images: [
-      'https://static0.makeuseofimages.com/wordpress/wp-content/uploads/2024/08/some-3d-social-media-icons.jpg',
-      'https://static0.makeuseofimages.com/wordpress/wp-content/uploads/2024/08/some-3d-social-media-icons.jpg',
-      'https://static0.makeuseofimages.com/wordpress/wp-content/uploads/2024/08/some-3d-social-media-icons.jpg',
-    ], likes: 300, comments: 22, reposts: 150 },
-];
-
 const SocialProfile: React.FC = () => {
   const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
-  const [posts, setPosts] = useState(initialPosts);
   const [activeTab, setActiveTab] = useState<'Posts' | 'Media' | 'Likes'>('Posts');
   const currentUser = useCurrentUser();
   const router = useRouter();
+  
+  // Fetch real posts from API
+  const { posts: allPosts, isLoading, error, createPost, likePost, fetchPosts } = useSocial();
 
-  const handleCreatePost = (content: string, images?: File[]) => {
-    const newPost = {
-      id: posts.length + 1,
-      time: 'Just now',
-      content,
-      images: images ? images.map(f => URL.createObjectURL(f)) : [],
-      likes: 0,
-      comments: 0,
-      reposts: 0,
-    };
-    setPosts(prev => [newPost, ...prev]);
-    setIsCreatePostModalOpen(false);
+  // Filter posts by current user's address
+  const userPosts = useMemo(() => {
+    if (!currentUser.address) return [];
+    return allPosts.filter(post => 
+      post.author.address.toLowerCase() === currentUser.address?.toLowerCase()
+    );
+  }, [allPosts, currentUser.address]);
+
+  // Filter for media posts (posts with images)
+  const mediaPosts = useMemo(() => {
+    return userPosts.filter(post => post.imageCids && post.imageCids.length > 0);
+  }, [userPosts]);
+
+  const handleCreatePost = async (content: string, images?: File[]) => {
+    const userAddress = currentUser.address || '0xe2f92e8f706997b021919a092437372b268a432d';
+    
+    try {
+      await createPost(
+        { text: content, zone: 'cyprus-1', images },
+        userAddress
+      );
+      setIsCreatePostModalOpen(false);
+    } catch (err) {
+      console.error('Failed to create post:', err);
+    }
   };
 
   const handleSaveProfile = (updatedProfile: { name: string; username: string; about: string; profileImg: string; coverImg: string; }) => {
@@ -113,33 +122,83 @@ const SocialProfile: React.FC = () => {
 
         {/* Posts */}
         <div className="flex flex-col gap-px bg-gray-700 rounded-lg overflow-y-scroll scrollbar-hide">
-          {posts.map(post => (
-            <div className="flex gap-4 bg-black p-6 cursor-pointer" key={post.id} onClick={() => router.push(`/dashboard/post/${post.id}`)}>
-              <div className="w-12 h-12 rounded-full bg-gray-600 flex-shrink-0 overflow-hidden">
-                <img src={currentUser.profileImg} className="w-auto h-full" alt="Your Profile" />
-              </div>
-              <div className="w-full">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="font-bold">{currentUser.username}</span>
-                  <span className="text-gray-400 text-sm">{post.time}</span>
-                </div>
-                <p className="leading-relaxed mb-4 whitespace-pre-line">{post.content}</p>
-                {post.images.length > 0 && (
-                  <div className={`grid ${getImageGridClasses(post.images.length)} gap-2 rounded-xl overflow-hidden mb-4`}>
-                    {post.images.map((imageUrl, index) => (
-                      <img key={index} src={imageUrl} alt={`Post image ${index + 1}`} className={`w-full object-cover ${getImageHeightClass(post.images.length)}`} />
-                    ))}
-                  </div>
-                )}
-                <div className="flex gap-6 text-gray-400">
-                  <button className="flex items-center gap-2 hover:text-red-500"><LikeIcon /> {post.likes}</button>
-                  <button className="flex items-center gap-2 hover:text-green-500"><RepostIcon /> {post.reposts}</button>
-                  <button className="flex items-center gap-2 hover:text-blue-500"><CommentIcon /> {post.comments}</button>
-                  <button className="flex items-center hover:text-blue-500"><ShareIcon /></button>
-                </div>
+          {isLoading ? (
+            <PostSkeletonList count={3} />
+          ) : error ? (
+            <div className="flex items-center justify-center p-8">
+              <div className="text-red-400 text-center">
+                <div className="text-lg font-medium mb-2">Error loading posts</div>
+                <div>{error}</div>
+                <button 
+                  onClick={() => fetchPosts()} 
+                  className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                >
+                  Retry
+                </button>
               </div>
             </div>
-          ))}
+          ) : (activeTab === 'Posts' ? userPosts : activeTab === 'Media' ? mediaPosts : userPosts).length === 0 ? (
+            <div className="flex items-center justify-center p-8">
+              <div className="text-gray-400 text-center">
+                <div className="text-lg mb-2">No {activeTab.toLowerCase()} yet</div>
+                <button 
+                  onClick={() => setIsCreatePostModalOpen(true)}
+                  className="mt-4 px-4 py-2 bg-gradient-to-r from-[#8B1E3F] to-[#6C3B9E] text-white rounded-lg hover:opacity-90 transition"
+                >
+                  Create your first post
+                </button>
+              </div>
+            </div>
+          ) : (
+            (activeTab === 'Posts' ? userPosts : activeTab === 'Media' ? mediaPosts : userPosts).map(post => (
+              <div className="flex gap-4 bg-black p-6 cursor-pointer" key={post.id} onClick={() => router.push(`/dashboard/post/${post.id}`)}>
+                <div className="w-12 h-12 rounded-full bg-gray-600 flex-shrink-0 overflow-hidden">
+                  <img src={currentUser.profileImg} className="w-auto h-full" alt="Your Profile" />
+                </div>
+                <div className="w-full">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="font-bold">{currentUser.username}</span>
+                    <span className="text-gray-400 text-sm">{new Date(post.createdAt).toLocaleTimeString()}</span>
+                  </div>
+                  <p className="leading-relaxed mb-4 whitespace-pre-line">{post.textPreview}</p>
+                  {post.imageCids && post.imageCids.length > 0 && (
+                    <div className={`grid ${getImageGridClasses(post.imageCids.length)} gap-2 rounded-xl overflow-hidden mb-4`}>
+                      {post.imageCids.map((cid, index) => {
+                        const imageUrl = cid.startsWith('local_') 
+                          ? `/api/placeholder?text=Image&cid=${cid}` 
+                          : `https://gateway.pinata.cloud/ipfs/${cid}`;
+                        
+                        return (
+                          <ImageWithLoading
+                            key={index}
+                            src={imageUrl}
+                            alt={`Post image ${index + 1}`}
+                            className={`w-full object-cover ${getImageHeightClass(post.imageCids!.length)}`}
+                          />
+                        );
+                      })}
+                    </div>
+                  )}
+                  <div className="flex gap-6 text-gray-400">
+                    <button 
+                      className="flex items-center gap-2 hover:text-red-500"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (currentUser.address) {
+                          likePost(currentUser.address, post.id);
+                        }
+                      }}
+                    >
+                      <LikeIcon /> {post.likes?.length || 0}
+                    </button>
+                    <button className="flex items-center gap-2 hover:text-green-500"><RepostIcon /> 0</button>
+                    <button className="flex items-center gap-2 hover:text-blue-500"><CommentIcon /> {post.comments?.length || 0}</button>
+                    <button className="flex items-center hover:text-blue-500"><ShareIcon /></button>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </main>
 
