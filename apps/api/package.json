@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc -p tsconfig.json",
+    "build": "prisma generate && tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
@@ -16,6 +16,7 @@
   "dependencies": {
     "@apollo/server": "^5.0.0",
     "@as-integrations/express4": "^1.1.2",
+    "@prisma/client": "^6.15.0",
     "@types/multer": "^2.0.0",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
@@ -26,6 +27,7 @@
     "nft.storage": "^7.2.0",
     "pg": "^8.16.3",
     "pino": "^9.3.2",
+    "prisma": "^6.15.0",
     "quais": "1.0.0-alpha.52",
     "viem": "^2.37.5",
     "web3.storage": "^4.5.5",
