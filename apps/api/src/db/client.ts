@@ -1,4 +1,4 @@
-import { PrismaClient } from "../generated/prisma";
+import { PrismaClient } from "@prisma/client";
 import { URL } from 'url';
 
 // Parse and modify the database URL to handle SSL properly
