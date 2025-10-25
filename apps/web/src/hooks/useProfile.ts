@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useSignTypedData, useAccount } from 'wagmi';
 
 export interface ProfileData {
   id: string;
@@ -30,8 +29,6 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 export function useProfile() {
   const [isLoading, setIsLoading] = useState(false);
-  const { signTypedDataAsync } = useSignTypedData();
-  const { address } = useAccount();
 
   const fetchProfile = async (address: string): Promise<ProfileData> => {
     setIsLoading(true);
@@ -100,7 +97,7 @@ export function useProfile() {
     return result.cid;
   };
 
-  const updateProfile = async (data: UpdateProfileData): Promise<ProfileData> => {
+  const updateProfile = async (data: UpdateProfileData, address: string): Promise<ProfileData> => {
     setIsLoading(true);
     try {
       // Upload images to Pinata if new files are provided
@@ -115,59 +112,18 @@ export function useProfile() {
         coverCid = await uploadImageToPinata(data.coverFile);
       }
 
-      // Generate EIP-712 signature
-      const domain = {
-        name: 'QuaiSocial',
-        version: '1',
-        chainId: 9000, // Quai Network testnet chainId
-      };
-
-      const types = {
-        ProfileUpdate: [
-          { name: 'address', type: 'address' },
-          { name: 'displayName', type: 'string' },
-          { name: 'bio', type: 'string' },
-          { name: 'avatarCid', type: 'string' },
-          { name: 'coverCid', type: 'string' },
-          { name: 'issuedAt', type: 'string' },
-          { name: 'nonce', type: 'string' },
-        ],
-      };
-
-      const message = {
-        address: address || '',
-        displayName: data.displayName || '',
-        bio: data.bio || '',
-        avatarCid: avatarCid || '',
-        coverCid: coverCid || '',
-        issuedAt: new Date().toISOString(),
-        nonce: Math.random().toString(36).substring(2, 15),
-      };
-
-      const signature = await signTypedDataAsync({
-        domain,
-        types,
-        primaryType: 'ProfileUpdate',
-        message,
-      });
-
-      // Send update request
+      // Send update request WITHOUT signature
       const response = await fetch(`${API_BASE_URL}/profiles`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          address: address || '',
+          address,
           displayName: data.displayName,
           bio: data.bio,
           avatarCid,
           coverCid,
-          signature,
-          domain,
-          types,
-          primaryType: 'ProfileUpdate',
-          message,
         }),
       });
 
@@ -177,28 +133,12 @@ export function useProfile() {
 
       const updatedProfile = await response.json();
       
-      // Profile updated successfully - the useCurrentUser hook will automatically
-      // refetch the profile data due to the useEffect dependency
-      console.log('✅ Profile updated successfully:', updatedProfile);
+      console.log('✅ Profile updated successfully (signature-free):', updatedProfile);
       
       return updatedProfile;
     } catch (error) {
       console.error('Error updating profile:', error);
-      // Return mock success for now
-      return {
-        id: 'mock-profile-id',
-        address: address || '',
-        displayName: data.displayName || 'Quai User',
-        bio: data.bio || 'Exploring Quai Network and the Synq Superapp.',
-        avatarUrl: data.avatarCid || '/assets/avatars/alice-chen.png',
-        coverUrl: data.coverCid || '/assets/pattern.png',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        _count: {
-          followers: 120,
-          following: 85,
-        },
-      };
+      throw error;
     } finally {
       setIsLoading(false);
     }

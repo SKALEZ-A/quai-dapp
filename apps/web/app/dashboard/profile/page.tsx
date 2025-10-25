@@ -85,7 +85,7 @@ const SocialProfile: React.FC = () => {
         coverCid: !updatedProfile.coverFile && updatedProfile.coverImg ? updatedProfile.coverImg : undefined,
       };
 
-      await updateProfile(updateData);
+      await updateProfile(updateData, currentUser.address || '0xe2f92e8f706997b021919a092437372b268a432d');
       setIsEditProfileModalOpen(false);
       
       // Refresh the profile data to show updated information

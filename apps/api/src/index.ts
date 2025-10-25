@@ -4,6 +4,7 @@ import pino from "pino";
 import postsRouter from "./routes/posts";
 import engagementsRouter from "./routes/engagements";
 import domainsRouter from "./routes/domains";
+import profilesRouter from "./routes/profiles-mock";
 import healthRouter from "./routes/health";
 import { mountGraphQL } from "./graphql/server";
 
@@ -43,6 +44,7 @@ app.use("/health", healthRouter);
 app.use("/posts", postsRouter);
 app.use("/engagements", engagementsRouter);
 app.use("/domains", domainsRouter);
+app.use("/profiles", profilesRouter);
 
 const port = Number(process.env.PORT || 4000);
 mountGraphQL(app).then(() => {
