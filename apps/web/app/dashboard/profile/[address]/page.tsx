@@ -33,7 +33,7 @@ const UserProfilePage: React.FC = () => {
   const params = useParams();
   const targetAddress = params.address as string;
   const currentUser = useCurrentUser();
-  const { posts, isLoading: postsLoading, refreshPosts } = useSocial();
+  const { posts, isLoading: postsLoading, fetchPosts } = useSocial();
   const { fetchProfile } = useProfile();
   
   const [userProfile, setUserProfile] = useState<UserProfileData | null>(null);
