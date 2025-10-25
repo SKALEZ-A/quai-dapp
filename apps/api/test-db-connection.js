@@ -15,10 +15,7 @@ console.log('');
 
 const pool = new Pool({
   connectionString,
-  ssl: {
-    rejectUnauthorized: false,
-    checkServerIdentity: () => undefined
-  }
+  ssl: false
 });
 
 async function testConnection() {

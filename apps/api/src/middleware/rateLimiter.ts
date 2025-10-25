@@ -99,6 +99,16 @@ export const commentLimiter = createRateLimiter({
   }
 });
 
+export const profileUpdateLimiter = createRateLimiter({
+  windowMs: 60 * 1000, // 1 minute
+  max: 3, // 3 profile updates per minute per user
+  message: "Too many profile updates. Please wait before updating again.",
+  keyGenerator: (req) => {
+    const address = req.body?.address;
+    return address ? `profile-${address}` : `profile-${req.ip}`;
+  }
+});
+
 export const generalLimiter = createRateLimiter({
   windowMs: 60 * 1000, // 1 minute
   max: 100, // 100 requests per minute per IP

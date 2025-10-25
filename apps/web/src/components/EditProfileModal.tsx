@@ -14,29 +14,59 @@ interface EditProfileModalProps {
         about: string;
         profileImg: string;
         coverImg: string;
+        profileFile?: File;
+        coverFile?: File;
     }) => void;
 }
 
 const EditProfileModal: React.FC<EditProfileModalProps> = ({ onClose, onSave }) => {
     const currentUser = useCurrentUser();
 
-    const [name, setName] = useState(currentUser.name);
-    const [username, setUsername] = useState(currentUser.username);
-    const [about, setAbout] = useState(currentUser.about);
-    const [profileImg, setProfileImg] = useState(currentUser.profileImg);
-    const [coverImg, setCoverImg] = useState(currentUser.coverImg);
+    const [name, setName] = useState('');
+    const [username, setUsername] = useState('');
+    const [about, setAbout] = useState('');
+    const [profileImg, setProfileImg] = useState('');
+    const [coverImg, setCoverImg] = useState('');
+    const [profileFile, setProfileFile] = useState<File | null>(null);
+    const [coverFile, setCoverFile] = useState<File | null>(null);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isInitialized, setIsInitialized] = useState(false);
     
+    // Wait for real data before initializing (skip "Loading..." state)
     useEffect(() => {
-        setName(currentUser.name);
-        setUsername(currentUser.username);
-        setAbout(currentUser.about);
-        setProfileImg(currentUser.profileImg);
-        setCoverImg(currentUser.coverImg);
-    }, [currentUser]);
+        if (!isInitialized && 
+            currentUser.name && 
+            currentUser.name !== "Loading..." && 
+            currentUser.username && 
+            currentUser.username !== "Loading...") {
+            console.log('EditProfileModal: Initializing with data:', {
+                name: currentUser.name,
+                username: currentUser.username,
+                profileImg: currentUser.profileImg,
+                coverImg: currentUser.coverImg
+            });
+            setName(currentUser.name);
+            setUsername(currentUser.username);
+            setAbout(currentUser.about);
+            setProfileImg(currentUser.profileImg);
+            setCoverImg(currentUser.coverImg);
+            setIsInitialized(true);
+        }
+    }, [currentUser, isInitialized]);
+
+    // Handle IPFS URLs for image previews
+    const getImageUrl = (url: string) => {
+        if (url.startsWith('http') || url.startsWith('/')) {
+            return url;
+        }
+        // If it's an IPFS CID, use Pinata gateway
+        return `https://gateway.pinata.cloud/ipfs/${url}`;
+    };
 
     const handleProfileImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
+            setProfileFile(file);
             const reader = new FileReader();
             reader.onloadend = () => {
                 setProfileImg(reader.result as string);
@@ -48,6 +78,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ onClose, onSave }) 
     const handleCoverImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
+            setCoverFile(file);
             const reader = new FileReader();
             reader.onloadend = () => {
                 setCoverImg(reader.result as string);
@@ -56,14 +87,40 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ onClose, onSave }) 
         }
     };
 
-    const handleSave = () => {
-        onSave({ name, username, about, profileImg, coverImg });
-        onClose();
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            await onSave({ 
+                name, 
+                username, 
+                about, 
+                profileImg, 
+                coverImg,
+                profileFile: profileFile || undefined,
+                coverFile: coverFile || undefined
+            });
+            onClose();
+        } catch (error) {
+            console.error('Error saving profile:', error);
+            // Error handling is done in the parent component
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-black rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto scrollbar-hide">
+            <div className="bg-black rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto scrollbar-hide relative">
+                {/* Loading overlay while waiting for data */}
+                {!isInitialized && (
+                    <div className="absolute inset-0 bg-black bg-opacity-90 flex items-center justify-center z-10 rounded-lg">
+                        <div className="flex flex-col items-center">
+                            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-purple-500 mb-4"></div>
+                            <p className="text-gray-400">Loading profile data...</p>
+                        </div>
+                    </div>
+                )}
+                
                 <div className="flex justify-between items-center p-4 border-b border-gray-700">
                     <h2 className="text-xl font-bold">Edit Profile</h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-white">
@@ -74,7 +131,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ onClose, onSave }) 
                 <div className="p-6">
                     {/* Cover Image Section */}
                     <div className="relative h-40 bg-gray-700 rounded-lg mb-16 overflow-hidden">
-                        <img src={coverImg} alt="Cover" className="w-full h-full object-cover" />
+                        <img src={getImageUrl(coverImg)} alt="Cover" className="w-full h-full object-cover" />
                         <label htmlFor="cover-upload" className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white cursor-pointer opacity-0 hover:opacity-100 transition-opacity duration-300">
                             <FontAwesomeIcon icon={faCamera} size="2x" />
                             <input
@@ -89,7 +146,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ onClose, onSave }) 
 
                     {/* Profile Image Section */}
                     <div className="relative w-32 h-32 rounded-full border-4 border-gray-800 bg-gray-600 -mt-24 ml-6 overflow-hidden">
-                        <img src={profileImg} alt="Profile" className="w-full h-full object-cover" />
+                        <img src={getImageUrl(profileImg)} alt="Profile" className="w-full h-full object-cover" />
                         <label htmlFor="profile-upload" className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white cursor-pointer opacity-0 hover:opacity-100 transition-opacity duration-300">
                             <FontAwesomeIcon icon={faCamera} size="lg" />
                             <input
@@ -140,9 +197,10 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ onClose, onSave }) 
                 <div className="p-4 border-t border-gray-700 flex justify-end">
                     <button
                         onClick={handleSave}
-                        className="bg-primary text-white font-bold py-2 px-6 rounded-full hover:bg-primary-dark transition-colors duration-200"
+                        disabled={isSaving}
+                        className="bg-primary text-white font-bold py-2 px-6 rounded-full hover:bg-primary-dark transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        Save
+                        {isSaving ? 'Saving...' : 'Save'}
                     </button>
                 </div>
             </div>

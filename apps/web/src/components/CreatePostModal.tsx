@@ -12,14 +12,15 @@ interface CreatePostModalProps {
 
 const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onCreatePost }) => {
   const [postContent, setPostContent] = useState('');
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const MAX_IMAGES = 4;
 
   const handlePost = () => {
-    if (postContent.trim() || imageFile) {
-      const images = imageFile ? [imageFile] : undefined;
+    if (postContent.trim() || imageFiles.length > 0) {
+      const images = imageFiles.length > 0 ? imageFiles : undefined;
       onCreatePost(postContent, images);
     }
   };
@@ -34,22 +35,40 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onCreatePost
   }, [postContent]);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+    const files = event.target.files;
+    if (files) {
+      const newFiles = Array.from(files).slice(0, MAX_IMAGES - imageFiles.length);
+      
+      newFiles.forEach(file => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreviews(prev => [...prev, reader.result as string]);
+        };
+        reader.readAsDataURL(file);
+      });
+      
+      setImageFiles(prev => [...prev, ...newFiles]);
+    }
+    
+    // Reset input value to allow selecting the same file again
+    if(fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
-  const handleRemoveImage = () => {
-    setImagePreview(null);
-    setImageFile(null);
-    if(fileInputRef.current) {
-        fileInputRef.current.value = "";
+  const handleRemoveImage = (index: number) => {
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const getImageGridClasses = () => {
+    const count = imagePreviews.length;
+    switch (count) {
+      case 1: return 'grid-cols-1';
+      case 2: return 'grid-cols-2';
+      case 3: return 'grid-cols-2 grid-rows-2 [&>*:first-child]:col-span-2';
+      case 4: return 'grid-cols-2 grid-rows-2';
+      default: return 'grid-cols-1';
     }
   };
 
@@ -62,38 +81,58 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onCreatePost
         className="bg-surface border border-border rounded-xl shadow-xl w-full max-w-xl p-6 space-y-5 overflow-y-auto max-h-[80vh] scrollbar-hide"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Image preview */}
-        {imagePreview && (
-          <div className="relative">
-            <img
-              src={imagePreview}
-              alt="Selected preview"
-              className="w-full max-h-[350px] object-cover rounded-lg border border-border"
-            />
-            <button
-              onClick={handleRemoveImage}
-              className="absolute top-2 right-2 w-8 h-8 bg-black/70 text-white text-xl rounded-full flex items-center justify-center hover:bg-black transition"
-              aria-label="Remove image"
-            >
-              &times;
-            </button>
+        {/* Multiple image previews */}
+        {imagePreviews.length > 0 && (
+          <div className={`grid ${getImageGridClasses()} gap-2`}>
+            {imagePreviews.map((preview, index) => (
+              <div key={index} className="relative group">
+                <img
+                  src={preview}
+                  alt={`Preview ${index + 1}`}
+                  className="w-full h-52 object-cover rounded-lg border border-border"
+                />
+                <button
+                  onClick={() => handleRemoveImage(index)}
+                  className="absolute top-2 right-2 w-8 h-8 bg-black/70 text-white text-xl rounded-full flex items-center justify-center hover:bg-black transition opacity-0 group-hover:opacity-100"
+                  aria-label="Remove image"
+                >
+                  &times;
+                </button>
+              </div>
+            ))}
+            
+            {/* Add more images button (show if less than MAX_IMAGES) */}
+            {imagePreviews.length < MAX_IMAGES && (
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full h-52 border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center hover:border-text-secondary transition text-text-secondary hover:text-text-primary"
+              >
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <span className="mt-2 text-sm">Add Image ({imagePreviews.length}/{MAX_IMAGES})</span>
+              </button>
+            )}
           </div>
         )}
 
         {/* Post input row */}
         <div className="flex items-start gap-4">
-          {/* Upload button */}
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="p-2 rounded-md text-text-secondary hover:text-text-primary hover:bg-border transition"
-          >
-            <ImageIcon />
-          </button>
+          {/* Upload button (only show if no images yet) */}
+          {imagePreviews.length === 0 && (
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="p-2 rounded-md text-text-secondary hover:text-text-primary hover:bg-border transition"
+            >
+              <ImageIcon />
+            </button>
+          )}
           <input
             type="file"
             ref={fileInputRef}
             onChange={handleImageChange}
             accept="image/png, image/jpeg, image/gif"
+            multiple
             className="hidden"
           />
 
@@ -111,7 +150,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onCreatePost
           {/* Post button */}
           <button
             onClick={handlePost}
-            disabled={!postContent.trim() && !imagePreview}
+            disabled={!postContent.trim() && imagePreviews.length === 0}
             className="px-5 py-2.5 bg-gradient-primary text-text-primary rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90"
           >
             Post

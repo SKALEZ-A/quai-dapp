@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 export interface ProfileData {
   id: string;
@@ -18,6 +18,7 @@ export interface ProfileData {
 
 export interface UpdateProfileData {
   displayName?: string;
+  qnsName?: string;
   bio?: string;
   avatarFile?: File;
   coverFile?: File;
@@ -30,7 +31,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 export function useProfile() {
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchProfile = async (address: string): Promise<ProfileData> => {
+  const fetchProfile = useCallback(async (address: string): Promise<ProfileData> => {
     setIsLoading(true);
     try {
       const response = await fetch(`${API_BASE_URL}/profiles/${address}`);
@@ -48,8 +49,8 @@ export function useProfile() {
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             _count: {
-              followers: 120,
-              following: 85,
+              followers: 0,
+              following: 0,
             },
           };
         }
@@ -71,14 +72,14 @@ export function useProfile() {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         _count: {
-          followers: 120,
-          following: 85,
+          followers: 0,
+          following: 0,
         },
       };
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [API_BASE_URL]);
 
   const uploadImageToPinata = async (file: File): Promise<string> => {
     const formData = new FormData();
@@ -121,6 +122,7 @@ export function useProfile() {
         body: JSON.stringify({
           address,
           displayName: data.displayName,
+          qnsName: data.qnsName,
           bio: data.bio,
           avatarCid,
           coverCid,

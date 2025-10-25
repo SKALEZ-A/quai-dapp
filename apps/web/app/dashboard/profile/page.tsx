@@ -7,6 +7,7 @@ import { faCalendar as faCalendarRegular } from '@fortawesome/free-regular-svg-i
 import { faPen } from '@fortawesome/free-solid-svg-icons';
 import CreatePostModal from '@/components/CreatePostModal';
 import EditProfileModal from '@/components/EditProfileModal';
+import FollowButton from '@/components/FollowButton';
 import ImageWithLoading from '@/components/ImageWithLoading';
 import { PostSkeletonList } from '@/components/PostSkeleton';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -77,6 +78,7 @@ const SocialProfile: React.FC = () => {
     try {
       const updateData: UpdateProfileData = {
         displayName: updatedProfile.name,
+        qnsName: updatedProfile.username, // Save username as qnsName
         bio: updatedProfile.about,
         avatarFile: updatedProfile.profileFile,
         coverFile: updatedProfile.coverFile,
@@ -85,7 +87,9 @@ const SocialProfile: React.FC = () => {
         coverCid: !updatedProfile.coverFile && updatedProfile.coverImg ? updatedProfile.coverImg : undefined,
       };
 
-      await updateProfile(updateData, currentUser.address || '0xe2f92e8f706997b021919a092437372b268a432d');
+      console.log('Updating profile with data:', updateData);
+      const result = await updateProfile(updateData, currentUser.address || '0xe2f92e8f706997b021919a092437372b268a432d');
+      console.log('Profile update result:', result);
       setIsEditProfileModalOpen(false);
       
       // Refresh the profile data to show updated information
@@ -98,6 +102,11 @@ const SocialProfile: React.FC = () => {
       // Show error message
       alert('Failed to update profile. Please try again.');
     }
+  };
+
+  const handleFollowChange = (isFollowing: boolean) => {
+    // Refresh profile to update follower counts
+    currentUser.refreshProfile();
   };
 
   const getImageGridClasses = (imageCount: number) => {

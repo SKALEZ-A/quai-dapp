@@ -50,45 +50,50 @@ export function useCurrentUser(): CurrentUser & { refreshProfile: () => void } {
           coverImg: profile.coverUrl || DEFAULT_COVER_IMG,
           about: profile.bio || "Exploring Quai Network and the Synq Superapp.",
           date_joined: "Joined Sep 2025",
-          followers: profile._count?.followers || 120,
-          following: profile._count?.following || 85,
+          followers: profile._count?.followers || 0,
+          following: profile._count?.following || 0,
         });
       } catch (error) {
         console.error('Failed to load profile:', error);
         // Fallback to default data
         setProfileData({
           name: "Quai User",
-          username: `${finalAddress.slice(2, 8)}.quai`,
+          username: "Quai User",
           address: finalAddress,
           short_address: `${finalAddress.slice(0, 6)}...${finalAddress.slice(-4)}`,
           profileImg: DEFAULT_PROFILE_IMG,
           coverImg: DEFAULT_COVER_IMG,
           about: "Exploring Quai Network and the Synq Superapp.",
           date_joined: "Joined Sep 2025",
-          followers: 120,
-          following: 85,
+          followers: 0,
+          following: 0,
         });
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadProfile();
+    // Add debouncing to prevent rapid API calls
+    const timeoutId = setTimeout(() => {
+      loadProfile();
+    }, 300);
+    
+    return () => clearTimeout(timeoutId);
   }, [finalAddress, fetchProfile, refreshTrigger]);
 
-  // Return default data while loading
+  // Return loading state while fetching data
   if (isLoading || !profileData) {
     return {
-      name: "Quai User",
-      username: `${finalAddress.slice(2, 8)}.quai`,
+      name: "Loading...",
+      username: "Loading...",
       address: finalAddress,
       short_address: `${finalAddress.slice(0, 6)}...${finalAddress.slice(-4)}`,
       profileImg: DEFAULT_PROFILE_IMG,
       coverImg: DEFAULT_COVER_IMG,
-      about: "Exploring Quai Network and the Synq Superapp.",
-      date_joined: "Joined Sep 2025",
-      followers: 120,
-      following: 85,
+      about: "Loading profile...",
+      date_joined: "Loading...",
+      followers: 0,
+      following: 0,
       refreshProfile,
     };
   }

@@ -7,6 +7,7 @@ import { getUserDomains } from '@/lib/qns';
 import { useSocial } from '@/hooks/useSocial';
 import { useBalance } from 'wagmi';
 import { formatEther } from 'viem';
+import FollowButton from '@/components/FollowButton';
 
 // SVG Icon Components
 const CopyIcon = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
@@ -280,10 +281,21 @@ const UserOverview = () => {
                         <img src={post.author.avatarUrl} alt={authorName} className="w-full h-full object-cover" />
                       ) : null}
                     </div>
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-2 mb-0">
-                        <span className="font-bold text-gray-50">{authorName}</span>
-                        <span className="text-sm text-gray-400">{timeAgo}</span>
+                    <div className="flex flex-col flex-1">
+                      <div className="flex items-center justify-between mb-0">
+                        <div className="flex items-center gap-2">
+                          <button 
+                            onClick={() => router.push(`/dashboard/profile/${post.author.address}`)}
+                            className="font-bold text-gray-50 hover:text-white transition-colors"
+                          >
+                            {authorName}
+                          </button>
+                          <span className="text-sm text-gray-400">{timeAgo}</span>
+                        </div>
+                        <FollowButton 
+                          targetAddress={post.author.address}
+                          currentUserAddress={currentUser.address || ''}
+                        />
                       </div>
                       <p className="text-gray-300 leading-relaxed text-sm">{post.textPreview}</p>
                     </div>
