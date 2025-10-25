@@ -147,7 +147,7 @@ const UserProfilePage: React.FC = () => {
   }
 
   // Filter posts by this user
-  const userPosts = posts.filter(post => post.author === targetAddress);
+  const userPosts = posts.filter(post => post.author.address === targetAddress);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-6 mt-[-20px]">
@@ -225,7 +225,7 @@ const UserProfilePage: React.FC = () => {
                       <span className="text-gray-500 text-sm">•</span>
                       <span className="text-gray-500 text-sm">{new Date(post.createdAt).toLocaleDateString()}</span>
                     </div>
-                    <p className="text-white mb-3">{post.content}</p>
+                    <p className="text-white mb-3">{post.textPreview}</p>
                     
                     {/* Post Images */}
                     {post.imageCids && post.imageCids.length > 0 && (
@@ -245,15 +245,15 @@ const UserProfilePage: React.FC = () => {
                     <div className="flex items-center gap-6 text-gray-400">
                       <button className="flex items-center gap-2 hover:text-white transition-colors">
                         <CommentIcon />
-                        <span className="text-sm">{post.commentCount || 0}</span>
+                        <span className="text-sm">{post.comments?.length || 0}</span>
                       </button>
                       <button className="flex items-center gap-2 hover:text-white transition-colors">
                         <RepostIcon />
-                        <span className="text-sm">{post.repostCount || 0}</span>
+                        <span className="text-sm">0</span>
                       </button>
                       <button className="flex items-center gap-2 hover:text-white transition-colors">
                         <LikeIcon />
-                        <span className="text-sm">{post.likeCount || 0}</span>
+                        <span className="text-sm">{post.likes?.length || 0}</span>
                       </button>
                       <button className="flex items-center gap-2 hover:text-white transition-colors">
                         <ShareIcon />
