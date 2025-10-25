@@ -177,9 +177,9 @@ export function useProfile() {
 
       const updatedProfile = await response.json();
       
-      // Trigger a page refresh to update the UI with new data
-      // This will cause useCurrentUser to refetch the profile
-      window.location.reload();
+      // Profile updated successfully - the useCurrentUser hook will automatically
+      // refetch the profile data due to the useEffect dependency
+      console.log('✅ Profile updated successfully:', updatedProfile);
       
       return updatedProfile;
     } catch (error) {

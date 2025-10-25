@@ -11,6 +11,7 @@ import ImageWithLoading from '@/components/ImageWithLoading';
 import { PostSkeletonList } from '@/components/PostSkeleton';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useSocial } from '@/hooks/useSocial';
+import { useProfile, UpdateProfileData } from '@/hooks/useProfile';
 
 const CommentIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 const RepostIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
@@ -23,6 +24,16 @@ const SocialProfile: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'Posts' | 'Media' | 'Likes'>('Posts');
   const currentUser = useCurrentUser();
   const router = useRouter();
+  const { updateProfile } = useProfile();
+  
+  // Handle IPFS URLs for image display
+  const getImageUrl = (url: string) => {
+    if (url.startsWith('http') || url.startsWith('/')) {
+      return url;
+    }
+    // If it's an IPFS CID, use Pinata gateway
+    return `https://gateway.pinata.cloud/ipfs/${url}`;
+  };
   
   // Fetch real posts from API
   const { posts: allPosts, isLoading, error, createPost, likePost, fetchPosts } = useSocial();
@@ -54,10 +65,39 @@ const SocialProfile: React.FC = () => {
     }
   };
 
-  const handleSaveProfile = (updatedProfile: { name: string; username: string; about: string; profileImg: string; coverImg: string; }) => {
-    // TODO: wire to backend/state
-    console.log('Saving profile', updatedProfile);
-    setIsEditProfileModalOpen(false);
+  const handleSaveProfile = async (updatedProfile: { 
+    name: string; 
+    username: string; 
+    about: string; 
+    profileImg: string; 
+    coverImg: string;
+    profileFile?: File;
+    coverFile?: File;
+  }) => {
+    try {
+      const updateData: UpdateProfileData = {
+        displayName: updatedProfile.name,
+        bio: updatedProfile.about,
+        avatarFile: updatedProfile.profileFile,
+        coverFile: updatedProfile.coverFile,
+        // If no new files, use existing URLs as CIDs
+        avatarCid: !updatedProfile.profileFile && updatedProfile.profileImg ? updatedProfile.profileImg : undefined,
+        coverCid: !updatedProfile.coverFile && updatedProfile.coverImg ? updatedProfile.coverImg : undefined,
+      };
+
+      await updateProfile(updateData);
+      setIsEditProfileModalOpen(false);
+      
+      // Refresh the profile data to show updated information
+      currentUser.refreshProfile();
+      
+      // Show success message
+      console.log('Profile updated successfully');
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      // Show error message
+      alert('Failed to update profile. Please try again.');
+    }
   };
 
   const getImageGridClasses = (imageCount: number) => {
@@ -85,12 +125,12 @@ const SocialProfile: React.FC = () => {
       <main className="flex flex-col gap-4 pr-6 lg:pr-0 relative">
         <div className="bg-black rounded-lg overflow-hidden relative">
           <div className="h-28 bg-white rounded-t-lg overflow-hidden">
-            <img src={currentUser.coverImg} className="w-full h-auto transform translate-y-[-40%]" alt="Your Cover" />
+            <img src={getImageUrl(currentUser.coverImg)} className="w-full h-auto transform translate-y-[-40%]" alt="Your Cover" />
           </div>
 
           <div className="relative px-6 py-6">
             <div className="absolute -top-10 left-6 w-20 h-20 rounded-full bg-purple-700 border-2 border-background shadow-md overflow-hidden">
-              <img src={currentUser.profileImg} className="w-auto h-full" alt="Your Profile" />
+              <img src={getImageUrl(currentUser.profileImg)} className="w-auto h-full" alt="Your Profile" />
             </div>
 
             <div className="mt-6">
@@ -153,7 +193,7 @@ const SocialProfile: React.FC = () => {
             (activeTab === 'Posts' ? userPosts : activeTab === 'Media' ? mediaPosts : userPosts).map(post => (
               <div className="flex gap-4 bg-black p-6 cursor-pointer" key={post.id} onClick={() => router.push(`/dashboard/post/${post.id}`)}>
                 <div className="w-12 h-12 rounded-full bg-gray-600 flex-shrink-0 overflow-hidden">
-                  <img src={currentUser.profileImg} className="w-auto h-full" alt="Your Profile" />
+                  <img src={getImageUrl(currentUser.profileImg)} className="w-auto h-full" alt="Your Profile" />
                 </div>
                 <div className="w-full">
                   <div className="flex items-center gap-2 mb-2">

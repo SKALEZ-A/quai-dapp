@@ -2,6 +2,7 @@
 
 import { useAccount } from "wagmi";
 import { useState, useEffect } from "react";
+import { useProfile } from "./useProfile";
 
 export type CurrentUser = {
   name: string;
@@ -19,83 +20,78 @@ export type CurrentUser = {
 const DEFAULT_PROFILE_IMG = "/assets/avatars/alice-chen.png";
 const DEFAULT_COVER_IMG = "/assets/pattern.png";
 
-export function useCurrentUser(): CurrentUser {
-  const [directAddress, setDirectAddress] = useState<string | null>(null);
-
-  // Try to get wallet address directly from Pelagus
+export function useCurrentUser(): CurrentUser & { refreshProfile: () => void } {
+  const { address } = useAccount();
+  const { fetchProfile } = useProfile();
+  const [profileData, setProfileData] = useState<CurrentUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  
+  const finalAddress = address || '0xe2f92e8f706997b021919a092437372b268a432d';
+  
+  const refreshProfile = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
+  
   useEffect(() => {
-    const checkDirectWallet = async () => {
+    const loadProfile = async () => {
+      if (!finalAddress) return;
+      
       try {
-        const eth = (globalThis as any)?.ethereum;
-        if (eth) {
-          // First try to get existing accounts
-          try {
-            const accounts = await eth.request({ method: 'eth_accounts' });
-            if (accounts && accounts.length > 0) {
-              setDirectAddress(accounts[0]);
-              return;
-            }
-          } catch (ethError) {
-            console.log('eth_accounts failed:', ethError);
-          }
-
-          // If no accounts, try to request them
-          try {
-            const accounts = await eth.request({ method: 'eth_requestAccounts' });
-            if (accounts && accounts.length > 0) {
-              setDirectAddress(accounts[0]);
-            }
-          } catch (requestError) {
-            console.log('eth_requestAccounts failed:', requestError);
-          }
-        }
+        setIsLoading(true);
+        const profile = await fetchProfile(finalAddress);
+        
+        setProfileData({
+          name: profile.displayName || "Quai User",
+          username: profile.qnsName || `${finalAddress.slice(2, 8)}.quai`,
+          address: finalAddress,
+          short_address: `${finalAddress.slice(0, 6)}...${finalAddress.slice(-4)}`,
+          profileImg: profile.avatarUrl || DEFAULT_PROFILE_IMG,
+          coverImg: profile.coverUrl || DEFAULT_COVER_IMG,
+          about: profile.bio || "Exploring Quai Network and the Synq Superapp.",
+          date_joined: "Joined Sep 2025",
+          followers: profile._count?.followers || 120,
+          following: profile._count?.following || 85,
+        });
       } catch (error) {
-        console.log('Direct wallet check failed:', error);
+        console.error('Failed to load profile:', error);
+        // Fallback to default data
+        setProfileData({
+          name: "Quai User",
+          username: `${finalAddress.slice(2, 8)}.quai`,
+          address: finalAddress,
+          short_address: `${finalAddress.slice(0, 6)}...${finalAddress.slice(-4)}`,
+          profileImg: DEFAULT_PROFILE_IMG,
+          coverImg: DEFAULT_COVER_IMG,
+          about: "Exploring Quai Network and the Synq Superapp.",
+          date_joined: "Joined Sep 2025",
+          followers: 120,
+          following: 85,
+        });
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    checkDirectWallet();
-  }, []);
+    loadProfile();
+  }, [finalAddress, fetchProfile, refreshTrigger]);
 
-  try {
-    const { address } = useAccount();
-
-    // Use direct connection if available, fallback to wagmi
-    const finalAddress = directAddress || address;
-
-    const short = finalAddress
-      ? `${finalAddress.slice(0, 6)}...${finalAddress.slice(-4)}`
-      : "Not connected";
-
+  // Return default data while loading
+  if (isLoading || !profileData) {
     return {
-      name: finalAddress ? "Quai User" : "Guest User",
-      username: finalAddress ? (finalAddress.slice(2, 8) + ".quai") : "guest",
-      address: finalAddress ?? null,
-      short_address: short,
+      name: "Quai User",
+      username: `${finalAddress.slice(2, 8)}.quai`,
+      address: finalAddress,
+      short_address: `${finalAddress.slice(0, 6)}...${finalAddress.slice(-4)}`,
       profileImg: DEFAULT_PROFILE_IMG,
       coverImg: DEFAULT_COVER_IMG,
       about: "Exploring Quai Network and the Synq Superapp.",
       date_joined: "Joined Sep 2025",
       followers: 120,
       following: 85,
-    };
-  } catch (error) {
-    // Fallback if useAccount fails
-    const short = directAddress
-      ? `${directAddress.slice(0, 6)}...${directAddress.slice(-4)}`
-      : "Not connected";
-
-    return {
-      name: directAddress ? "Quai User" : "Guest User",
-      username: directAddress ? (directAddress.slice(2, 8) + ".quai") : "guest",
-      address: directAddress ?? null,
-      short_address: short,
-      profileImg: DEFAULT_PROFILE_IMG,
-      coverImg: DEFAULT_COVER_IMG,
-      about: "Exploring Quai Network and the Synq Superapp.",
-      date_joined: "Joined Sep 2025",
-      followers: 120,
-      following: 85,
+      refreshProfile,
     };
   }
+
+  return { ...profileData, refreshProfile };
 }
