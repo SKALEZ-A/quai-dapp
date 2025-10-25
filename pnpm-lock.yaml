@@ -63,6 +63,9 @@ importers:
       express:
         specifier: ^4.19.2
         version: 4.21.2
+      form-data:
+        specifier: ^4.0.0
+        version: 4.0.4
       graphql:
         specifier: ^16.11.0
         version: 16.11.0
@@ -71,7 +74,10 @@ importers:
         version: 2.0.2
       nft.storage:
         specifier: ^7.2.0
-        version: 7.2.0(encoding@0.1.13)(node-fetch@2.7.0(encoding@0.1.13))
+        version: 7.2.0(encoding@0.1.13)(node-fetch@3.3.2)
+      node-fetch:
+        specifier: ^3.3.2
+        version: 3.3.2
       pg:
         specifier: ^8.16.3
         version: 8.16.3
@@ -89,7 +95,7 @@ importers:
         version: 2.38.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76)
       web3.storage:
         specifier: ^4.5.5
-        version: 4.5.5(encoding@0.1.13)(node-fetch@2.7.0(encoding@0.1.13))
+        version: 4.5.5(encoding@0.1.13)(node-fetch@3.3.2)
       zod:
         specifier: ^3.23.8
         version: 3.25.76
@@ -106,6 +112,9 @@ importers:
       '@types/node':
         specifier: ^22.5.5
         version: 22.18.0
+      '@types/node-fetch':
+        specifier: ^2.6.11
+        version: 2.6.13
       eslint:
         specifier: ^9.9.0
         version: 9.34.0(jiti@2.5.1)
@@ -2544,6 +2553,9 @@ packages:
   '@types/multer@2.0.0':
     resolution: {integrity: sha512-C3Z9v9Evij2yST3RSBktxP9STm6OdMc5uR1xF1SGr98uv8dUlAL2hqwrZ3GVB3uyMyiegnscEK6PGtYvNrjTjw==}
 
+  '@types/node-fetch@2.6.13':
+    resolution: {integrity: sha512-QGpRVpzSaUs30JBSGPjOg4Uveu384erbHBoT1zeONvyCfwQxIkUshLAOqN/k9EjGviPRmWTTe6aH2qySWKTVSw==}
+
   '@types/node@10.17.60':
     resolution: {integrity: sha512-F0KIgDJfy2nA3zMLmWGKxcH2ZVEtCZXHHdOQs2gSaQ27+lNeEfGxzkIw90aXswATX7AZ33tahPbzy6KAfUreVw==}
 
@@ -3711,6 +3723,10 @@ packages:
     resolution: {integrity: sha512-WboRycPNsVw3B3TL559F7kuBUM4d8CgMEvk6xEJlOp7OBPjt6G7z8WMWlD2rOFZLk6OYfFIUGsCOWzcQH9K2og==}
     engines: {node: '>= 6'}
 
+  data-uri-to-buffer@4.0.1:
+    resolution: {integrity: sha512-0R9ikRb668HB7QDxT1vkpuUBtqc53YyAwMwGeUFKRojY/NWKvdZ+9UYtRfGmhqNbRkTSVpMbmyhXipFFv2cb/A==}
+    engines: {node: '>= 12'}
+
   date-fns@2.30.0:
     resolution: {integrity: sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==}
     engines: {node: '>=0.11'}
@@ -4204,6 +4220,10 @@ packages:
       picomatch:
         optional: true
 
+  fetch-blob@3.2.0:
+    resolution: {integrity: sha512-7yAQpD2UMJzLi1Dqv7qFYnPbaPx7ZfFK6PiIxQ4PfkGPyNyl2Ugx+a/umUonmKqjhM4DnfbMvdX6otXq83soQQ==}
+    engines: {node: ^12.20 || >= 14.13}
+
   file-entry-cache@8.0.0:
     resolution: {integrity: sha512-XXTUwCvisa5oacNGRP9SfNtYBNAMi+RPwBFmblZEF7N7swHYQS6/Zfk7SRwx4D5j3CH211YNRco1DEMNVfZCnQ==}
     engines: {node: '>=16.0.0'}
@@ -4281,6 +4301,10 @@ packages:
   form-data@4.0.4:
     resolution: {integrity: sha512-KrGhL9Q4zjj0kiUt5OO4Mr/A/jlI2jDYs5eHBpYHPcBEVSiipAvn2Ko2HnPe20rmcuuvMHNdZFp+4IlGTMF0Ow==}
     engines: {node: '>= 6'}
+
+  formdata-polyfill@4.0.10:
+    resolution: {integrity: sha512-buewHzMvYL29jdeQTVILecSaZKnt/RJWjoZCF5OW60Z67/GmSLBkOFM7qh1PI3zFNtJbaZL5eQu1vLfazOwj4g==}
+    engines: {node: '>=12.20.0'}
 
   forwarded@0.2.0:
     resolution: {integrity: sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==}
@@ -5569,6 +5593,11 @@ packages:
   node-addon-api@5.1.0:
     resolution: {integrity: sha512-eh0GgfEkpnoWDq+VY8OyvYhFEzBk6jIYbRKdIlyTiAXIVJ8PyBaKb0rp7oDtoddbdoHWhq8wwr+XZ81F1rpNdA==}
 
+  node-domexception@1.0.0:
+    resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
+    engines: {node: '>=10.5.0'}
+    deprecated: Use your platform's native DOMException instead
+
   node-emoji@1.11.0:
     resolution: {integrity: sha512-wo2DpQkQp7Sjm2A0cq+sN7EHKO6Sl0ctXeBdFZrL9T9+UywORbufTcTZxom8YqpLQt/FqNMUkOpkZrJVYSKD3A==}
 
@@ -5583,6 +5612,10 @@ packages:
     peerDependenciesMeta:
       encoding:
         optional: true
+
+  node-fetch@3.3.2:
+    resolution: {integrity: sha512-dRB78srN/l6gqWulah9SrxeYnxeddIG30+GOqK/9OlLVyLg3HPnr6SqOWTWOXKRwC2eGYCkZ59NNuSgvSrpgOA==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
   node-forge@1.3.1:
     resolution: {integrity: sha512-dPEtOeMvF9VMcYV/1Wb8CPoVAXtp6MKMlcbAt4ddqmGqUJ6fQZFXkNZNkNlfevtNkGtaSoXf/vNNNSvgrdXwtA==}
@@ -11010,6 +11043,11 @@ snapshots:
     dependencies:
       '@types/express': 4.17.23
 
+  '@types/node-fetch@2.6.13':
+    dependencies:
+      '@types/node': 22.18.0
+      form-data: 4.0.4
+
   '@types/node@10.17.60': {}
 
   '@types/node@22.18.0':
@@ -13244,6 +13282,8 @@ snapshots:
 
   data-uri-to-buffer@3.0.1: {}
 
+  data-uri-to-buffer@4.0.1: {}
+
   date-fns@2.30.0:
     dependencies:
       '@babel/runtime': 7.28.3
@@ -13344,10 +13384,10 @@ snapshots:
 
   dlv@1.1.3: {}
 
-  dns-over-http-resolver@1.2.3(node-fetch@2.7.0(encoding@0.1.13)):
+  dns-over-http-resolver@1.2.3(node-fetch@3.3.2):
     dependencies:
       debug: 4.4.1(supports-color@8.1.1)
-      native-fetch: 3.0.0(node-fetch@2.7.0(encoding@0.1.13))
+      native-fetch: 3.0.0(node-fetch@3.3.2)
       receptacle: 1.3.2
     transitivePeerDependencies:
       - node-fetch
@@ -13882,6 +13922,11 @@ snapshots:
     optionalDependencies:
       picomatch: 4.0.3
 
+  fetch-blob@3.2.0:
+    dependencies:
+      node-domexception: 1.0.0
+      web-streams-polyfill: 3.3.3
+
   file-entry-cache@8.0.0:
     dependencies:
       flat-cache: 4.0.1
@@ -13988,6 +14033,10 @@ snapshots:
       es-set-tostringtag: 2.1.0
       hasown: 2.0.2
       mime-types: 2.1.35
+
+  formdata-polyfill@4.0.10:
+    dependencies:
+      fetch-blob: 3.2.0
 
   forwarded@0.2.0: {}
 
@@ -14455,7 +14504,7 @@ snapshots:
 
   ipaddr.js@1.9.1: {}
 
-  ipfs-car@0.6.2(encoding@0.1.13)(node-fetch@2.7.0(encoding@0.1.13)):
+  ipfs-car@0.6.2(encoding@0.1.13)(node-fetch@3.3.2):
     dependencies:
       '@ipld/car': 3.2.4
       '@web-std/blob': 3.0.5
@@ -14464,8 +14513,8 @@ snapshots:
       browser-readablestream-to-it: 1.0.3
       idb-keyval: 6.2.2
       interface-blockstore: 2.0.3
-      ipfs-core-types: 0.8.4(node-fetch@2.7.0(encoding@0.1.13))
-      ipfs-core-utils: 0.12.2(encoding@0.1.13)(node-fetch@2.7.0(encoding@0.1.13))
+      ipfs-core-types: 0.8.4(node-fetch@3.3.2)
+      ipfs-core-utils: 0.12.2(encoding@0.1.13)(node-fetch@3.3.2)
       ipfs-unixfs-exporter: 7.0.11
       ipfs-unixfs-importer: 9.0.10(encoding@0.1.13)
       ipfs-utils: 9.0.14(encoding@0.1.13)
@@ -14483,7 +14532,7 @@ snapshots:
       - node-fetch
       - supports-color
 
-  ipfs-car@0.7.0(encoding@0.1.13)(node-fetch@2.7.0(encoding@0.1.13)):
+  ipfs-car@0.7.0(encoding@0.1.13)(node-fetch@3.3.2):
     dependencies:
       '@ipld/car': 3.2.4
       '@web-std/blob': 3.0.5
@@ -14492,8 +14541,8 @@ snapshots:
       browser-readablestream-to-it: 1.0.3
       idb-keyval: 6.2.2
       interface-blockstore: 2.0.3
-      ipfs-core-types: 0.8.4(node-fetch@2.7.0(encoding@0.1.13))
-      ipfs-core-utils: 0.12.2(encoding@0.1.13)(node-fetch@2.7.0(encoding@0.1.13))
+      ipfs-core-types: 0.8.4(node-fetch@3.3.2)
+      ipfs-core-utils: 0.12.2(encoding@0.1.13)(node-fetch@3.3.2)
       ipfs-unixfs-exporter: 7.0.11
       ipfs-unixfs-importer: 9.0.10(encoding@0.1.13)
       ipfs-utils: 9.0.14(encoding@0.1.13)
@@ -14511,23 +14560,23 @@ snapshots:
       - node-fetch
       - supports-color
 
-  ipfs-core-types@0.8.4(node-fetch@2.7.0(encoding@0.1.13)):
+  ipfs-core-types@0.8.4(node-fetch@3.3.2):
     dependencies:
       interface-datastore: 6.1.1
-      multiaddr: 10.0.1(node-fetch@2.7.0(encoding@0.1.13))
+      multiaddr: 10.0.1(node-fetch@3.3.2)
       multiformats: 9.9.0
     transitivePeerDependencies:
       - node-fetch
       - supports-color
 
-  ipfs-core-utils@0.12.2(encoding@0.1.13)(node-fetch@2.7.0(encoding@0.1.13)):
+  ipfs-core-utils@0.12.2(encoding@0.1.13)(node-fetch@3.3.2):
     dependencies:
       any-signal: 2.1.2
       blob-to-it: 1.0.4
       browser-readablestream-to-it: 1.0.3
       debug: 4.4.1(supports-color@8.1.1)
       err-code: 3.0.1
-      ipfs-core-types: 0.8.4(node-fetch@2.7.0(encoding@0.1.13))
+      ipfs-core-types: 0.8.4(node-fetch@3.3.2)
       ipfs-unixfs: 6.0.9
       ipfs-utils: 9.0.14(encoding@0.1.13)
       it-all: 1.0.6
@@ -14535,8 +14584,8 @@ snapshots:
       it-peekable: 1.0.3
       it-to-stream: 1.0.0
       merge-options: 3.0.4
-      multiaddr: 10.0.1(node-fetch@2.7.0(encoding@0.1.13))
-      multiaddr-to-uri: 8.0.0(node-fetch@2.7.0(encoding@0.1.13))
+      multiaddr: 10.0.1(node-fetch@3.3.2)
+      multiaddr-to-uri: 8.0.0(node-fetch@3.3.2)
       multiformats: 9.9.0
       nanoid: 3.3.11
       parse-duration: 1.1.2
@@ -15625,16 +15674,16 @@ snapshots:
       type-is: 1.6.18
       xtend: 4.0.2
 
-  multiaddr-to-uri@8.0.0(node-fetch@2.7.0(encoding@0.1.13)):
+  multiaddr-to-uri@8.0.0(node-fetch@3.3.2):
     dependencies:
-      multiaddr: 10.0.1(node-fetch@2.7.0(encoding@0.1.13))
+      multiaddr: 10.0.1(node-fetch@3.3.2)
     transitivePeerDependencies:
       - node-fetch
       - supports-color
 
-  multiaddr@10.0.1(node-fetch@2.7.0(encoding@0.1.13)):
+  multiaddr@10.0.1(node-fetch@3.3.2):
     dependencies:
-      dns-over-http-resolver: 1.2.3(node-fetch@2.7.0(encoding@0.1.13))
+      dns-over-http-resolver: 1.2.3(node-fetch@3.3.2)
       err-code: 3.0.1
       is-ip: 3.1.0
       multiformats: 9.9.0
@@ -15694,6 +15743,10 @@ snapshots:
     dependencies:
       node-fetch: 2.7.0(encoding@0.1.13)
 
+  native-fetch@3.0.0(node-fetch@3.3.2):
+    dependencies:
+      node-fetch: 3.3.2
+
   native-fetch@4.0.2(undici@6.21.3):
     dependencies:
       undici: 6.21.3
@@ -15743,7 +15796,7 @@ snapshots:
       - '@babel/core'
       - babel-plugin-macros
 
-  nft.storage@7.2.0(encoding@0.1.13)(node-fetch@2.7.0(encoding@0.1.13)):
+  nft.storage@7.2.0(encoding@0.1.13)(node-fetch@3.3.2):
     dependencies:
       '@ipld/car': 3.2.4
       '@ipld/dag-cbor': 6.0.15
@@ -15752,7 +15805,7 @@ snapshots:
       '@web-std/file': 3.0.3
       '@web-std/form-data': 3.1.0
       carbites: 1.0.6
-      ipfs-car: 0.6.2(encoding@0.1.13)(node-fetch@2.7.0(encoding@0.1.13))
+      ipfs-car: 0.6.2(encoding@0.1.13)(node-fetch@3.3.2)
       it-pipe: 1.1.0
       multiformats: 9.9.0
       p-retry: 4.6.2
@@ -15767,6 +15820,8 @@ snapshots:
 
   node-addon-api@5.1.0: {}
 
+  node-domexception@1.0.0: {}
+
   node-emoji@1.11.0:
     dependencies:
       lodash: 4.17.21
@@ -15778,6 +15833,12 @@ snapshots:
       whatwg-url: 5.0.0
     optionalDependencies:
       encoding: 0.1.13
+
+  node-fetch@3.3.2:
+    dependencies:
+      data-uri-to-buffer: 4.0.1
+      fetch-blob: 3.2.0
+      formdata-polyfill: 4.0.10
 
   node-forge@1.3.1: {}
 
@@ -17793,7 +17854,7 @@ snapshots:
       randombytes: 2.1.0
       utf8: 3.0.0
 
-  web3.storage@4.5.5(encoding@0.1.13)(node-fetch@2.7.0(encoding@0.1.13)):
+  web3.storage@4.5.5(encoding@0.1.13)(node-fetch@3.3.2):
     dependencies:
       '@ipld/car': 3.2.4
       '@web-std/blob': 3.0.5
@@ -17804,7 +17865,7 @@ snapshots:
       carbites: 1.0.6
       cborg: 1.10.2
       files-from-path: 0.2.6
-      ipfs-car: 0.7.0(encoding@0.1.13)(node-fetch@2.7.0(encoding@0.1.13))
+      ipfs-car: 0.7.0(encoding@0.1.13)(node-fetch@3.3.2)
       libp2p-crypto: 0.21.2
       p-retry: 4.6.2
       streaming-iterables: 6.2.0
