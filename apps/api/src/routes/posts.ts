@@ -106,16 +106,64 @@ router.post("/", postCreationLimiter, upload.array('images', 4), async (req, res
 
   // Skip signature verification in development mode
   if (process.env.NODE_ENV !== 'development') {
-    const ok = await verifyTypedData({
-      address: authorAddress as `0x${string}`,
-      domain,
-      types,
-      primaryType: "Post",
-      message,
-      signature: signature as `0x${string}`,
-    });
-    if (!ok) {
-      return res.status(401).json({ error: "Invalid EIP-712 signature" });
+    try {
+      console.log('🔐 Verifying signature for post creation:', {
+        authorAddress,
+        signatureLength: signature.length,
+        signaturePrefix: signature.slice(0, 10),
+        environment: process.env.NODE_ENV
+      });
+
+      const ok = await verifyTypedData({
+        address: authorAddress as `0x${string}`,
+        domain,
+        types,
+        primaryType: "Post",
+        message,
+        signature: signature as `0x${string}`,
+      });
+
+      if (!ok) {
+        console.warn('❌ Signature verification failed for address:', authorAddress);
+        return res.status(401).json({ 
+          error: "Invalid EIP-712 signature",
+          code: "INVALID_SIGNATURE"
+        });
+      }
+
+      console.log('✅ Signature verification successful for address:', authorAddress);
+    } catch (error) {
+      console.error('🚨 Signature verification error:', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        authorAddress,
+        signatureLength: signature.length,
+        signature: signature.slice(0, 20) + '...',
+        stack: error instanceof Error ? error.stack : undefined
+      });
+
+      // Return a more specific error based on the error type
+      if (error instanceof Error) {
+        if (error.message.includes('Invalid yParityOrV value')) {
+          return res.status(400).json({ 
+            error: "Invalid signature format: yParityOrV value is invalid",
+            code: "INVALID_SIGNATURE_FORMAT",
+            details: "The signature format is not compatible with the current verification method"
+          });
+        }
+        if (error.message.includes('Invalid signature')) {
+          return res.status(400).json({ 
+            error: "Invalid signature format",
+            code: "INVALID_SIGNATURE_FORMAT",
+            details: "The signature does not match the expected format"
+          });
+        }
+      }
+
+      return res.status(400).json({ 
+        error: "Signature verification failed",
+        code: "SIGNATURE_VERIFICATION_ERROR",
+        details: error instanceof Error ? error.message : "Unknown signature verification error"
+      });
     }
   }
 

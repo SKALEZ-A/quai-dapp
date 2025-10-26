@@ -35,10 +35,26 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('🚨 API Error:', err.message);
-  res.status(500).json({ 
-    error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message 
+  console.error('🚨 API Error:', {
+    message: err.message,
+    stack: err.stack,
+    url: req.url,
+    method: req.method,
+    timestamp: new Date().toISOString()
   });
+
+  // Don't send stack traces in production
+  const errorResponse = {
+    error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message,
+    code: 'INTERNAL_SERVER_ERROR',
+    timestamp: new Date().toISOString()
+  };
+
+  if (process.env.NODE_ENV !== 'production') {
+    (errorResponse as any).stack = err.stack;
+  }
+
+  res.status(500).json(errorResponse);
 });
 
 app.use("/health", healthRouter);
@@ -49,8 +65,35 @@ app.use("/profiles", profilesRouter);
 app.use("/follows", followsRouter);
 
 const port = Number(process.env.PORT || 4000);
+
+// Graceful shutdown handlers
+process.on('uncaughtException', (error) => {
+  console.error('🚨 Uncaught Exception:', error);
+  // Don't exit immediately, let the process handle it gracefully
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('🚨 Unhandled Rejection at:', promise, 'reason:', reason);
+  // Don't exit immediately, let the process handle it gracefully
+});
+
 mountGraphQL(app).then(() => {
-  app.listen(port, () => {
+  const server = app.listen(port, () => {
     logger.info({ port }, "API server listening");
   });
+
+  // Graceful shutdown
+  const gracefulShutdown = (signal: string) => {
+    console.log(`🛑 Received ${signal}. Starting graceful shutdown...`);
+    server.close(() => {
+      console.log('✅ Server closed gracefully');
+      process.exit(0);
+    });
+  };
+
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+}).catch((error) => {
+  console.error('🚨 Failed to start server:', error);
+  process.exit(1);
 });
