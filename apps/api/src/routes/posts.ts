@@ -246,7 +246,7 @@ router.post("/", postCreationLimiter, upload.array('images', 4), async (req, res
       authorId: profile.id,
       cid,
       textPreview: text.slice(0, 180),
-      imageCids: imageCids.join(','),
+      imageCids: imageCids,
       zone,
     },
     include: { author: true },

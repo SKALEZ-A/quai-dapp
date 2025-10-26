@@ -39,7 +39,7 @@ model Post {
   author       Profile   @relation(fields: [authorId], references: [id])
   cid          String    // IPFS CID of the post body
   textPreview  String?   // cached preview/title for feed
-  imageCids    String?   // JSON array of IPFS CIDs for images (stored as string for SQLite)
+  imageCids    Json?     // JSON array of IPFS CIDs for images (native JSON support in PostgreSQL)
   zone         String?   // optional Quai zone identifier
   txHash       String?   // optional on-chain anchoring tx
 
