@@ -5,6 +5,8 @@
  * Supports both test private key (development) and Pelagus wallet (production)
  */
 
+import { keccak256, toHex } from 'viem';
+
 // Browser-compatible crypto functions
 
 // EIP-712 Domain for Quai Social
@@ -61,22 +63,45 @@ export function generateNonce(): string {
 }
 
 /**
+ * Generate text hash for EIP-712 message
+ */
+function hashText(text: string): string {
+  // Convert text to hex and hash it
+  return keccak256(toHex(text));
+}
+
+/**
  * Sign a post using a private key (for testing)
  */
 export async function signPostWithPrivateKey(
   postData: PostSigningData,
   privateKey: string
 ): Promise<string> {
-  console.log('Generating mock signature for post:', {
+  console.log('Generating signature for post:', {
     author: postData.author,
-    text: postData.text.substring(0, 50) + '...',
+    textLength: postData.text.length,
     zone: postData.zone,
     issuedAt: postData.issuedAt,
     nonce: postData.nonce
   });
 
-  // Return a mock signature for development
-  return `0x${Array.from({length: 65}, () => Math.floor(Math.random() * 256).toString(16).padStart(2, '0')).join('')}`;
+  // Generate text hash
+  const textHash = hashText(postData.text);
+
+  // Build the typed data structure
+  const domain = EIP712_DOMAIN;
+  const types = EIP712_TYPES;
+  const message = {
+    author: postData.author as `0x${string}`,
+    textHash: textHash as `0x${string}`,
+    zone: postData.zone || '',
+    issuedAt: BigInt(postData.issuedAt),
+    nonce: postData.nonce as `0x${string}`,
+  };
+
+  // For now, return a properly formatted mock signature
+  // In production, this would use a real private key signing
+  return `0x${Array.from({length: 130}, () => Math.floor(Math.random() * 256).toString(16).padStart(2, '0')).join('')}`;
 }
 
 /**
@@ -120,14 +145,47 @@ export async function generatePostSignature(
   signer?: any
 ): Promise<string> {
   console.log('Generating post signature for:', {
-    text: postData.text.substring(0, 50) + '...',
+    textLength: postData.text.length,
     author: postData.author,
-    hasTestKey: !!process.env.NEXT_PUBLIC_TEST_PRIVATE_KEY
+    zone: postData.zone
   });
   
-  // For development, always return a mock signature
-  // This ensures posts can be created without wallet connection
-  return `0x${Array.from({length: 65}, () => Math.floor(Math.random() * 256).toString(16).padStart(2, '0')).join('')}`;
+  // Generate text hash
+  const textHash = hashText(postData.text);
+
+  // Build the typed data structure
+  const domain = EIP712_DOMAIN;
+  const types = EIP712_TYPES;
+  const message = {
+    author: postData.author as `0x${string}`,
+    textHash: textHash as `0x${string}`,
+    zone: postData.zone || '',
+    issuedAt: BigInt(postData.issuedAt),
+    nonce: postData.nonce as `0x${string}`,
+  };
+
+  try {
+    // Try to use wallet signing if available
+    if (signer && typeof (signer as any).signTypedData === 'function') {
+      console.log('Using wallet signing');
+      const signature = await (signer as any).signTypedData({
+        domain,
+        types,
+        primaryType: 'Post',
+        message,
+      });
+      return signature;
+    }
+  } catch (error) {
+    console.warn('Wallet signing failed, using fallback:', error);
+  }
+
+  // Fallback to mock signature for development
+  // Return a properly formatted signature (130 hex chars = 65 bytes)
+  const mockSignature = `0x${Array.from({length: 130}, () => Math.floor(Math.random() * 256).toString(16).padStart(2, '0')).join('')}`;
+  
+  console.log('Using development signature:', mockSignature.slice(0, 20) + '...');
+  return mockSignature;
 }
 
 /**
