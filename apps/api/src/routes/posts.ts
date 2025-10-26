@@ -159,8 +159,7 @@ router.post("/", postCreationLimiter, upload.array('images', 4), async (req, res
   const existingProfiles = await prisma.profile.findMany({
     where: {
       address: {
-        equals: authorAddress.toLowerCase(),
-        mode: 'insensitive'
+        equals: authorAddress.toLowerCase()
       }
     }
   });
@@ -247,7 +246,7 @@ router.post("/", postCreationLimiter, upload.array('images', 4), async (req, res
       authorId: profile.id,
       cid,
       textPreview: text.slice(0, 180),
-      imageCids,
+      imageCids: imageCids.join(','),
       zone,
     },
     include: { author: true },

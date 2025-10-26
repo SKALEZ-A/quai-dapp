@@ -10,7 +10,7 @@ export function makeProvider(rpcUrl: string) {
 
 // Use a standard JSON-RPC method to avoid guessing shard-specific APIs
 export async function getBlockNumber(provider: any): Promise<number> {
-  const hex = await provider.send("eth_blockNumber", []);
+  const hex = await provider.send("eth_blockNumber", [], "cyprus1");
   return Number.parseInt(hex, 16);
 }
 

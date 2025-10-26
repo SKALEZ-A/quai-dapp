@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-10-18T10:22:57.612Z",
+  "timestamp": "2025-10-26T15:52:25.310Z",
   "network": "cyprus1_testnet",
   "chainId": 15000,
   "contracts": {
@@ -11,7 +11,7 @@
       "metadata": {
         "name": "Quai Name Service",
         "symbol": "QNS",
-        "totalSupply": "3"
+        "totalSupply": "8"
       }
     },
     "QNS_REGISTRY": {

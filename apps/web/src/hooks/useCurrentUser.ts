@@ -3,6 +3,7 @@
 import { useAccount } from "wagmi";
 import { useState, useEffect } from "react";
 import { useProfile } from "./useProfile";
+import { formatDomainName } from "@/lib/qns";
 
 export type CurrentUser = {
   name: string;
@@ -50,15 +51,17 @@ export function useCurrentUser(): CurrentUser & { refreshProfile: () => void } {
       if (!finalAddress) return;
       
       try {
+        console.log('🔄 Loading profile for address:', finalAddress);
         setIsLoading(true);
         const profile = await fetchProfile(finalAddress);
+        console.log('✅ Profile loaded:', profile);
         
         const profileImgUrl = getImageUrl(profile.avatarUrl);
         const coverImgUrl = getImageUrl(profile.coverUrl) || DEFAULT_COVER_IMG;
         
         const userData = {
           name: profile.displayName || "Quai User",
-          username: profile.qnsName || `${finalAddress.slice(2, 8)}.quai`,
+          username: profile.qnsName ? formatDomainName(profile.qnsName) : `${finalAddress.slice(2, 8)}.quai`,
           address: finalAddress,
           short_address: `${finalAddress.slice(0, 6)}...${finalAddress.slice(-4)}`,
           profileImg: profileImgUrl,

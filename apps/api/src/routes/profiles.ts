@@ -153,8 +153,7 @@ router.put('/', profileUpdateLimiter, async (req, res) => {
     const existingProfiles = await prisma.profile.findMany({
       where: {
         address: {
-          equals: address,
-          mode: 'insensitive'
+          equals: address
         }
       }
     });

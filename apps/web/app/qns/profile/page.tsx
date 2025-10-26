@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAccount } from 'wagmi';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
-import { checkDomainAvailability, getDomainPrice, registerDomain, getUserDomains } from "@/lib/qns";
+import { checkDomainAvailability, getDomainPrice, registerDomain, getUserDomains, formatDomainName, stripDomainSuffix, resolveDomainToAddress, sendFundsToDomain } from "@/lib/qns";
 import { BrowserProvider } from "quais";
 import { getOnchainPrice } from "@/lib/qns";
 
@@ -26,6 +26,14 @@ export default function QNSProfilePage() {
   const [ownedDomains, setOwnedDomains] = useState<string[]>([]);
   const [registering, setRegistering] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  
+  // Payment-to-domain state
+  const [paymentDomain, setPaymentDomain] = useState("");
+  const [paymentAmount, setPaymentAmount] = useState("");
+  const [resolvedAddress, setResolvedAddress] = useState<string | null>(null);
+  const [resolving, setResolving] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState("");
   
   // Safe wallet hooks with error handling
   let address: string | null = null;
@@ -123,13 +131,83 @@ export default function QNSProfilePage() {
     }
   }
 
+  // Payment-to-domain functions
+  async function resolvePaymentDomain(domain: string) {
+    if (!domain.trim()) {
+      setResolvedAddress(null);
+      return;
+    }
+    
+    setResolving(true);
+    try {
+      const result = await resolveDomainToAddress(domain);
+      if (result.success && result.address) {
+        setResolvedAddress(result.address);
+      } else {
+        setResolvedAddress(null);
+      }
+    } catch (error) {
+      console.error('Domain resolution failed:', error);
+      setResolvedAddress(null);
+    } finally {
+      setResolving(false);
+    }
+  }
+
+  async function sendPaymentToDomain() {
+    if (!paymentDomain.trim() || !paymentAmount.trim() || !resolvedAddress) {
+      alert('Please enter a valid domain and amount');
+      return;
+    }
+
+    const finalAddress = address || directAddress;
+    if (!finalAddress) {
+      alert('Please connect your wallet');
+      return;
+    }
+
+    setSending(true);
+    setPaymentStatus('Preparing transaction...');
+    
+    try {
+      const eth = (globalThis as any)?.ethereum;
+      if (!eth) {
+        throw new Error('Wallet not found');
+      }
+
+      const provider = new BrowserProvider(eth);
+      const signer = await provider.getSigner();
+      
+      setPaymentStatus('Sending payment...');
+      const result = await sendFundsToDomain(paymentDomain, paymentAmount, signer, {
+        onProgress: (status: string) => {
+          setPaymentStatus(status);
+        }
+      });
+
+      if (result.success) {
+        setPaymentStatus(`✅ Payment sent! TX: ${result.txHash}`);
+        setPaymentDomain("");
+        setPaymentAmount("");
+        setResolvedAddress(null);
+      } else {
+        setPaymentStatus(`❌ Payment failed: ${result.error}`);
+      }
+    } catch (error: any) {
+      console.error('Payment failed:', error);
+      setPaymentStatus(`❌ Payment failed: ${error?.message || 'Unknown error'}`);
+    } finally {
+      setSending(false);
+    }
+  }
+
   async function searchDomainByName(name: string) {
     if (!name.trim()) return;
     setLoading(true);
     try {
       console.log('Starting search for:', name);
-      const cleanName = name.toLowerCase().trim();
-      console.log('Clean name:', cleanName);
+      const cleanName = stripDomainSuffix(name); // Strip .quai suffix for blockchain queries
+      console.log('Clean name (for blockchain):', cleanName);
       
       // Check availability on blockchain
       console.log('Checking domain availability...');
@@ -155,7 +233,7 @@ export default function QNSProfilePage() {
       console.log('Local pricing (fallback):', pricing);
       
       const domainInfo = { 
-        name: cleanName, 
+        name: formatDomainName(cleanName), // Display with .quai suffix
         available: availability.available, 
         price: pricing.price,
         priceDisplay: onchainPriceDisplay || pricing.display,
@@ -279,7 +357,8 @@ export default function QNSProfilePage() {
 
       // Register domain on blockchain with progress callback
       console.log('Calling registerDomain function...');
-      const result = await registerDomain(domainInfo.name, signer, {
+      const cleanName = stripDomainSuffix(domainInfo.name); // Strip .quai suffix for registration
+      const result = await registerDomain(cleanName, signer, {
         maxRetries: 3,
         validateFirst: true,
         onProgress: (status: string) => {
@@ -292,7 +371,7 @@ export default function QNSProfilePage() {
 
       if (result.success) {
         setRegistrationStatus('Success! Domain registered.');
-        alert(`✅ Domain registered successfully!\n\n${domainInfo.name}.qns is now yours!\n\nTransaction: ${result.txHash?.slice(0, 10)}...`);
+        alert(`✅ Domain registered successfully!\n\n${domainInfo.name} is now yours!\n\nTransaction: ${result.txHash?.slice(0, 10)}...`);
 
         // Refresh domain info
         await searchDomainByName(domainInfo.name);
@@ -330,7 +409,7 @@ export default function QNSProfilePage() {
               <span className="text-gray-400">Connected:</span> <span className="font-mono text-primary">{finalAddress.slice(0, 10)}...{finalAddress.slice(-8)}</span>
             </div>
             <div className="mt-3 text-sm text-gray-400">
-              <span className="font-medium">Your domains:</span> {ownedDomains.length > 0 ? ownedDomains.join(", ") : "None"}
+              <span className="font-medium">Your .quai domains:</span> {ownedDomains.length > 0 ? ownedDomains.map(d => formatDomainName(d)).join(", ") : "None"}
             </div>
           </div>
         ) : (
@@ -348,7 +427,7 @@ export default function QNSProfilePage() {
         <div className="flex gap-3 mb-6">
           <input 
             type="text" 
-            placeholder="hello" 
+            placeholder="skalez" 
             value={searchQuery} 
             onChange={(e) => setSearchQuery(e.target.value)} 
             className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-text-primary placeholder:text-gray-500 outline-none focus:border-primary transition-colors" 
@@ -371,7 +450,7 @@ export default function QNSProfilePage() {
           }`}>
             <div className="mb-4">
               <h3 className="font-space-grotesk text-3xl font-bold text-text-primary mb-2">
-                {domainInfo.name}<span className="text-primary">.qns</span>
+                {domainInfo.name}
               </h3>
               <div className="flex items-center gap-2">
                 <span className="text-gray-400 font-medium">Status:</span>
@@ -550,6 +629,72 @@ export default function QNSProfilePage() {
               Use your QNS domain across all Quai zones and networks
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* Payment-to-Domain Section */}
+      <div className="bg-surface border border-border rounded-lg p-6">
+        <h2 className="font-space-grotesk text-2xl font-bold text-text-primary mb-4">Send QUAI to .quai Domain</h2>
+        <p className="text-gray-400 mb-6">
+          Send QUAI directly to any .quai domain name - just like sending to an address!
+        </p>
+        
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-text-primary mb-2">
+              Domain Name
+            </label>
+            <input
+              type="text"
+              placeholder="skalez.quai"
+              value={paymentDomain}
+              onChange={(e) => {
+                setPaymentDomain(e.target.value);
+                resolvePaymentDomain(e.target.value);
+              }}
+              className="w-full bg-surface border border-border rounded-lg px-4 py-3 text-text-primary placeholder:text-gray-500 outline-none focus:border-primary transition-colors"
+            />
+            {resolving && (
+              <p className="text-sm text-gray-400 mt-1">Resolving domain...</p>
+            )}
+            {resolvedAddress && (
+              <p className="text-sm text-green-400 mt-1">
+                ✓ Resolves to: {resolvedAddress.slice(0, 10)}...{resolvedAddress.slice(-8)}
+              </p>
+            )}
+            {paymentDomain.trim() && !resolvedAddress && !resolving && (
+              <p className="text-sm text-red-400 mt-1">
+                ✗ Domain not found or not registered
+              </p>
+            )}
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-text-primary mb-2">
+              Amount (QUAI)
+            </label>
+            <input
+              type="number"
+              placeholder="1.0"
+              value={paymentAmount}
+              onChange={(e) => setPaymentAmount(e.target.value)}
+              className="w-full bg-surface border border-border rounded-lg px-4 py-3 text-text-primary placeholder:text-gray-500 outline-none focus:border-primary transition-colors"
+            />
+          </div>
+          
+          <button
+            onClick={sendPaymentToDomain}
+            disabled={!resolvedAddress || !paymentAmount.trim() || sending}
+            className="w-full bg-primary hover:bg-primary/90 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-lg transition-colors"
+          >
+            {sending ? 'Sending...' : 'Send Payment'}
+          </button>
+          
+          {paymentStatus && (
+            <div className="mt-4 p-3 bg-gray-800 rounded-lg">
+              <p className="text-sm text-gray-300">{paymentStatus}</p>
+            </div>
+          )}
         </div>
       </div>
     </main>

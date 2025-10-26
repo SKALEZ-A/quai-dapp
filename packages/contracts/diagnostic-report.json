@@ -1,14 +1,14 @@
 {
-  "timestamp": "2025-10-18T10:22:57.288Z",
+  "timestamp": "2025-10-26T15:52:25.007Z",
   "scripts": {
     "Contract Validation": {
       "name": "Contract Validation",
       "script": "validate-deployment.js",
       "success": true,
-      "output": "🔍 QNS Contract Validation\n\nDeployment Info:\n  Network: cyprus1_testnet\n  Chain ID: 15000\n  Timestamp: 2025-10-05T08:06:20.823Z\n\n📋 Validating Contract Deployments...\n\n1️⃣  QNS NFT Contract\n   Address: 0x005382DebE72ee74d5D6E5a2D97Dc7bA2C16be12\n   Deployed: ✅\n   Accessible: ✅\n   Name: Quai Name Service\n   Symbol: QNS\n   Total Supply: 3\n\n2️⃣  QNS Registry Contract\n   Address: 0x0047904d94645A46BA56Cf7E8c064cB823746cFf\n   Deployed: ✅\n   Accessible: ✅\n\n3️⃣  QNS Reserved Names Contract\n   Address: 0x0023272C07514D2D236f6c6895507DFd26442471\n   Deployed: ✅\n   Accessible: ✅\n\n4️⃣  QNS Registrar Contract\n   Address: 0x00204d553264Bdb39f4A6C6c1325d9B4553E427b\n   Deployed: ✅\n   Accessible: ✅\n\n   Checking Registrar References...\n   NFT Reference: 0x005382DebE72ee74d5D6E5a2D97Dc7bA2C16be12 ✅\n   Registry Reference: 0x0047904d94645A46BA56Cf7E8c064cB823746cFf ✅\n   Reserved Names Reference: 0x0023272C07514D2D236f6c6895507DFd26442471 ✅\n   Admin: 0x003DAC94805c77d7fD485cd415F8078414d171e4\n   Treasury: 0x003DAC94805c77d7fD485cd415F8078414d171e4\n   Paused: false\n\n🧪 Testing Basic Functions...\n\nTesting getPrice(\"test\")...\n  ❌ Error: quais.formatEther is not a function\nTesting available(testNode)...\n  ✅ Available: true\n\n📊 Validation Summary:\n  Contracts Deployed: ✅\n  Contracts Accessible: ✅\n  References Match: ✅\n  Issues: 0\n  Warnings: 0\n\n✅ All validations passed!\n\n📄 Results saved to: /Users/mac/Desktop/CODES/HACKATHON/QUAI_Rocster/QUAI/packages/contracts/validation-results.json\n",
+      "output": "🔍 QNS Contract Validation\n\nDeployment Info:\n  Network: cyprus1_testnet\n  Chain ID: 15000\n  Timestamp: 2025-10-05T08:06:20.823Z\n\n📋 Validating Contract Deployments...\n\n1️⃣  QNS NFT Contract\n   Address: 0x005382DebE72ee74d5D6E5a2D97Dc7bA2C16be12\n   Deployed: ✅\n   Accessible: ✅\n   Name: Quai Name Service\n   Symbol: QNS\n   Total Supply: 8\n\n2️⃣  QNS Registry Contract\n   Address: 0x0047904d94645A46BA56Cf7E8c064cB823746cFf\n   Deployed: ✅\n   Accessible: ✅\n\n3️⃣  QNS Reserved Names Contract\n   Address: 0x0023272C07514D2D236f6c6895507DFd26442471\n   Deployed: ✅\n   Accessible: ✅\n\n4️⃣  QNS Registrar Contract\n   Address: 0x00204d553264Bdb39f4A6C6c1325d9B4553E427b\n   Deployed: ✅\n   Accessible: ✅\n\n   Checking Registrar References...\n   NFT Reference: 0x005382DebE72ee74d5D6E5a2D97Dc7bA2C16be12 ✅\n   Registry Reference: 0x0047904d94645A46BA56Cf7E8c064cB823746cFf ✅\n   Reserved Names Reference: 0x0023272C07514D2D236f6c6895507DFd26442471 ✅\n   Admin: 0x003DAC94805c77d7fD485cd415F8078414d171e4\n   Treasury: 0x003DAC94805c77d7fD485cd415F8078414d171e4\n   Paused: false\n\n🧪 Testing Basic Functions...\n\nTesting getPrice(\"test\")...\n  ❌ Error: quais.formatEther is not a function\nTesting available(testNode)...\n  ✅ Available: true\n\n📊 Validation Summary:\n  Contracts Deployed: ✅\n  Contracts Accessible: ✅\n  References Match: ✅\n  Issues: 0\n  Warnings: 0\n\n✅ All validations passed!\n\n📄 Results saved to: /Users/mac/Desktop/CODES/HACKATHON/QUAI_Rocster/QUAI/packages/contracts/validation-results.json\n",
       "error": null,
       "data": {
-        "timestamp": "2025-10-18T10:22:57.612Z",
+        "timestamp": "2025-10-26T15:52:25.310Z",
         "network": "cyprus1_testnet",
         "chainId": 15000,
         "contracts": {
@@ -20,7 +20,7 @@
             "metadata": {
               "name": "Quai Name Service",
               "symbol": "QNS",
-              "totalSupply": "3"
+              "totalSupply": "8"
             }
           },
           "QNS_REGISTRY": {
@@ -90,7 +90,7 @@
       "output": "🔍 Frontend Configuration Verification\n\nDeployment Info:\n  Network: cyprus1_testnet\n  Chain ID: 15000\n  Timestamp: 2025-10-05T08:06:20.823Z\n\n📋 Comparing Contract Addresses:\n\nQNS_REGISTRAR:\n  Deployed:  0x00204d553264Bdb39f4A6C6c1325d9B4553E427b\n  Frontend:  NOT FOUND\n  Env:       NOT FOUND\n  Frontend Match: ❌\n  Env Match: ❌\n\nQNS_NFT:\n  Deployed:  0x005382DebE72ee74d5D6E5a2D97Dc7bA2C16be12\n  Frontend:  NOT FOUND\n  Env:       NOT FOUND\n  Frontend Match: ❌\n  Env Match: ❌\n\nQNS_REGISTRY:\n  Deployed:  0x0047904d94645A46BA56Cf7E8c064cB823746cFf\n  Frontend:  NOT FOUND\n  Env:       NOT FOUND\n  Frontend Match: ❌\n  Env Match: ❌\n\nQNS_RESERVED_NAMES:\n  Deployed:  0x0023272C07514D2D236f6c6895507DFd26442471\n  Frontend:  NOT FOUND\n  Env:       NOT FOUND\n  Frontend Match: ❌\n  Env Match: ❌\n\n📊 Summary:\n  Total Mismatches: 8\n  ❌ Mismatches found:\n\n  1. QNS_REGISTRAR in frontend\n     Expected: 0x00204d553264Bdb39f4A6C6c1325d9B4553E427b\n     Actual:   NOT SET\n  2. QNS_REGISTRAR in env\n     Expected: 0x00204d553264Bdb39f4A6C6c1325d9B4553E427b\n     Actual:   NOT SET\n  3. QNS_NFT in frontend\n     Expected: 0x005382DebE72ee74d5D6E5a2D97Dc7bA2C16be12\n     Actual:   NOT SET\n  4. QNS_NFT in env\n     Expected: 0x005382DebE72ee74d5D6E5a2D97Dc7bA2C16be12\n     Actual:   NOT SET\n  5. QNS_REGISTRY in frontend\n     Expected: 0x0047904d94645A46BA56Cf7E8c064cB823746cFf\n     Actual:   NOT SET\n  6. QNS_REGISTRY in env\n     Expected: 0x0047904d94645A46BA56Cf7E8c064cB823746cFf\n     Actual:   NOT SET\n  7. QNS_RESERVED_NAMES in frontend\n     Expected: 0x0023272C07514D2D236f6c6895507DFd26442471\n     Actual:   NOT SET\n  8. QNS_RESERVED_NAMES in env\n     Expected: 0x0023272C07514D2D236f6c6895507DFd26442471\n     Actual:   NOT SET\n\n💡 Recommendations:\n\n1. Update .env file with correct addresses:\n   Run: node scripts/update-env-addresses.js\n\n2. Update frontend contracts.ts with correct addresses:\n   Edit: apps/web/src/lib/contracts.ts\n\n3. After updating, restart the development server\n📄 Results saved to: /Users/mac/Desktop/CODES/HACKATHON/QUAI_Rocster/QUAI/packages/contracts/frontend-config-verification.json\n\n📝 Update script generated: /Users/mac/Desktop/CODES/HACKATHON/QUAI_Rocster/QUAI/packages/contracts/update-env-addresses.sh\n   Run: cd packages/contracts && ./update-env-addresses.sh\n\n",
       "error": null,
       "data": {
-        "timestamp": "2025-10-18T10:23:04.029Z",
+        "timestamp": "2025-10-26T15:52:31.866Z",
         "deployment": {
           "QNS_REGISTRY": "0x0047904d94645A46BA56Cf7E8c064cB823746cFf",
           "QNS_NFT": "0x005382DebE72ee74d5D6E5a2D97Dc7bA2C16be12",

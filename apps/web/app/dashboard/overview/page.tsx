@@ -47,15 +47,41 @@ const UserOverview = () => {
     // Avoid duplicate loading
     if (loadingDomains) return;
     
-    console.log("Loading domains for address:", currentUser.address);
+    console.log("🔄 Loading domains for address:", currentUser.address);
     setLoadingDomains(true);
+    
     try {
-      const domains = await getUserDomains(currentUser.address);
-      console.log("Loaded domains:", domains);
-      setMyDomains(domains);
+      // ONLY query blockchain for actual purchased domains
+      console.log("🔄 Querying blockchain for purchased domains...");
+      const domains = await Promise.race([
+        getUserDomains(currentUser.address),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Blockchain query timeout')), 15000))
+      ]) as string[];
+      
+      console.log("✅ Loaded domains from blockchain:", domains);
+      
+      if (domains.length > 0) {
+        // Format domains with .quai suffix for display
+        const formattedDomains = domains.map(domain => {
+          if (!domain.endsWith('.quai')) {
+            return `${domain}.quai`;
+          }
+          return domain;
+        });
+        
+        console.log("✅ Formatted domains for display:", formattedDomains);
+        setMyDomains(formattedDomains);
+      } else {
+        console.log("ℹ️ No domains found on blockchain for this address");
+        setMyDomains([]);
+      }
+      
       setDomainsLoaded(true);
     } catch (error) {
-      console.error("Error loading domains:", error);
+      console.error("❌ Error loading domains from blockchain:", error);
+      console.log("ℹ️ No domains will be displayed (blockchain query failed)");
+      setMyDomains([]);
+      setDomainsLoaded(true);
     } finally {
       setLoadingDomains(false);
     }
@@ -230,14 +256,14 @@ const UserOverview = () => {
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-2">
                         <DomainIcon />
-                        <span className="font-space-grotesk font-bold text-text-primary">{domain}<span className="text-primary">.qns</span></span>
+                        <span className="font-space-grotesk font-bold text-text-primary">{domain}</span>
                       </div>
                       <span className="text-xs px-2 py-1 bg-green-900/30 text-green-400 rounded">Active</span>
                     </div>
                     
                     <div className="flex flex-col sm:flex-row gap-2 mt-4">
                       <button 
-                        onClick={() => copyItem(domain + '.qns')}
+                        onClick={() => copyItem(domain)}
                         className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-xs bg-gray-800 hover:bg-gray-700 rounded transition-colors text-gray-300"
                       >
                         <CopyIcon /> Copy

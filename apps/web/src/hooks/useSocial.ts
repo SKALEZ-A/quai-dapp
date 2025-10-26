@@ -199,6 +199,7 @@ export function useSocial() {
 
   // Load posts on mount and when address changes
   useEffect(() => {
+    console.log('🔄 useSocial: Loading posts, address:', address);
     fetchPosts();
   }, [address, fetchPosts]);
 

@@ -1425,8 +1425,8 @@
       ]
     },
     "/Users/mac/Desktop/CODES/HACKATHON/QUAI_Rocster/QUAI/packages/contracts/contracts/QNSRegistrarSimple.sol": {
-      "lastModificationDate": 1759936835682,
-      "contentHash": "a20c68c1e707457fddf3bf0eac3749cf",
+      "lastModificationDate": 1761495414614,
+      "contentHash": "01683924e3502c0a35e45bce1677f5b6",
       "sourceName": "contracts/QNSRegistrarSimple.sol",
       "solcConfig": {
         "version": "0.8.23",
@@ -1733,8 +1733,8 @@
       ]
     },
     "/Users/mac/Desktop/CODES/HACKATHON/QUAI_Rocster/QUAI/packages/contracts/contracts/QNSNFTSimple.sol": {
-      "lastModificationDate": 1759651427494,
-      "contentHash": "e69c8f4f6782e020463f883655f7761e",
+      "lastModificationDate": 1761490261200,
+      "contentHash": "59e6294c9365e7d7662358562c16f2f8",
       "sourceName": "contracts/QNSNFTSimple.sol",
       "solcConfig": {
         "version": "0.8.23",

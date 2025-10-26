@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>API Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function testAPI() {
+            const results = document.getElementById('results');
+            
+            try {
+                // Test posts endpoint
+                console.log('Testing posts endpoint...');
+                const postsResponse = await fetch('/api/proxy/posts');
+                const postsData = await postsResponse.json();
+                console.log('Posts response:', postsData);
+                results.innerHTML += '<h2>Posts:</h2><pre>' + JSON.stringify(postsData, null, 2) + '</pre>';
+                
+                // Test leaderboard endpoint
+                console.log('Testing leaderboard endpoint...');
+                const leaderboardResponse = await fetch('/api/proxy/profiles/leaderboard');
+                const leaderboardData = await leaderboardResponse.json();
+                console.log('Leaderboard response:', leaderboardData);
+                results.innerHTML += '<h2>Leaderboard:</h2><pre>' + JSON.stringify(leaderboardData, null, 2) + '</pre>';
+                
+                // Test profile endpoint
+                console.log('Testing profile endpoint...');
+                const profileResponse = await fetch('/api/proxy/profiles/0x003dac94805c77d7fd485cd415f8078414d171e4');
+                const profileData = await profileResponse.json();
+                console.log('Profile response:', profileData);
+                results.innerHTML += '<h2>Profile:</h2><pre>' + JSON.stringify(profileData, null, 2) + '</pre>';
+                
+            } catch (error) {
+                console.error('API test failed:', error);
+                results.innerHTML += '<h2>Error:</h2><pre>' + error.message + '</pre>';
+            }
+        }
+        
+        // Run test when page loads
+        testAPI();
+    </script>
+</body>
+</html>

@@ -86,7 +86,7 @@ contract QNSNFTSimple is ERC721, AccessControl {
     function nodeToName(bytes32 node) internal pure returns (string memory) {
         // Simple conversion - in production this would be more sophisticated
         // This is a placeholder implementation
-        return "domain.qns"; // Would need proper name resolution
+        return "domain.quai"; // Updated to use .quai suffix
     }
 
     function getNode(uint256 tokenId) external view returns (bytes32) {
@@ -112,7 +112,7 @@ contract QNSNFTSimple is ERC721, AccessControl {
     // Basic base64 encoding for tokenURI
     function base64Encode(bytes memory data) internal pure returns (string memory) {
         // Simplified base64 encoding - in production use a proper library
-        return "eyJuYW1lIjoiZG9tYWluLnFucyJ9"; // Example encoded JSON
+        return "eyJuYW1lIjoiZG9tYWluLnF1YWkifQ=="; // Example encoded JSON with .quai
     }
 
     function supportsInterface(bytes4 interfaceId) public view override(ERC721, AccessControl) returns (bool) {

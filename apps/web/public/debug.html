@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Frontend</title>
+</head>
+<body>
+    <h1>Frontend Debug</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function debugFrontend() {
+            const results = document.getElementById('results');
+            
+            try {
+                // Test if we can detect localhost
+                const isLocalhost = window.location.hostname === 'localhost' || 
+                                  window.location.hostname === '127.0.0.1' ||
+                                  window.location.hostname.includes('localhost');
+                
+                results.innerHTML += '<h2>Environment Detection:</h2>';
+                results.innerHTML += '<p>Hostname: ' + window.location.hostname + '</p>';
+                results.innerHTML += '<p>Is Localhost: ' + isLocalhost + '</p>';
+                results.innerHTML += '<p>API URL would be: ' + (isLocalhost ? '/api/proxy' : 'production') + '</p>';
+                
+                // Test API calls
+                results.innerHTML += '<h2>API Tests:</h2>';
+                
+                // Test posts
+                try {
+                    const postsResponse = await fetch('/api/proxy/posts');
+                    const postsData = await postsResponse.json();
+                    results.innerHTML += '<p>✅ Posts API: ' + postsData.posts.length + ' posts loaded</p>';
+                } catch (error) {
+                    results.innerHTML += '<p>❌ Posts API Error: ' + error.message + '</p>';
+                }
+                
+                // Test leaderboard
+                try {
+                    const leaderboardResponse = await fetch('/api/proxy/profiles/leaderboard');
+                    const leaderboardData = await leaderboardResponse.json();
+                    results.innerHTML += '<p>✅ Leaderboard API: ' + leaderboardData.leaderboard.length + ' entries loaded</p>';
+                } catch (error) {
+                    results.innerHTML += '<p>❌ Leaderboard API Error: ' + error.message + '</p>';
+                }
+                
+                // Test profile
+                try {
+                    const profileResponse = await fetch('/api/proxy/profiles/0x003dac94805c77d7fd485cd415f8078414d171e4');
+                    const profileData = await profileResponse.json();
+                    results.innerHTML += '<p>✅ Profile API: ' + profileData.displayName + ' loaded</p>';
+                } catch (error) {
+                    results.innerHTML += '<p>❌ Profile API Error: ' + error.message + '</p>';
+                }
+                
+            } catch (error) {
+                results.innerHTML += '<h2>Error:</h2><pre>' + error.message + '</pre>';
+            }
+        }
+        
+        // Run debug when page loads
+        debugFrontend();
+    </script>
+</body>
+</html>

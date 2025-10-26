@@ -1,6 +1,6 @@
 // QNS blockchain interaction utilities
 import { Contract, keccak256, toUtf8Bytes } from 'quais';
-import { makeProvider } from './quai';
+import { makeProvider, getBlockNumber } from './quai';
 import { CONTRACTS, RPC_URL, QNS_REGISTRY_ABI, QNS_NFT_ABI, QNS_CONTROLLER_ABI, QNS_AUCTION_MANAGER_ABI, QNS_REGISTRAR_ABI, QI_PAYMENT_RESOLVER_ABI } from './contracts';
 import { transactionManager, TransactionResult } from './transactionManager';
 import { errorHandler, ErrorCategory } from './errorHandler';
@@ -14,14 +14,14 @@ function formatEther(value: bigint): string {
   return (Number(value) / 1e18).toFixed(4);
 }
 
-// Domain pricing based on length - REDUCED for testing
+// Domain pricing based on length - AFFORDABLE PRICING (5/20/50 QUAI)
 export const PRICING = {
-  3: { price: '10', display: '10 QI' },
-  4: { price: '5', display: '5 QI' },
-  5: { price: '2', display: '2 QI' },
-  6: { price: '2', display: '2 QI' },
-  7: { price: '2', display: '2 QI' },
-  default: { price: '1', display: '1 QI' },
+  3: { price: '50', display: '50 QUAI' },   // Much more affordable for 3-char domains
+  4: { price: '20', display: '20 QUAI' },   // Much more affordable for 4-char domains
+  5: { price: '5', display: '5 QUAI' },     // Very affordable for 5+ char domains
+  6: { price: '5', display: '5 QUAI' },     // Very affordable for 5+ char domains
+  7: { price: '5', display: '5 QUAI' },     // Very affordable for 5+ char domains
+  default: { price: '5', display: '5 QUAI' }, // Very affordable default
 } as const;
 
 export function getDomainPrice(name: string): { price: string; display: string; needsAuction: boolean } {
@@ -40,11 +40,45 @@ export function getDomainPrice(name: string): { price: string; display: string; 
 }
 
 
+// Domain utility functions for .quai suffix handling
+export function formatDomainName(name: string): string {
+  // Always append .quai suffix for display, removing any existing .qns suffix
+  const cleanName = name.toLowerCase().trim();
+  
+  // Remove .qns suffix if present
+  if (cleanName.endsWith('.qns')) {
+    const withoutQns = cleanName.slice(0, -4); // Remove '.qns'
+    return `${withoutQns}.quai`;
+  }
+  
+  // Remove .quai suffix if present (to avoid duplication)
+  if (cleanName.endsWith('.quai')) {
+    return cleanName;
+  }
+  
+  return `${cleanName}.quai`;
+}
+
+export function stripDomainSuffix(name: string): string {
+  // Remove both .quai and .qns suffixes before blockchain queries
+  const cleanName = name.toLowerCase().trim();
+  
+  if (cleanName.endsWith('.quai')) {
+    return cleanName.slice(0, -5); // Remove '.quai'
+  }
+  
+  if (cleanName.endsWith('.qns')) {
+    return cleanName.slice(0, -4); // Remove '.qns'
+  }
+  
+  return cleanName;
+}
+
 // Convert domain name to node hash (namehash)
 export function nameToNode(name: string): string {
-  // Simple implementation - full namehash would be more complex
-  const label = name.toLowerCase();
-  return keccak256(toUtf8Bytes(label));
+  // Strip .quai suffix before hashing
+  const cleanName = stripDomainSuffix(name);
+  return keccak256(toUtf8Bytes(cleanName));
 }
 
 // Check if domain is available
@@ -369,21 +403,50 @@ export async function getUserDomains(address: string): Promise<string[]> {
       const topic0 = keccak256(toUtf8Bytes(eventSig));
       const ownerTopic = '0x' + '0'.repeat(24) + address.toLowerCase().replace(/^0x/, '');
 
-      const fromBlock = 0; // full history on testnet; adjust if needed
+      // Use recent block range to avoid "filter range exceeds maximum limit" error
+      const currentBlock = await getBlockNumber(provider);
+      const fromBlock = Math.max(0, currentBlock - 10000); // Last 10k blocks
       const toBlock: any = 'latest';
 
       console.log('Querying logs for NameMinted events...', { topic0, ownerTopic, fromBlock, toBlock });
-      const logs = await provider.getLogs({
+      // Use raw RPC call with cyprus1 shard to avoid "getLogs can only be called in zone chain" error
+      const logs = await provider.send('eth_getLogs', [{
         address: CONTRACTS.QNS_NFT,
         topics: [topic0, null, null, ownerTopic],
-        fromBlock,
-        toBlock
-      } as any);
+        fromBlock: '0x' + fromBlock.toString(16),
+        toBlock: toBlock === 'latest' ? 'latest' : '0x' + toBlock.toString(16)
+      }], 'cyprus1' as any);
 
       console.log('Found logs:', logs.length);
 
+      // If no logs found in recent range, try a broader range in chunks
+      let allLogs = logs;
+      if (logs.length === 0) {
+        console.log('No recent logs found, trying broader range in chunks...');
+        const chunkSize = 5000; // Smaller chunks to avoid limit
+        const olderFromBlock = Math.max(0, currentBlock - 50000); // Go back 50k blocks
+        
+        for (let start = olderFromBlock; start < currentBlock; start += chunkSize) {
+          const end = Math.min(start + chunkSize - 1, currentBlock);
+          try {
+            console.log(`Querying chunk: ${start} to ${end}`);
+            const chunkLogs = await provider.send('eth_getLogs', [{
+              address: CONTRACTS.QNS_NFT,
+              topics: [topic0, null, null, ownerTopic],
+              fromBlock: '0x' + start.toString(16),
+              toBlock: '0x' + end.toString(16)
+            }], 'cyprus1' as any);
+            allLogs = allLogs.concat(chunkLogs);
+            console.log(`Found ${chunkLogs.length} logs in chunk ${start}-${end}`);
+          } catch (error) {
+            console.warn(`Failed to query chunk ${start}-${end}:`, error);
+            break; // Stop if we hit an error
+          }
+        }
+      }
+
       const seenNodes = new Set<string>();
-      for (const log of logs) {
+      for (const log of allLogs) {
         try {
           const node = log.topics?.[1];
           if (!node || seenNodes.has(node)) continue;
@@ -628,7 +691,7 @@ export async function resolveDomainToAddress(
     
     const provider = providerOrSigner?.provider || providerOrSigner || makeProvider(RPC_URL);
     const registryContract = new Contract(CONTRACTS.QNS_REGISTRY, QNS_REGISTRY_ABI, provider);
-    const node = nameToNode(domainName);
+    const node = nameToNode(domainName); // This now handles .quai suffix stripping
     
     // First check if the domain exists and get its owner
     let owner: string;

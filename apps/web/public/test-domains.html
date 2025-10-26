@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Domains</title>
+</head>
+<body>
+    <h1>Test Domain Loading</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function testDomainLoading() {
+            const results = document.getElementById('results');
+            
+            try {
+                // Test the profile API first
+                console.log('Testing profile API...');
+                const profileResponse = await fetch('/api/proxy/profiles/0x003DAC94805c77d7fD485cd415F8078414d171e4');
+                const profile = await profileResponse.json();
+                console.log('Profile data:', profile);
+                
+                results.innerHTML += '<h2>Profile Data:</h2>';
+                results.innerHTML += '<pre>' + JSON.stringify(profile, null, 2) + '</pre>';
+                
+                if (profile.qnsName) {
+                    results.innerHTML += '<h2>QNS Name Found:</h2>';
+                    results.innerHTML += '<p>QNS Name: ' + profile.qnsName + '</p>';
+                    results.innerHTML += '<p>Formatted: ' + (profile.qnsName.endsWith('.quai') ? profile.qnsName : profile.qnsName + '.quai') + '</p>';
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                results.innerHTML += '<p style="color: red;">Error: ' + error.message + '</p>';
+            }
+        }
+        
+        testDomainLoading();
+    </script>
+</body>
+</html>
