@@ -21,13 +21,92 @@ const profileUpdateSchema = z.object({
   coverCid: z.string().optional(),
 });
 
+// GET /profiles/leaderboard - Get user leaderboard with post counts and engagement
+router.get('/leaderboard', async (req, res) => {
+  try {
+    const limit = Math.min(Math.max(Number(req.query.limit ?? 20), 1), 100);
+    const offset = Math.max(Number(req.query.offset ?? 0), 0);
+
+    // Get all profiles with their post counts and engagement metrics
+    const profiles = await prisma.profile.findMany({
+      include: {
+        _count: {
+          select: {
+            posts: true,
+          },
+        },
+        posts: {
+          include: {
+            _count: {
+              select: {
+                likes: true,
+                comments: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc', // Fallback ordering
+      },
+    });
+
+    console.log('Found profiles:', profiles.length);
+
+    // Calculate engagement scores for each profile
+    const leaderboardData = profiles
+      .map((profile) => {
+        const postCount = profile._count.posts;
+        const totalLikes = profile.posts.reduce((sum, post) => sum + post._count.likes, 0);
+        const totalComments = profile.posts.reduce((sum, post) => sum + post._count.comments, 0);
+        
+        // Calculate engagement score: postCount + (totalLikes * 0.5) + (totalComments * 0.3)
+        const engagementScore = postCount + (totalLikes * 0.5) + (totalComments * 0.3);
+
+        return {
+          profile: {
+            id: profile.id,
+            address: profile.address,
+            qnsName: profile.qnsName,
+            displayName: profile.displayName,
+            avatarUrl: profile.avatarUrl,
+            bio: profile.bio,
+          },
+          postCount,
+          totalLikes,
+          totalComments,
+          engagementScore,
+        };
+      })
+      .filter((entry) => entry.postCount > 0) // Only include users with posts
+      .sort((a, b) => b.engagementScore - a.engagementScore) // Sort by engagement score
+      .slice(offset, offset + limit)
+      .map((entry, index) => ({
+        rank: offset + index + 1,
+        ...entry,
+      }));
+
+    res.json({
+      leaderboard: leaderboardData,
+      total: profiles.filter(p => p._count.posts > 0).length,
+      hasMore: offset + limit < profiles.filter(p => p._count.posts > 0).length,
+    });
+  } catch (error) {
+    console.error('Error fetching leaderboard:', error);
+    res.status(500).json({ error: 'Failed to fetch leaderboard' });
+  }
+});
+
 // GET /profiles/:address - Fetch profile by address
 router.get('/:address', async (req, res) => {
   try {
     const { address } = req.params;
+    
+    // Normalize address to lowercase for consistent lookup
+    const normalizedAddress = address.toLowerCase();
 
     const profile = await prisma.profile.findUnique({
-      where: { address },
+      where: { address: normalizedAddress },
       include: {
         _count: {
           select: {
@@ -69,6 +148,39 @@ router.put('/', profileUpdateLimiter, async (req, res) => {
     let profile = await prisma.profile.findUnique({
       where: { address },
     });
+
+    // Check for duplicate profiles with same address (case-insensitive)
+    const existingProfiles = await prisma.profile.findMany({
+      where: {
+        address: {
+          equals: address,
+          mode: 'insensitive'
+        }
+      }
+    });
+
+    if (existingProfiles.length > 1) {
+      console.log(`⚠️ Found ${existingProfiles.length} duplicate profiles for address: ${address}`);
+      // Keep the most recent profile and delete others
+      const profilesToDelete = existingProfiles.slice(1);
+      for (const duplicateProfile of profilesToDelete) {
+        // Delete follow relationships first
+        await prisma.follow.deleteMany({
+          where: {
+            OR: [
+              { followerId: duplicateProfile.id },
+              { followingId: duplicateProfile.id }
+            ]
+          }
+        });
+        await prisma.profile.delete({
+          where: { id: duplicateProfile.id }
+        });
+        console.log(`🗑️ Deleted duplicate profile: ${duplicateProfile.id}`);
+      }
+      // Update profile reference to the remaining one
+      profile = existingProfiles[0];
+    }
 
     const updateData: any = {};
     if (displayName !== undefined) updateData.displayName = displayName;
