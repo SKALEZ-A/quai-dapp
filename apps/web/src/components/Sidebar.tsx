@@ -43,8 +43,18 @@ const AnalyticsIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 const SettingsIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-    <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
     <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+const LeaderboardIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M4 22h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M10 14.66V17c0 .55-.47.98-.97 1.21l-1 .42A2 2 0 0 1 6 16.5v-1.84" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M14 14.66V17c0 .55.47.98.97 1.21l1 .42A2 2 0 0 0 18 16.5v-1.84" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 const ChevronDownIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -119,6 +129,10 @@ const Sidebar = () => {
             <Link href="/dashboard/social" onClick={closeMobileMenu} className={`flex items-center gap-3 py-3 px-2 rounded-lg text-text-secondary font-medium transition-all duration-200 ease-in-out hover:bg-surface hover:text-text-primary ${isActive('/dashboard/social') ? 'bg-primary text-text-primary' : ''}`}>
               <ActivityIcon className="w-5 h-5" />
               <span>Social Activity</span>
+            </Link>
+            <Link href="/dashboard/leaderboard" onClick={closeMobileMenu} className={`flex items-center gap-3 py-3 px-2 rounded-lg text-text-secondary font-medium transition-all duration-200 ease-in-out hover:bg-surface hover:text-text-primary ${isActive('/dashboard/leaderboard') ? 'bg-primary text-text-primary' : ''}`}>
+              <LeaderboardIcon className="w-5 h-5" />
+              <span>Leaderboard</span>
             </Link>
             <Link href="/qns/profile" onClick={closeMobileMenu} className={`flex items-center gap-3 py-3 px-2 rounded-lg text-text-secondary font-medium transition-all duration-200 ease-in-out hover:bg-surface hover:text-text-primary ${isActive('/qns/profile') ? 'bg-primary text-text-primary' : ''}`}>
               <QnsIcon className="w-5 h-5" />

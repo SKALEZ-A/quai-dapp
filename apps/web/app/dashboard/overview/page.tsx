@@ -288,15 +288,24 @@ const UserOverview = () => {
                 
                 return (
                   <div className="flex gap-4 items-start pb-6 mb-6 last:mb-0 last:pb-0 last:border-b-0 border-b border-gray-700" key={post.id}>
-                    <div className="w-10 h-10 rounded-full bg-gray-500 flex-shrink-0 overflow-hidden">
+                    <div 
+                      className="w-10 h-10 rounded-full bg-gray-500 flex-shrink-0 overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={(e) => { 
+                        e.stopPropagation(); 
+                        router.push(`/dashboard/profile/${post.author.address}`); 
+                      }}
+                    >
                       <img src={getImageUrl(post.author.avatarUrl)} alt={authorName} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex flex-col flex-1">
                       <div className="flex items-center justify-between mb-0">
                         <div className="flex items-center gap-2">
                           <button 
-                            onClick={() => router.push(`/dashboard/profile/${post.author.address}`)}
-                            className="font-bold text-gray-50 hover:text-white transition-colors"
+                            onClick={(e) => { 
+                              e.stopPropagation(); 
+                              router.push(`/dashboard/profile/${post.author.address}`); 
+                            }}
+                            className="font-bold text-gray-50 hover:text-white transition-colors cursor-pointer hover:underline"
                           >
                             {authorName}
                           </button>
@@ -307,7 +316,12 @@ const UserOverview = () => {
                           currentUserAddress={currentUser.address || ''}
                         />
                       </div>
-                      <p className="text-gray-300 leading-relaxed text-sm">{post.textPreview}</p>
+                      <div 
+                        className="cursor-pointer"
+                        onClick={() => router.push(`/dashboard/post/${post.id}`)}
+                      >
+                        <p className="text-gray-300 leading-relaxed text-sm">{post.textPreview}</p>
+                      </div>
                     </div>
                   </div>
                 );

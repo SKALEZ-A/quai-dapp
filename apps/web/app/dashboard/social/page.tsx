@@ -166,16 +166,34 @@ const SocialActivity = () => {
                         </div>
                     ) : (
                         posts.map(post => (
-                            <div className="flex gap-3 lg:gap-4 bg-black p-4 lg:p-6 cursor-pointer" key={post.id} onClick={() => router.push(`/dashboard/post/${post.id}`)}>
-                                <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-gray-600 flex-shrink-0 overflow-hidden">
+                            <div className="flex gap-3 lg:gap-4 bg-black p-4 lg:p-6" key={post.id}>
+                                <div 
+                                    className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-gray-600 flex-shrink-0 overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
+                                    onClick={(e) => { 
+                                        e.stopPropagation(); 
+                                        router.push(`/dashboard/profile/${post.author.address}`); 
+                                    }}
+                                >
                                     <img src={getImageUrl(post.author.avatarUrl)} className="w-auto h-full" alt={`${post.author.displayName || post.author.qnsName || 'User'} Profile`} />
                                 </div>
                                 <div className="w-full">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <span className="font-bold text-sm lg:text-base">{post.author.displayName || post.author.qnsName || `${post.author.address.slice(0, 6)}...${post.author.address.slice(-4)}`}</span>
+                                        <span 
+                                            className="font-bold text-sm lg:text-base cursor-pointer hover:underline transition-colors"
+                                            onClick={(e) => { 
+                                                e.stopPropagation(); 
+                                                router.push(`/dashboard/profile/${post.author.address}`); 
+                                            }}
+                                        >
+                                            {post.author.displayName || post.author.qnsName || `${post.author.address.slice(0, 6)}...${post.author.address.slice(-4)}`}
+                                        </span>
                                         <span className="text-gray-400 text-xs lg:text-sm">{new Date(post.createdAt).toLocaleTimeString()}</span>
                                     </div>
-                                    <p className="leading-relaxed mb-4 text-sm lg:text-base">{post.textPreview}</p>
+                                    <div 
+                                        className="cursor-pointer"
+                                        onClick={() => router.push(`/dashboard/post/${post.id}`)}
+                                    >
+                                        <p className="leading-relaxed mb-4 text-sm lg:text-base">{post.textPreview}</p>
                                     {post.imageCids && post.imageCids.length > 0 && (
                                         <div className={`grid ${getImageGridClasses(post.imageCids.length)} gap-2 rounded-xl overflow-hidden mb-4`}>
                                             {post.imageCids.map((cid, index) => {
@@ -225,6 +243,7 @@ onError={(e) => {
                                             })}
                                         </div>
                                     )}
+                                    </div>
                                     <div className="flex gap-4 lg:gap-6 text-gray-400">
                                         <button 
                                             className="flex items-center gap-1 lg:gap-2 hover:text-red-500 text-xs lg:text-sm"

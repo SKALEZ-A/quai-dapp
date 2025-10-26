@@ -41,11 +41,14 @@ const UserProfilePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'posts' | 'replies' | 'media' | 'likes'>('posts');
 
   // Handle IPFS URLs for image display
-  const getImageUrl = (url: string) => {
-    if (url.startsWith('http') || url.startsWith('/')) {
-      return url;
-    }
-    // If it's an IPFS CID, use Pinata gateway
+  const getImageUrl = (url?: string | null): string => {
+    // Handle null, undefined, or empty string
+    if (!url || url.trim() === '') return '/assets/avatars/default-avatar.png';
+    
+    // If already a full URL or relative path, return as-is
+    if (url.startsWith('http') || url.startsWith('/')) return url;
+    
+    // IPFS CID - convert to Pinata gateway URL
     return `https://gateway.pinata.cloud/ipfs/${url}`;
   };
 
@@ -62,8 +65,8 @@ const UserProfilePage: React.FC = () => {
           username: profile.qnsName || `${targetAddress.slice(2, 8)}.quai`,
           address: targetAddress,
           short_address: `${targetAddress.slice(0, 6)}...${targetAddress.slice(-4)}`,
-          profileImg: profile.avatarUrl || '/default-profile.png',
-          coverImg: profile.coverUrl || '/default-cover.png',
+          profileImg: profile.avatarUrl || '/assets/avatars/default-avatar.png',
+          coverImg: profile.coverUrl || '/assets/pattern.png',
           about: profile.bio || "Exploring Quai Network and the Synq Superapp.",
           date_joined: "Joined Sep 2025",
           followers: profile._count?.followers || 0,
@@ -77,8 +80,8 @@ const UserProfilePage: React.FC = () => {
           username: `${targetAddress.slice(2, 8)}.quai`,
           address: targetAddress,
           short_address: `${targetAddress.slice(0, 6)}...${targetAddress.slice(-4)}`,
-          profileImg: '/default-profile.png',
-          coverImg: '/default-cover.png',
+          profileImg: '/assets/avatars/default-avatar.png',
+          coverImg: '/assets/pattern.png',
           about: "User profile not found.",
           date_joined: "Unknown",
           followers: 0,

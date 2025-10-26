@@ -1,5 +1,28 @@
 
 
+> api@0.1.0 prebuild /Users/mac/Desktop/CODES/HACKATHON/QUAI_Rocster/QUAI/apps/api
+> prisma generate
+
+[2mEnvironment variables loaded from .env[22m
+[2mPrisma schema loaded from prisma/schema.prisma[22m
+
+
+✔ Generated [1mPrisma Client[22m (v6.15.0)[2m to ./../../node_modules/.pnpm/@prisma+client@6.15.0_prisma@6.15.0_magicast@0.3.5_typescript@5.8.3__typescript@5.8.3/node_modules/@prisma/client[22m in 210ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+
+
 > api@0.1.0 build /Users/mac/Desktop/CODES/HACKATHON/QUAI_Rocster/QUAI/apps/api
-> tsc -p tsconfig.json
+> prisma generate && tsc -p tsconfig.json
+
+[2mEnvironment variables loaded from .env[22m
+[2mPrisma schema loaded from prisma/schema.prisma[22m
+
+✔ Generated [1mPrisma Client[22m (v6.15.0)[2m to ./../../node_modules/.pnpm/@prisma+client@6.15.0_prisma@6.15.0_magicast@0.3.5_typescript@5.8.3__typescript@5.8.3/node_modules/@prisma/client[22m in 198ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
 
