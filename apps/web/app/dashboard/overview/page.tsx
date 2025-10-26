@@ -70,6 +70,18 @@ const UserOverview = () => {
     }
   };
 
+  // Handle IPFS URLs for image display
+  const getImageUrl = (url?: string | null): string => {
+    // Handle null, undefined, or empty string
+    if (!url || url.trim() === '') return '/assets/avatars/default-avatar.png';
+    
+    // If already a full URL or relative path, return as-is
+    if (url.startsWith('http') || url.startsWith('/')) return url;
+    
+    // IPFS CID - convert to Pinata gateway URL
+    return `https://gateway.pinata.cloud/ipfs/${url}`;
+  };
+
   return (
     <div className="min-h-screen text-gray-100 font-sans">
       <div className="flex flex-col gap-6 max-w-7xl mx-auto px-4 lg:px-0">
@@ -277,9 +289,7 @@ const UserOverview = () => {
                 return (
                   <div className="flex gap-4 items-start pb-6 mb-6 last:mb-0 last:pb-0 last:border-b-0 border-b border-gray-700" key={post.id}>
                     <div className="w-10 h-10 rounded-full bg-gray-500 flex-shrink-0 overflow-hidden">
-                      {post.author.avatarUrl ? (
-                        <img src={post.author.avatarUrl} alt={authorName} className="w-full h-full object-cover" />
-                      ) : null}
+                      <img src={getImageUrl(post.author.avatarUrl)} alt={authorName} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex flex-col flex-1">
                       <div className="flex items-center justify-between mb-0">

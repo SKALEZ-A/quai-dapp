@@ -31,6 +31,13 @@ export default function DashboardPostDetailPage({ params }: { params: { postId: 
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
+  // Handle IPFS URLs for image display
+  const getImageUrl = (url?: string) => {
+    if (!url) return '/assets/avatars/default-avatar.png'; // default
+    if (url.startsWith('http') || url.startsWith('/')) return url;
+    return `https://gateway.pinata.cloud/ipfs/${url}`;
+  };
+
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -213,7 +220,13 @@ export default function DashboardPostDetailPage({ params }: { params: { postId: 
 
         <div className="flex flex-col bg-black p-6 rounded-lg gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-gray-600 flex-shrink-0 overflow-hidden"></div>
+            <div className="w-12 h-12 rounded-full bg-gray-600 flex-shrink-0 overflow-hidden">
+              <img 
+                src={getImageUrl(post.author.avatarUrl)} 
+                className="w-full h-full object-cover" 
+                alt={`${post.author.displayName || post.author.qnsName || 'User'} Profile`} 
+              />
+            </div>
             <div>
               <span className="font-bold block">
                 {post.author.qnsName || post.author.displayName || 
@@ -310,7 +323,7 @@ export default function DashboardPostDetailPage({ params }: { params: { postId: 
 
         <div className="flex items-start gap-4 bg-black p-4 rounded-lg">
           <div className="w-10 h-10 rounded-full bg-gray-600 flex-shrink-0 overflow-hidden mt-3">
-            <img src={currentUser.profileImg} className="w-auto h-full" alt="Your Profile" />
+            <img src={getImageUrl(currentUser.profileImg)} className="w-full h-full object-cover" alt="Your Profile" />
           </div>
           <div className="flex-grow flex flex-col relative">
             <textarea
@@ -339,9 +352,9 @@ export default function DashboardPostDetailPage({ params }: { params: { postId: 
               <div className="flex gap-4 bg-black p-6" key={comment.id}>
                 <div className="w-10 h-10 rounded-full bg-gray-600 flex-shrink-0 overflow-hidden">
                   <img 
-                    src={comment.author?.avatarUrl || '/assets/avatars/alice-chen.png'} 
-                    className="w-auto h-full" 
-                    alt={`${comment.author?.qnsName || comment.author?.address || 'User'}'s profile`} 
+                    src={getImageUrl(comment.author?.avatarUrl)} 
+                    className="w-full h-full object-cover" 
+                    alt={`${comment.author?.displayName || comment.author?.qnsName || 'User'} Profile`} 
                   />
                 </div>
                 <div className="w-full">

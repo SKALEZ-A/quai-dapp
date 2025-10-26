@@ -155,6 +155,37 @@ router.post("/", postCreationLimiter, upload.array('images', 4), async (req, res
   */
 
   // Ensure profile exists (address is unique identifier)
+  // First check for duplicate profiles and clean them up
+  const existingProfiles = await prisma.profile.findMany({
+    where: {
+      address: {
+        equals: authorAddress.toLowerCase(),
+        mode: 'insensitive'
+      }
+    }
+  });
+
+  if (existingProfiles.length > 1) {
+    console.log(`⚠️ Found ${existingProfiles.length} duplicate profiles for address: ${authorAddress}`);
+    // Keep the most recent profile and delete others
+    const profilesToDelete = existingProfiles.slice(1);
+    for (const duplicateProfile of profilesToDelete) {
+      // Delete follow relationships first
+      await prisma.follow.deleteMany({
+        where: {
+          OR: [
+            { followerId: duplicateProfile.id },
+            { followingId: duplicateProfile.id }
+          ]
+        }
+      });
+      await prisma.profile.delete({
+        where: { id: duplicateProfile.id }
+      });
+      console.log(`🗑️ Deleted duplicate profile: ${duplicateProfile.id}`);
+    }
+  }
+
   const profile = await prisma.profile.upsert({
     where: { address: authorAddress.toLowerCase() },
     update: {},

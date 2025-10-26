@@ -49,6 +49,21 @@ export interface Comment {
   author?: Profile;
 }
 
+export interface LeaderboardEntry {
+  rank: number;
+  profile: Profile;
+  postCount: number;
+  totalLikes: number;
+  totalComments: number;
+  engagementScore: number;
+}
+
+export interface LeaderboardResponse {
+  leaderboard: LeaderboardEntry[];
+  total: number;
+  hasMore: boolean;
+}
+
 export interface CreatePostData {
   authorAddress: string;
   text: string;
@@ -349,6 +364,40 @@ export async function unlikePost(profileAddress: string, postId: string): Promis
 }
 
 /**
+ * Get leaderboard data
+ */
+export async function getLeaderboard(params?: {
+  limit?: number;
+  offset?: number;
+}): Promise<LeaderboardResponse> {
+  const queryParams = new URLSearchParams();
+  if (params?.limit) queryParams.set('limit', params.limit.toString());
+  if (params?.offset) queryParams.set('offset', params.offset.toString());
+
+  const url = `${API_URL}/profiles/leaderboard${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+  
+  console.log('🔍 Fetching leaderboard from:', url);
+  
+  try {
+    const response = await fetch(url);
+    console.log('📡 Leaderboard response status:', response.status, response.statusText);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Leaderboard API Error Response:', errorText);
+      throw new Error(`Failed to fetch leaderboard: ${response.statusText} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log('✅ Leaderboard fetched successfully:', data.leaderboard?.length || 0, 'entries');
+    return data;
+  } catch (error) {
+    console.error('❌ Network error fetching leaderboard:', error);
+    throw error;
+  }
+}
+
+/**
  * API client object (for compatibility with useSocial hook)
  */
 export const api = {
@@ -360,6 +409,7 @@ export const api = {
   likePost,
   unlikePost,
   commentOnPost,
+  getLeaderboard,
   getApiHealth: checkApiHealth,
 };
 
