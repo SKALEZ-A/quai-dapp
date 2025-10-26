@@ -36,17 +36,17 @@ router.get('/check-data', async (req, res) => {
     
     res.json(data);
     
-  } catch (error) {
+  } catch (error: any) {
     console.log('❌ Error checking data:', error.message);
     
-    if (error.message.includes('P2023') || error.message.includes('converting field')) {
+    if (error.message && (error.message.includes('P2023') || error.message.includes('converting field'))) {
       res.json({
         error: 'P2023 Data Format Error',
         message: 'Data exists but has incompatible format - confirms need to clear database',
         recommendation: 'Clear the database to fix format issues'
       });
     } else {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error.message || 'Unknown error occurred' });
     }
   }
 });
