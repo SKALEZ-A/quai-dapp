@@ -39,48 +39,22 @@ export function useCurrentUser(): CurrentUser & { refreshProfile: () => void } {
   const [isLoading, setIsLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   
-  console.log('🚀 useCurrentUser: Hook called, address from wagmi:', address);
-  
   const finalAddress = address || '0xe2f92e8f706997b021919a092437372b268a432d';
-  
-  console.log('🚀 useCurrentUser: finalAddress:', finalAddress);
   
   const refreshProfile = () => {
     setRefreshTrigger(prev => prev + 1);
   };
   
   useEffect(() => {
-    console.log('🚀 useCurrentUser: useEffect triggered, finalAddress:', finalAddress);
-    
     const loadProfile = async () => {
-      if (!finalAddress) {
-        console.log('⚠️ useCurrentUser: No address, skipping');
-        return;
-      }
-      
-      console.log('🔍 useCurrentUser: Loading profile for address:', finalAddress);
+      if (!finalAddress) return;
       
       try {
         setIsLoading(true);
         const profile = await fetchProfile(finalAddress);
         
-        console.log('✅ useCurrentUser: Profile fetched successfully:', {
-          displayName: profile.displayName,
-          qnsName: profile.qnsName,
-          avatarUrl: profile.avatarUrl,
-          address: profile.address,
-          bio: profile.bio
-        });
-        
         const profileImgUrl = getImageUrl(profile.avatarUrl);
         const coverImgUrl = getImageUrl(profile.coverUrl) || DEFAULT_COVER_IMG;
-        
-        console.log('🖼️ useCurrentUser: Image URLs:', {
-          rawAvatarUrl: profile.avatarUrl,
-          convertedProfileImg: profileImgUrl,
-          rawCoverUrl: profile.coverUrl,
-          convertedCoverImg: coverImgUrl
-        });
         
         const userData = {
           name: profile.displayName || "Quai User",
@@ -95,11 +69,9 @@ export function useCurrentUser(): CurrentUser & { refreshProfile: () => void } {
           following: profile._count?.following || 0,
         };
         
-        console.log('💾 useCurrentUser: Setting profile data:', userData);
         setProfileData(userData);
       } catch (error) {
-        console.error('❌ useCurrentUser: Failed to load profile:', error);
-        console.log('🔄 useCurrentUser: Using fallback data for address:', finalAddress);
+        console.error('Failed to load profile:', error);
         // Fallback to default data
         setProfileData({
           name: "Quai User",

@@ -33,8 +33,10 @@ export function useProfile() {
 
   const fetchProfile = useCallback(async (address: string): Promise<ProfileData> => {
     setIsLoading(true);
+    
     try {
-      const response = await fetch(`${API_BASE_URL}/profiles/${address}`);
+      const url = `${API_BASE_URL}/profiles/${address}`;
+      const response = await fetch(url);
       
       if (!response.ok) {
         if (response.status === 404) {
@@ -113,6 +115,9 @@ export function useProfile() {
         coverCid = await uploadImageToPinata(data.coverFile);
       }
 
+      // Normalize address to lowercase to match backend expectations
+      const normalizedAddress = address.toLowerCase();
+
       // Send update request WITHOUT signature
       const response = await fetch(`${API_BASE_URL}/profiles`, {
         method: 'PUT',
@@ -120,7 +125,7 @@ export function useProfile() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          address,
+          address: normalizedAddress,
           displayName: data.displayName,
           qnsName: data.qnsName,
           bio: data.bio,
@@ -135,7 +140,7 @@ export function useProfile() {
 
       const updatedProfile = await response.json();
       
-      console.log('✅ Profile updated successfully (signature-free):', updatedProfile);
+      console.log('✅ Profile updated successfully');
       
       return updatedProfile;
     } catch (error) {
