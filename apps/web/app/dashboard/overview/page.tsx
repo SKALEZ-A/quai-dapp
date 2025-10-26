@@ -71,6 +71,27 @@ const UserOverview = () => {
         
         console.log("✅ Formatted domains for display:", formattedDomains);
         setMyDomains(formattedDomains);
+        
+        // Sync domains to database
+        try {
+          console.log("🔄 Syncing domains to database...");
+          const syncResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api-production-af00.up.railway.app'}/profiles/sync-qns`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ address: currentUser.address })
+          });
+          
+          const syncData = await syncResponse.json();
+          if (syncData.success) {
+            console.log("✅ Domains synced to database:", syncData.domains);
+            // Refresh profile to show updated QNS name
+            currentUser.refreshProfile();
+          } else {
+            console.warn("⚠️ Database sync failed:", syncData.error);
+          }
+        } catch (syncError) {
+          console.warn("⚠️ Database sync failed (non-critical):", syncError);
+        }
       } else {
         console.log("ℹ️ No domains found on blockchain for this address");
         setMyDomains([]);

@@ -56,6 +56,30 @@ export function useCurrentUser(): CurrentUser & { refreshProfile: () => void } {
         const profile = await fetchProfile(finalAddress);
         console.log('✅ Profile loaded:', profile);
         
+        // Auto-sync QNS domains if profile doesn't have qnsName
+        if (profile && !profile.qnsName && finalAddress) {
+          try {
+            console.log('🔄 Auto-syncing QNS domains for address:', finalAddress);
+            const syncResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api-production-af00.up.railway.app'}/profiles/sync-qns`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ address: finalAddress })
+            });
+            
+            const syncData = await syncResponse.json();
+            if (syncData.success && syncData.profile) {
+              console.log('✅ QNS domains synced:', syncData.domains);
+              // Update profile with synced QNS
+              profile.qnsName = syncData.profile.qnsName;
+            } else {
+              console.log('ℹ️  No QNS domains found for this address');
+            }
+          } catch (syncError) {
+            console.warn('⚠️  QNS sync failed (non-critical):', syncError);
+            // Don't fail the entire profile load if QNS sync fails
+          }
+        }
+        
         const profileImgUrl = getImageUrl(profile.avatarUrl);
         const coverImgUrl = getImageUrl(profile.coverUrl) || DEFAULT_COVER_IMG;
         

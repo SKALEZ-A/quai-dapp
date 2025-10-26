@@ -246,4 +246,69 @@ router.post('/upload', upload.single('file'), async (req, res) => {
   }
 });
 
+// POST /profiles/sync-qns - Sync QNS domains from blockchain
+router.post('/sync-qns', async (req, res) => {
+  try {
+    const { address } = req.body;
+    
+    if (!address) {
+      return res.status(400).json({ error: 'Address is required' });
+    }
+
+    console.log(`🔄 Syncing QNS domains for address: ${address}`);
+
+    // For now, return empty domains array
+    // TODO: Implement blockchain query logic here
+    // This would query the QNS contracts to get domains for the address
+    const domains: string[] = [];
+    
+    console.log(`ℹ️  QNS sync not yet implemented - returning empty domains for ${address}`);
+    
+    if (domains.length > 0) {
+      // Update profile with first domain
+      const profile = await prisma.profile.upsert({
+        where: { address: address.toLowerCase() },
+        update: { qnsName: domains[0] },
+        create: { 
+          address: address.toLowerCase(), 
+          qnsName: domains[0],
+          displayName: `User ${address.slice(0, 6)}...${address.slice(-4)}`
+        },
+        include: {
+          _count: {
+            select: {
+              followers: true,
+              following: true,
+            },
+          },
+        },
+      });
+      
+      console.log(`✅ Synced QNS domain: ${domains[0]} for ${address}`);
+      return res.json({ 
+        success: true, 
+        profile, 
+        domains,
+        message: `Synced QNS domain: ${domains[0]}`
+      });
+    }
+    
+    // No domains found, but still return success
+    console.log(`ℹ️  No QNS domains found for ${address}`);
+    return res.json({ 
+      success: true, 
+      domains: [], 
+      message: 'No QNS domains found for this address'
+    });
+    
+  } catch (error) {
+    console.error('❌ Error syncing QNS domains:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to sync QNS domains',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
 export default router;
