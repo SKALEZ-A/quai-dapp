@@ -8,6 +8,7 @@ import profilesRouter from "./routes/profiles";
 import followsRouter from "./routes/follows";
 import healthRouter from "./routes/health";
 import checkDataRouter from "./routes/check-data";
+import clearDatabaseRouter from "./routes/clear-database";
 import { mountGraphQL } from "./graphql/server";
 
 const app = express();
@@ -65,6 +66,7 @@ app.use("/domains", domainsRouter);
 app.use("/profiles", profilesRouter);
 app.use("/follows", followsRouter);
 app.use("/check", checkDataRouter);
+app.use("/admin", clearDatabaseRouter);
 
 const port = Number(process.env.PORT || 4000);
 
