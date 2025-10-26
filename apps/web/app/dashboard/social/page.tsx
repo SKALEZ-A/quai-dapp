@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useSocial } from '@/hooks/useSocial';
+import { useLeaderboard } from '@/hooks/useLeaderboard';
 import CreatePostModal from '@/components/CreatePostModal';
 import ImageLightbox from '@/components/ImageLightbox';
 import ImageWithLoading from '@/components/ImageWithLoading';
@@ -20,16 +21,6 @@ const ProfileIcon = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="
 
 
 
-const leaderboard = [
-    { rank: 1, name: 'alice.quai', score: '300 posts' },
-    { rank: 2, name: 'alice.quai', score: '300 posts' },
-    { rank: 3, name: 'alice.quai', score: '300 posts' },
-    { rank: 4, name: 'alice.quai', score: '300 posts' },
-    { rank: 5, name: 'alice.quai', score: '300 posts' },
-    { rank: 6, name: 'alice.quai', score: '300 posts' },
-    { rank: 7, name: 'alice.quai', score: '300 posts' },
-    { rank: 8, name: 'alice.quai', score: '300 posts' },
-];
 
 const trending = [
     { tag: '#quai', count: '50 posts' }, 
@@ -48,6 +39,19 @@ const SocialActivity = () => {
     const router = useRouter();
     const currentUser = useCurrentUser();
     const { posts, isLoading, isCreatingPost, error, createPost, likePost, commentOnPost, fetchPosts } = useSocial();
+    const { leaderboard, isLoading: leaderboardLoading, error: leaderboardError } = useLeaderboard(8);
+
+    // Handle IPFS URLs for image display
+    const getImageUrl = (url?: string | null): string => {
+        // Handle null, undefined, or empty string
+        if (!url || url.trim() === '') return '/assets/avatars/default-avatar.png';
+        
+        // If already a full URL or relative path, return as-is
+        if (url.startsWith('http') || url.startsWith('/')) return url;
+        
+        // IPFS CID - convert to Pinata gateway URL
+        return `https://gateway.pinata.cloud/ipfs/${url}`;
+    };
 
     const handleCreatePost = async (content: string, images?: File[]) => {
         // Use fallback address if no wallet connected
@@ -129,7 +133,7 @@ const SocialActivity = () => {
                 
                 <div className="flex items-center gap-3 lg:gap-4 bg-black p-3 lg:p-4 rounded-lg cursor-pointer" onClick={() => setIsModalOpen(true)}>
                             <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-gray-600 flex-shrink-0 overflow-hidden">
-                                <img src={currentUser.profileImg} className="w-auto h-full" alt="Your Profile Image" />
+                                <img src={getImageUrl(currentUser.profileImg)} className="w-auto h-full" alt="Your Profile Image" />
                             </div>
                     <div className="flex-grow flex items-center rounded-lg px-2">
                        <span className="py-3 text-gray-400 text-sm lg:text-base">Got an Alpha?</span>
@@ -163,7 +167,9 @@ const SocialActivity = () => {
                     ) : (
                         posts.map(post => (
                             <div className="flex gap-3 lg:gap-4 bg-black p-4 lg:p-6 cursor-pointer" key={post.id} onClick={() => router.push(`/dashboard/post/${post.id}`)}>
-                                <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-gray-600 flex-shrink-0"></div>
+                                <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-gray-600 flex-shrink-0 overflow-hidden">
+                                    <img src={getImageUrl(post.author.avatarUrl)} className="w-auto h-full" alt={`${post.author.displayName || post.author.qnsName || 'User'} Profile`} />
+                                </div>
                                 <div className="w-full">
                                     <div className="flex items-center gap-2 mb-2">
                                         <span className="font-bold text-sm lg:text-base">{post.author.displayName || post.author.qnsName || `${post.author.address.slice(0, 6)}...${post.author.address.slice(-4)}`}</span>
@@ -245,16 +251,57 @@ onError={(e) => {
             <aside className="hidden lg:flex flex-col gap-6 overflow-y-auto h-full scrollbar-hide bg-black rounded-xl">
                 <div className="p-6">
                     <h4 className="text-xl mb-6">User Leaderboard</h4>
+                    {leaderboardLoading ? (
+                        <div className="space-y-4">
+                            {[...Array(8)].map((_, i) => (
+                                <div key={i} className="flex items-center gap-3 animate-pulse">
+                                    <div className="w-4 h-4 bg-gray-600 rounded"></div>
+                                    <div className="w-8 h-8 bg-gray-600 rounded-full"></div>
+                                    <div className="flex-grow">
+                                        <div className="h-4 bg-gray-600 rounded w-3/4 mb-1"></div>
+                                        <div className="h-3 bg-gray-700 rounded w-1/2"></div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : leaderboardError ? (
+                        <div className="text-red-400 text-center py-4">
+                            <div className="text-sm">Failed to load leaderboard</div>
+                            <div className="text-xs mt-1">{leaderboardError}</div>
+                        </div>
+                    ) : leaderboard.length === 0 ? (
+                        <div className="text-gray-400 text-center py-4">
+                            <div className="text-sm">No users yet</div>
+                            <div className="text-xs mt-1">Be the first to post!</div>
+                        </div>
+                    ) : (
                     <ul className="list-none">
-                        {leaderboard.map((user, i) => (
-                            <li key={i} className="flex items-center gap-3 mb-4 last:mb-0">
-                                <span className="text-[#BE8200] font-bold w-4 text-sm">#{user.rank}</span>
-                                <div className="w-8 h-8 rounded-full bg-gray-600"></div>
-                                <span className="flex-grow">{user.name}</span>
-                                <span className="text-primary font-medium text-sm">{user.score}</span>
+                            {leaderboard.map((entry) => (
+                                <li key={entry.rank} className="flex items-center gap-3 mb-4 last:mb-0">
+                                    <span className="text-[#BE8200] font-bold w-4 text-sm">#{entry.rank}</span>
+                                    <div className="w-8 h-8 rounded-full bg-gray-600 overflow-hidden">
+                                        <img 
+                                            src={getImageUrl(entry.profile.avatarUrl)} 
+                                            className="w-full h-full object-cover" 
+                                            alt={`${entry.profile.displayName || entry.profile.qnsName || 'User'} Profile`} 
+                                        />
+                                    </div>
+                                    <div className="flex-grow">
+                                        <div className="font-medium text-sm">
+                                            {entry.profile.displayName || entry.profile.qnsName || 
+                                             `${entry.profile.address.slice(0, 6)}...${entry.profile.address.slice(-4)}`}
+                                        </div>
+                                        <div className="text-xs text-gray-400">
+                                            {entry.postCount} posts
+                                        </div>
+                                    </div>
+                                    <div className="text-primary font-medium text-sm">
+                                        {Math.round(entry.engagementScore)} pts
+                                    </div>
                             </li>
                         ))}
                     </ul>
+                    )}
                     <div className="flex justify-end gap-4 mt-6 text-sm">
                         <button className="text-gray-400 hover:text-white">&lt; Next</button>
                         <button className="text-gray-400 hover:text-white">Prev &gt;</button>
