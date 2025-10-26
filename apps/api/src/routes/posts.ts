@@ -193,7 +193,7 @@ router.post("/", postCreationLimiter, upload.array('images', 4), async (req, res
 
   // Upload images to IPFS if any
   let imageCids: string[] = [];
-  const files = req.files as Express.Multer.File[];
+  const files = req.files as any[];
   if (files && files.length > 0) {
     try {
       // Validate image files
