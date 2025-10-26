@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 
 /**
- * Check Railway database data before clearing
- * Run this in Railway console to see what you'll lose
+ * Clear Railway PostgreSQL Database
+ * This script safely clears all data from the Railway database
+ * Run this to fix P2023 data format errors
  */
 
-const { PrismaClient } = require('@prisma/client');
+import pkg from '@prisma/client';
+const { PrismaClient } = pkg;
 
 async function clearRailwayDatabase() {
   const prisma = new PrismaClient();
@@ -53,4 +55,11 @@ async function clearRailwayDatabase() {
   }
 }
 
-clearRailwayDatabase();
+// Check if we're in production (Railway)
+if (process.env.NODE_ENV === 'production') {
+  console.log('🚨 PRODUCTION MODE - Clearing Railway database...');
+  clearRailwayDatabase();
+} else {
+  console.log('⚠️  Not in production mode. Set NODE_ENV=production to clear database.');
+  console.log('   This prevents accidental clearing of local development data.');
+}
