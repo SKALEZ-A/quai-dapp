@@ -238,6 +238,7 @@ router.post("/", postCreationLimiter, upload.array('images', 4), async (req, res
       console.error('Invalid image CIDs:', imageCids);
       return res.status(500).json({ error: 'Invalid image data' });
     }
+    console.log('🔍 Image CIDs before database insertion:', imageCids);
   }
 
   // Upload post body to IPFS (fallback to local CID if IPFS is down)
@@ -250,14 +251,27 @@ router.post("/", postCreationLimiter, upload.array('images', 4), async (req, res
     cid = `local_${Date.now()}_${nonce.slice(2, 10)}`;
   }
 
+  // Debug the data being sent to database
+  const postData = {
+    authorId: profile.id,
+    cid,
+    textPreview: text.slice(0, 180),
+    imageCids: imageCids && imageCids.length > 0 ? imageCids : undefined,
+    zone,
+  };
+  
+  console.log('🔍 Post data being sent to database:', {
+    authorId: postData.authorId,
+    cid: postData.cid,
+    textPreview: postData.textPreview,
+    imageCids: postData.imageCids,
+    imageCidsType: typeof postData.imageCids,
+    imageCidsLength: Array.isArray(postData.imageCids) ? postData.imageCids.length : 'not array',
+    zone: postData.zone
+  });
+
   const post = await prisma.post.create({
-    data: {
-      authorId: profile.id,
-      cid,
-      textPreview: text.slice(0, 180),
-      imageCids: imageCids && imageCids.length > 0 ? imageCids : undefined,
-      zone,
-    },
+    data: postData,
     include: { author: true },
   });
 
