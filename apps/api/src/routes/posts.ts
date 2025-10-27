@@ -231,6 +231,15 @@ router.post("/", postCreationLimiter, upload.array('images', 4), async (req, res
     }
   }
 
+  // Validate imageCids before database insertion
+  if (imageCids.length > 0) {
+    // Ensure all CIDs are valid strings
+    if (!imageCids.every(cid => typeof cid === 'string' && cid.length > 0)) {
+      console.error('Invalid image CIDs:', imageCids);
+      return res.status(500).json({ error: 'Invalid image data' });
+    }
+  }
+
   // Upload post body to IPFS (fallback to local CID if IPFS is down)
   let cid: string;
   try {
@@ -246,7 +255,7 @@ router.post("/", postCreationLimiter, upload.array('images', 4), async (req, res
       authorId: profile.id,
       cid,
       textPreview: text.slice(0, 180),
-      imageCids: imageCids,
+      imageCids: imageCids && imageCids.length > 0 ? imageCids : undefined,
       zone,
     },
     include: { author: true },
