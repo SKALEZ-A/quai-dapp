@@ -8,6 +8,7 @@ import { useSocial } from '@/hooks/useSocial';
 import { useBalance } from 'wagmi';
 import { formatEther } from 'viem';
 import FollowButton from '@/components/FollowButton';
+import { formatTimeAgo } from '@/utils/timeFormat';
 
 // SVG Icon Components
 const CopyIcon = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
@@ -34,28 +35,52 @@ const UserOverview = () => {
 
   useEffect(() => {
     if (currentUser.address && !domainsLoaded) {
+      console.log('🔵 useEffect triggered - loading domains for:', currentUser.address);
       loadDomains();
+    } else if (!currentUser.address) {
+      console.log('⚠️ No user address available');
+    } else if (domainsLoaded) {
+      console.log('ℹ️ Domains already loaded, skipping');
     }
   }, [currentUser.address, domainsLoaded]);
 
   const loadDomains = async () => {
     if (!currentUser.address) {
-      console.log("No user address available for loading domains");
+      console.log("❌ No user address available for loading domains");
       return;
     }
     
     // Avoid duplicate loading
-    if (loadingDomains) return;
+    if (loadingDomains) {
+      console.log("⚠️ Already loading domains, skipping duplicate request");
+      return;
+    }
     
     console.log("🔄 Loading domains for address:", currentUser.address);
     setLoadingDomains(true);
     
     try {
-      // ONLY query blockchain for actual purchased domains
-      console.log("🔄 Querying blockchain for purchased domains...");
+      // First try API cache for instant results
+      console.log("🔄 Checking API cache first...");
+      try {
+        const apiResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api-production-af00.up.railway.app'}/profiles/${currentUser.address}`);
+        if (apiResponse.ok) {
+          const profileData = await apiResponse.json();
+          if (profileData.profile?.qnsName) {
+            console.log("✅ Found domain from API cache (instant):", profileData.profile.qnsName);
+            setMyDomains([profileData.profile.qnsName]);
+            // Continue to blockchain query to verify/update
+          }
+        }
+      } catch (apiError) {
+        console.log("ℹ️ API cache check failed, will query blockchain:", apiError);
+      }
+      
+      // Query blockchain for actual purchased domains with increased timeout
+      console.log("🔄 Querying blockchain for purchased domains (this may take 30-60 seconds)...");
       const domains = await Promise.race([
         getUserDomains(currentUser.address),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Blockchain query timeout')), 15000))
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Blockchain query timeout after 60 seconds')), 60000)) // Increased to 60 seconds
       ]) as string[];
       
       console.log("✅ Loaded domains from blockchain:", domains);
@@ -63,44 +88,73 @@ const UserOverview = () => {
       if (domains.length > 0) {
         // Format domains with .quai suffix for display
         const formattedDomains = domains.map(domain => {
-          if (!domain.endsWith('.quai')) {
-            return `${domain}.quai`;
-          }
-          return domain;
+          // Strip any existing suffix and add .quai
+          const cleanDomain = domain.toLowerCase().replace(/\.(quai|qns)$/, '');
+          return `${cleanDomain}.quai`;
         });
         
         console.log("✅ Formatted domains for display:", formattedDomains);
         setMyDomains(formattedDomains);
         
-        // Sync domains to database
-        try {
-          console.log("🔄 Syncing domains to database...");
-          const syncResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api-production-af00.up.railway.app'}/profiles/sync-qns`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ address: currentUser.address })
+        // Sync domains to database in background (non-blocking)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api-production-af00.up.railway.app'}/profiles/sync-qns`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address: currentUser.address })
+        })
+          .then(res => res.json())
+          .then(syncData => {
+            if (syncData.success) {
+              console.log("✅ Domains synced to database:", syncData.domains);
+              currentUser.refreshProfile();
+            } else {
+              console.warn("⚠️ Database sync failed:", syncData.error);
+            }
+          })
+          .catch(syncError => {
+            console.warn("⚠️ Database sync failed (non-critical):", syncError);
           });
-          
-          const syncData = await syncResponse.json();
-          if (syncData.success) {
-            console.log("✅ Domains synced to database:", syncData.domains);
-            // Refresh profile to show updated QNS name
-            currentUser.refreshProfile();
-          } else {
-            console.warn("⚠️ Database sync failed:", syncData.error);
-          }
-        } catch (syncError) {
-          console.warn("⚠️ Database sync failed (non-critical):", syncError);
-        }
       } else {
         console.log("ℹ️ No domains found on blockchain for this address");
-        setMyDomains([]);
+        // If API cache had a domain but blockchain didn't, keep the cached domain
+        if (myDomains.length === 0) {
+          setMyDomains([]);
+        } else {
+          console.log("ℹ️ Keeping cached domain from API:", myDomains);
+        }
       }
       
       setDomainsLoaded(true);
     } catch (error) {
       console.error("❌ Error loading domains from blockchain:", error);
-      console.log("ℹ️ No domains will be displayed (blockchain query failed)");
+      
+      // If we already have domains from cache, keep them
+      if (myDomains.length > 0) {
+        console.log("✅ Using cached domains from API:", myDomains);
+        setDomainsLoaded(true);
+        setLoadingDomains(false);
+        return;
+      }
+      
+      // Try API fallback as last resort
+      try {
+        console.log("🔄 Attempting API fallback for domains...");
+        const apiResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api-production-af00.up.railway.app'}/profiles/${currentUser.address}`);
+        if (apiResponse.ok) {
+          const profileData = await apiResponse.json();
+          if (profileData.profile?.qnsName) {
+            console.log("✅ Found domain from API fallback:", profileData.profile.qnsName);
+            setMyDomains([profileData.profile.qnsName]);
+            setDomainsLoaded(true);
+            setLoadingDomains(false);
+            return;
+          }
+        }
+      } catch (apiError) {
+        console.warn("⚠️ API fallback also failed:", apiError);
+      }
+      
+      console.log("ℹ️ No domains will be displayed (all queries failed)");
       setMyDomains([]);
       setDomainsLoaded(true);
     } finally {
@@ -330,7 +384,7 @@ const UserOverview = () => {
               </div>
             ) : (
               recentPosts.slice(0, 3).map(post => {
-                const timeAgo = new Date(post.createdAt).toLocaleDateString();
+                const timeAgo = formatTimeAgo(post.createdAt);
                 const authorName = post.author.displayName || post.author.qnsName || `${post.author.address.slice(0, 6)}...${post.author.address.slice(-4)}`;
                 
                 return (

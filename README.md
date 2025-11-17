@@ -1,110 +1,94 @@
 # Quai Superapp Monorepo
 
-This monorepo follows the rules in `BUILD_RULES.md` to deliver a social dApp, QNS (Quai Name Service), and a bridge module on Quai Network.
+A comprehensive social dApp platform on Quai Network featuring QNS (Quai Name Service), social features, and cross-chain bridging.
 
-## 🎯 **NEW: Getting Started with Production Deployment**
-
-**📚 [START_HERE.md](START_HERE.md)** - Complete guide to databases, deployment, and production setup
-
-**Quick links:**
-- [YOUR_QUESTIONS_ANSWERED.md](YOUR_QUESTIONS_ANSWERED.md) - Database & deployment guide
-- [QUICK_START_PRODUCTION.md](QUICK_START_PRODUCTION.md) - 15-minute production setup
-- [DIGITALOCEAN_SETUP_GUIDE.md](DIGITALOCEAN_SETUP_GUIDE.md) - DigitalOcean configuration
-- [setup-database.sh](setup-database.sh) - Automated database setup
-
-## Workspaces
-- `apps/web` – Next.js frontend
-- `apps/api` – Node.js API (GraphQL reads, REST writes)
-- `packages/contracts` – Solidity contracts (Hardhat)
-- `packages/shared` – Shared types/utils
-
-## Scripts
-Use `pnpm` with workspaces and Turborepo.
+## 🚀 Quick Start
 
 ```bash
-pnpm i
-pnpm run build
+# Install dependencies
+pnpm install
+
+# Start development
 pnpm run dev
+
+# Access the app
+# Frontend: http://localhost:3000
+# API: http://localhost:4000
 ```
 
-## 🚀 Deployment
+**📚 [Getting Started Guide](docs/GETTING_STARTED.md)** - Complete setup instructions
 
-### 📚 **NEW: Comprehensive Deployment Documentation**
+## 📁 Project Structure
 
-**Start here:** [YOUR_QUESTIONS_ANSWERED.md](YOUR_QUESTIONS_ANSWERED.md) - Complete guide to databases and deployment
-
-**Quick guides:**
-- [QUICK_START_PRODUCTION.md](QUICK_START_PRODUCTION.md) - Fastest path to production (15 min)
-- [DATABASE_SUMMARY.md](DATABASE_SUMMARY.md) - Current database status
-- [DIGITALOCEAN_SETUP_GUIDE.md](DIGITALOCEAN_SETUP_GUIDE.md) - DigitalOcean setup (60 min)
-- [PRODUCTION_READINESS_CHECKLIST.md](PRODUCTION_READINESS_CHECKLIST.md) - Pre-launch checklist
-
-**All guides:** See [README_DEPLOYMENT.md](README_DEPLOYMENT.md) for complete index
-
-### Local Development
-```bash
-# Option 1: Use current SQLite setup (Already working!)
-cd apps/api
-pnpm dev
-
-# Option 2: Set up PostgreSQL + Redis
-./setup-database.sh  # Interactive setup script
-
-# Option 3: Docker
-docker compose up -d postgres redis
-
-# API setup
-cd apps/api
-cp ENV_EXAMPLE .env
-pnpm run prisma:migrate
-pnpm run prisma:generate
-
-# Start services
-pnpm run dev    # API
-pnpm run indexer # Background indexer
-cd ../web && pnpm run dev # Frontend
+```
+QUAI/
+├── apps/
+│   ├── web/          # Next.js frontend (port 3000)
+│   └── api/          # Node.js API (port 4000)
+├── packages/
+│   ├── contracts/    # Solidity contracts (Hardhat)
+│   └── shared/       # Shared types/utils
+├── docs/             # Documentation
+└── pnpm-workspace.yaml
 ```
 
-### Production Deployment
-See `docs/MAINNET_DEPLOYMENT.md` for complete mainnet deployment guide.
+## ✨ Features
 
-**Database Options:**
-- **Supabase** (Recommended for quick start): 15 min setup, free tier
-- **DigitalOcean** (Recommended for production): 60 min setup, full control
+- **QNS (Quai Name Service):** Human-readable blockchain addresses (.quai domains)
+- **Social DApp:** Posts, likes, comments, following system
+- **Bridge:** Wormhole Connect integration (40+ blockchains)
+- **Wallet:** Pelagus wallet integration
+- **Storage:** IPFS via web3.storage
 
-**Quick Production Setup:**
-```bash
-# Deploy contracts to mainnet
-cd packages/contracts
-pnpm hardhat run scripts/deploy.ts --network quai
+## 📖 Documentation
 
-# Start production services
-docker-compose -f docker-compose.prod.yml up -d
+### Essential Guides
+- **[Getting Started](docs/GETTING_STARTED.md)** - Setup & development
+- **[QNS Guide](docs/QNS_GUIDE.md)** - Domain registration & management
+- **[Deployment](docs/DEPLOYMENT.md)** - Production deployment
+- **[Database](docs/DATABASE.md)** - Database configuration
 
-# Deploy frontend (Vercel/Netlify)
-cd apps/web
-pnpm run build && # deploy build/ folder
-```
+### Additional Resources
+- **[Architecture](docs/architecture.md)** - System design
+- **[Mainnet Deployment](docs/MAINNET_DEPLOYMENT.md)** - Mainnet guide
+- **[Runbook](docs/RUNBOOK.md)** - Operations guide
+- **[Product Requirements](prd.md)** - PRD document
+- **[Design Document](design.md)** - Technical design
 
-## 📋 Project Status
+## 🎯 Current Status
 
-✅ **Completed:**
-- QNS contracts (Registry, Controller, Auction Manager, Reserved Names, NFT, Payment Resolver)
-- Social dApp with posts, NFT sharing, tipping UI
-- Event indexer for all contracts
-- Complete frontend for QNS and Social features
+### ✅ Completed
+- QNS smart contracts deployed
+- Social dApp features (posts, likes, comments, follows)
+- Wormhole bridge integration
+- Frontend UI & UX
+- Event indexing system
+- API & GraphQL endpoints
 
-🔄 **In Progress:**
-- Mainnet deployment setup
-- Production infrastructure configuration
+### 🔄 In Progress
+- Production deployment optimization
+- Performance improvements
+- Mobile responsiveness
 
-⏳ **Remaining:**
-- Bridge integration (deferred)
-- Encrypted DMs (XMTP integration)
-- Analytics and monitoring
-- Security audit
+### 📊 Tech Stack
 
-See `BUILD_RULES.md` for detailed implementation roadmap.
+**Frontend:** Next.js 14, React 18, TypeScript, Tailwind CSS  
+**Backend:** Node.js, Express, GraphQL, Prisma  
+**Blockchain:** Quai Network, quais.js, Solidity  
+**Database:** PostgreSQL / SQLite  
+**Storage:** IPFS (web3.storage)  
+**Bridge:** Wormhole Connect
 
-# quai-frontend
-# Trigger Railway redeploy
+## 🤝 Contributing
+
+See `BUILD_RULES.md` for development guidelines.
+
+## 📞 Support
+
+- **Documentation:** `/docs` folder
+- **Quai Discord:** https://discord.gg/quai
+- **Issues:** GitHub Issues
+
+---
+
+**Built for Quai Network** 🚀

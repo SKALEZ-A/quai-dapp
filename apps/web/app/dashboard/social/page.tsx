@@ -9,12 +9,17 @@ import CreatePostModal from '@/components/CreatePostModal';
 import ImageLightbox from '@/components/ImageLightbox';
 import ImageWithLoading from '@/components/ImageWithLoading';
 import { PostSkeletonList } from '@/components/PostSkeleton';
+import { formatTimeAgo } from '@/utils/timeFormat';
 
 // SVG Icons
 const ImageIcon = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="m21 15-5-5L5 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 const CommentIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 const RepostIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
-const LikeIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+const LikeIcon = ({ filled }: { filled?: boolean }) => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} xmlns="http://www.w3.org/2000/svg">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+);
 const ShareIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8m-4-6-4-4-4 4m4-4v13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 const AddIcon = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 5v14m-7-7h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 const ProfileIcon = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
@@ -38,7 +43,10 @@ const SocialActivity = () => {
     const [isLightboxOpen, setIsLightboxOpen] = useState(false);
     const router = useRouter();
     const currentUser = useCurrentUser();
-    const { posts, isLoading, isCreatingPost, error, createPost, likePost, commentOnPost, fetchPosts } = useSocial();
+    const { posts, isLoading, isCreatingPost, error, createPost, likePost, commentOnPost, fetchPosts } = useSocial(
+        activeTab === 'Following',
+        currentUser.address || undefined
+    );
     const { leaderboard, isLoading: leaderboardLoading, error: leaderboardError } = useLeaderboard(8);
 
     // Handle IPFS URLs for image display
@@ -187,7 +195,7 @@ const SocialActivity = () => {
                                         >
                                             {post.author.displayName || post.author.qnsName || `${post.author.address.slice(0, 6)}...${post.author.address.slice(-4)}`}
                                         </span>
-                                        <span className="text-gray-400 text-xs lg:text-sm">{new Date(post.createdAt).toLocaleTimeString()}</span>
+                                        <span className="text-gray-400 text-xs lg:text-sm">{formatTimeAgo(post.createdAt)}</span>
                                     </div>
                                     <div 
                                         className="cursor-pointer"
@@ -246,7 +254,13 @@ onError={(e) => {
                                     </div>
                                     <div className="flex gap-4 lg:gap-6 text-gray-400">
                                         <button 
-                                            className="flex items-center gap-1 lg:gap-2 hover:text-red-500 text-xs lg:text-sm"
+                                            className={`flex items-center gap-1 lg:gap-2 transition-colors text-xs lg:text-sm ${
+                                                post.likes?.some(like => 
+                                                    like.profile?.address?.toLowerCase() === currentUser.address?.toLowerCase()
+                                                ) 
+                                                ? 'text-pink-500 hover:text-pink-600' 
+                                                : 'hover:text-pink-500'
+                                            }`}
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 if (currentUser.address) {
@@ -254,7 +268,9 @@ onError={(e) => {
                                                 }
                                             }}
                                         >
-                                            <LikeIcon /> {post.likes?.length || 0}
+                                            <LikeIcon filled={post.likes?.some(like => 
+                                                like.profile?.address?.toLowerCase() === currentUser.address?.toLowerCase()
+                                            )} /> {post.likes?.length || 0}
                                         </button>
                                         <button className="flex items-center gap-1 lg:gap-2 hover:text-green-500 text-xs lg:text-sm"><RepostIcon /> 0</button>
                                         <button className="flex items-center gap-1 lg:gap-2 hover:text-blue-500 text-xs lg:text-sm"><CommentIcon /> {post.comments?.length || 0}</button>

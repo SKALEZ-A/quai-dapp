@@ -1,111 +1,182 @@
 # 🚀 Quick Start Guide
 
-## ✅ What's Done
+Get the Quai Superapp running in 5 minutes!
 
-Your Quai Network project now has **real Wormhole Connect** instead of mock bridge!
+## Prerequisites
 
-### Test It Now (No deployment needed!)
+- Node.js 18+ and pnpm installed
+- Pelagus wallet (for blockchain features)
+- Testnet QI (from https://faucet.quai.network/)
+
+---
+
+## 1. Install Dependencies
 
 ```bash
-cd apps/web
+# Install all workspace dependencies
+pnpm install
+```
+
+---
+
+## 2. Set Up Environment
+
+```bash
+# Copy example environment files
+cp .env.example .env
+cp apps/api/.env.example apps/api/.env
+cp apps/web/.env.example apps/web/.env.local
+
+# Default config uses SQLite (no setup needed)
+# For PostgreSQL, see docs/DATABASE.md
+```
+
+---
+
+## 3. Start Development
+
+```bash
+# Start all services (API + Frontend)
 pnpm run dev
+
+# Or start individually:
+cd apps/api && pnpm dev      # API: http://localhost:4000
+cd apps/web && pnpm dev      # Web: http://localhost:3000
 ```
-
-Then visit: **http://localhost:3000/dashboard/bridge**
-
-You'll see the real Wormhole Connect widget with 40+ blockchain support! 🎉
 
 ---
 
-## 🔧 Contract Deployment (Required for QNS/Social features)
+## 4. Access the App
 
-### Check Your Balance First
+**Frontend:** http://localhost:3000
+- Dashboard: `/dashboard`
+- QNS: `/qns/profile`
+- Bridge: `/dashboard/bridge`
 
-Your deployer wallet: `0x003DAC94805c77d7fD485cd415F8078414d171e4`
+**API:** http://localhost:4000
+- Health: `/health`
+- GraphQL: `/graphql`
+- Posts: `/posts`
 
-Visit: https://quaiscan.io/address/0x003DAC94805c77d7fD485cd415F8078414d171e4
+---
 
-**Need**: 1-2 QI for gas
+## 🎯 What You Can Do
 
-### Deploy Contracts
+### ✅ Without Deployment
+- Browse the UI
+- Connect Pelagus wallet
+- View existing posts
+- Check domain availability
+- Test bridge interface (Wormhole)
+
+### ⏳ After Contract Deployment
+- Register QNS domains
+- Create social posts
+- Like & comment
+- Follow users
+- Transfer domains
+
+---
+
+## 🚀 Deploy Contracts (Optional)
+
+If you want to test blockchain features:
 
 ```bash
+# 1. Ensure wallet has testnet QI
+# Check: https://quaiscan.io/address/YOUR_ADDRESS
+# Get QI: https://faucet.quai.network/
+
+# 2. Deploy contracts
 cd packages/contracts
-pnpm hardhat run scripts/deploy.ts --network quai
+pnpm hardhat run scripts/deploy.ts --network cyprus1_testnet
+
+# 3. Update .env files with contract addresses
+# See output from deployment script
 ```
 
-### If It Fails
+---
 
-**Error: "block not found"** = RPC issue or no funds
+## 🎨 Key Features
 
-**Solutions**:
-1. Check wallet has QI
-2. Try different RPC in `.env`
-3. Contact Quai Discord for RPC status
+### QNS (Quai Name Service)
+- Register `.quai` domains (5-50 QUAI)
+- Manage domain records
+- Transfer ownership
+- NFT-based ownership
+
+### Social DApp
+- Create posts with IPFS storage
+- Like, comment, share
+- Follow system
+- User profiles with QNS integration
+
+### Bridge
+- Wormhole Connect integration
+- 40+ supported blockchains
+- Native token transfers
+- Beautiful dark theme UI
 
 ---
 
-## 📝 Files Updated
+## 📚 Next Steps
 
-| File | Status |
-|------|--------|
-| `apps/web/app/dashboard/bridge/page.tsx` | ✅ Real Wormhole Connect |
-| `apps/web/app/globals.css` | ✅ Custom styling added |
-| `packages/contracts/contracts/QNSNFT.sol` | ✅ Fixed compilation |
-| `packages/contracts/.env` | ✅ Mainnet config |
-| `WORMHOLE_INTEGRATION_GUIDE.md` | ✅ Full documentation |
+### For Development
+1. **Explore the Code**
+   - Frontend: `apps/web/app`
+   - API: `apps/api/src`
+   - Contracts: `packages/contracts/contracts`
 
----
+2. **Read Documentation**
+   - [Getting Started](docs/GETTING_STARTED.md) - Full setup
+   - [QNS Guide](docs/QNS_GUIDE.md) - Domain system
+   - [Deployment](docs/DEPLOYMENT.md) - Go to production
 
-## 🎨 What You Got
+### For Testing
+1. **Deploy Contracts** (see above)
+2. **Register a Domain**
+3. **Create Posts**
+4. **Test Bridge**
 
-### Bridge Features
-- ✅ 40+ blockchain support
-- ✅ Ethereum, Solana, Polygon, BSC, Base, Arbitrum, etc.
-- ✅ Dark theme matching your brand
-- ✅ Native Token Transfers (no wrapped tokens!)
-- ✅ Stats dashboard
-- ✅ Beautiful UI with feature cards
-
-### Integration
-- ✅ Wormhole Connect v4.0.0
-- ✅ Custom theme (#8B1E3F, #6C3B9E)
-- ✅ Responsive design
-- ✅ Help section with resources
+### For Production
+1. **Review** [Deployment Guide](docs/DEPLOYMENT.md)
+2. **Set Up Database** (PostgreSQL)
+3. **Deploy to Hosting** (Vercel/Railway)
+4. **Configure Monitoring**
 
 ---
 
-## 🌟 Next Steps
+## ⚠️ Common Issues
 
-1. **Test Bridge UI** ← Do this now!
-   ```bash
-   cd apps/web && pnpm run dev
-   ```
+### "Block not found" error
+- **Cause:** Quai testnet RPC temporarily down
+- **Solution:** Wait and retry, or check Quai Discord
 
-2. **Check Wallet Balance**
-   - Need 1-2 QI in deployer address
-   - Buy from exchange or get from faucet
+### "Cannot connect to database"
+- **Cause:** DATABASE_URL not set or wrong format
+- **Solution:** Check .env files, default SQLite should work
 
-3. **Deploy Contracts**
-   ```bash
-   cd packages/contracts
-   pnpm hardhat run scripts/deploy.ts --network quai
-   ```
+### "Insufficient funds"
+- **Cause:** Wallet needs testnet QI
+- **Solution:** Get from https://faucet.quai.network/
 
-4. **After Deployment**
-   - Copy contract addresses
-   - Update `apps/web/.env.local`
-   - Update `apps/api/.env`
-   - Restart services
+### "Module not found"
+- **Cause:** Dependencies not installed
+- **Solution:** Run `pnpm install` in project root
 
 ---
 
-## 📞 Need Help?
+## 📞 Support
 
-- **Quai Discord**: https://discord.gg/quai
-- **Wormhole Discord**: https://discord.gg/wormholecrypto
-- **Docs**: See `WORMHOLE_INTEGRATION_GUIDE.md`
+- **Documentation:** `/docs` folder
+- **Quai Discord:** https://discord.gg/quai  
+- **QuaiScan:** https://quaiscan.io
+- **Faucet:** https://faucet.quai.network/
 
 ---
 
-Shoyee... Your bridge is ready to test! Start the dev server and check it out at `/dashboard/bridge`. How else can I help you? 🚀
+## 🎊 You're Ready!
+
+The app should now be running. Open http://localhost:3000 and start exploring!
+
+**Happy building!** 🚀

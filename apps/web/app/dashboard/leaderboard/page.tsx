@@ -11,7 +11,7 @@ const ArrowLeftIcon = () => <svg width="24" height="24" viewBox="0 0 24 24" fill
 
 const LeaderboardPage = () => {
   const router = useRouter();
-  const { leaderboard, isLoading, error, refreshLeaderboard } = useLeaderboard(50);
+  const { leaderboard, isLoading, error, refreshLeaderboard } = useLeaderboard(5);
 
   // Handle IPFS URLs for image display
   const getImageUrl = (url?: string | null): string => {
@@ -157,27 +157,6 @@ const LeaderboardPage = () => {
           )}
         </div>
 
-        {/* Stats Summary */}
-        {leaderboard.length > 0 && (
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-black border border-gray-700 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-yellow-400">{leaderboard.length}</div>
-              <div className="text-sm text-gray-400">Total Users</div>
-            </div>
-            <div className="bg-black border border-gray-700 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-blue-400">
-                {leaderboard.reduce((sum, entry) => sum + entry.postCount, 0)}
-              </div>
-              <div className="text-sm text-gray-400">Total Posts</div>
-            </div>
-            <div className="bg-black border border-gray-700 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-green-400">
-                {Math.round(leaderboard.reduce((sum, entry) => sum + entry.engagementScore, 0))}
-              </div>
-              <div className="text-sm text-gray-400">Total Points</div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -156,46 +156,80 @@ export default function QNSProfilePage() {
 
   async function sendPaymentToDomain() {
     if (!paymentDomain.trim() || !paymentAmount.trim() || !resolvedAddress) {
-      alert('Please enter a valid domain and amount');
+      setPaymentStatus('❌ Please enter a valid domain and amount');
       return;
     }
 
     const finalAddress = address || directAddress;
     if (!finalAddress) {
-      alert('Please connect your wallet');
+      setPaymentStatus('❌ Please connect your wallet first');
       return;
     }
 
     setSending(true);
-    setPaymentStatus('Preparing transaction...');
+    setPaymentStatus('🔄 Preparing transaction...');
     
     try {
       const eth = (globalThis as any)?.ethereum;
       if (!eth) {
-        throw new Error('Wallet not found');
+        throw new Error('Wallet provider not found. Please ensure Pelagus wallet is installed and unlocked.');
       }
 
+      console.log('🔵 Creating provider and getting signer...');
       const provider = new BrowserProvider(eth);
-      const signer = await provider.getSigner();
       
-      setPaymentStatus('Sending payment...');
+      // Verify network connection
+      try {
+        const network = await provider.getNetwork();
+        console.log('✅ Connected to network:', network.chainId.toString());
+        setPaymentStatus(`🔄 Connected to network (Chain ID: ${network.chainId.toString()})`);
+      } catch (netError) {
+        console.warn('⚠️ Could not verify network:', netError);
+      }
+      
+      const signer = await provider.getSigner();
+      const signerAddress = await signer.getAddress();
+      console.log('✅ Signer address:', signerAddress);
+      
+      // Verify signer has balance
+      setPaymentStatus('🔄 Checking balance...');
+      const balance = await provider.getBalance(signerAddress);
+      const balanceInQi = Number(balance) / 1e18;
+      console.log('💰 Account balance:', balanceInQi.toFixed(4), 'QI');
+      
+      const amountInQi = parseFloat(paymentAmount);
+      if (balanceInQi < amountInQi) {
+        throw new Error(`Insufficient balance. You have ${balanceInQi.toFixed(4)} QI but need ${amountInQi} QI`);
+      }
+      
+      setPaymentStatus(`🔄 Sending ${paymentAmount} QI to ${paymentDomain}...`);
+      console.log('🔵 Calling sendFundsToDomain...');
+      
       const result = await sendFundsToDomain(paymentDomain, paymentAmount, signer, {
         onProgress: (status: string) => {
-          setPaymentStatus(status);
+          console.log('📊 Progress:', status);
+          setPaymentStatus(`🔄 ${status}`);
         }
       });
 
       if (result.success) {
-        setPaymentStatus(`✅ Payment sent! TX: ${result.txHash}`);
-        setPaymentDomain("");
-        setPaymentAmount("");
-        setResolvedAddress(null);
+        console.log('✅ Payment successful!', result);
+        setPaymentStatus(`✅ Payment sent successfully!\n\nTransaction: ${result.txHash}\nTo: ${result.resolvedAddress}`);
+        
+        // Clear form after 3 seconds
+        setTimeout(() => {
+          setPaymentDomain("");
+          setPaymentAmount("");
+          setResolvedAddress(null);
+        }, 3000);
       } else {
+        console.error('❌ Payment failed:', result.error);
         setPaymentStatus(`❌ Payment failed: ${result.error}`);
       }
     } catch (error: any) {
-      console.error('Payment failed:', error);
-      setPaymentStatus(`❌ Payment failed: ${error?.message || 'Unknown error'}`);
+      console.error('❌ Payment error:', error);
+      const errorMsg = error?.message || error?.reason || 'Unknown error occurred';
+      setPaymentStatus(`❌ Payment failed: ${errorMsg}`);
     } finally {
       setSending(false);
     }

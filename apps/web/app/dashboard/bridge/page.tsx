@@ -4,7 +4,7 @@ import React from 'react';
 
 export default function DashboardBridgePage() {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="relative flex flex-col gap-6">
       {/* Header */}
       <div className="text-left mb-2">
         <h1 className="text-4xl font-extrabold font-space-grotesk mb-2 text-white">
@@ -281,6 +281,26 @@ export default function DashboardBridgePage() {
               <p className="text-sm font-medium text-white">Enter Amount & Confirm</p>
               <p className="text-xs text-gray-400">Your $QUAI will be bridged securely via Entangle's Universal Interoperability Protocol</p>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Coming Soon Overlay */}
+      <div className="absolute inset-0 backdrop-blur-md bg-black/60 flex items-center justify-center z-50 rounded-xl">
+        <div className="text-center px-6">
+          <div className="mb-6">
+            <svg className="w-24 h-24 mx-auto text-[#8B1E3F] opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h2 className="text-5xl font-bold text-white mb-4 font-space-grotesk">
+            Coming Soon
+          </h2>
+          <p className="text-xl text-gray-300 max-w-md mx-auto mb-6">
+            Bridge functionality will be available in an upcoming release
+          </p>
+          <div className="inline-block px-6 py-3 bg-gradient-to-r from-[#8B1E3F] to-[#6C3B9E] rounded-lg">
+            <p className="text-white font-medium">Stay tuned for updates</p>
           </div>
         </div>
       </div>

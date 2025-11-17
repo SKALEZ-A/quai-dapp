@@ -8,11 +8,16 @@ import { generateCommentSignature, generateNonce } from '@/lib/signatures';
 import ImageLightbox from '@/components/ImageLightbox';
 import ImageWithLoading from '@/components/ImageWithLoading';
 import { Post, Comment, Like } from '@/lib/api';
+import { formatTimeAgo, formatDetailedTime } from '@/utils/timeFormat';
 
 // Icons
 const CommentIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 const RepostIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
-const LikeIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+const LikeIcon = ({ filled }: { filled?: boolean }) => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} xmlns="http://www.w3.org/2000/svg">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+);
 const ShareIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8m-4-6-4-4-4 4m4-4v13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 const ArrowLeftIcon = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="m15 18-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 
@@ -233,7 +238,7 @@ export default function DashboardPostDetailPage({ params }: { params: { postId: 
                  `${post.author.address.slice(0, 6)}...${post.author.address.slice(-4)}`}
               </span>
               <span className="text-gray-400 text-sm">
-                {new Date(post.createdAt).toLocaleString()}
+                {formatDetailedTime(post.createdAt)}
               </span>
             </div>
           </div>
@@ -304,10 +309,10 @@ export default function DashboardPostDetailPage({ params }: { params: { postId: 
               onClick={handleLike}
               disabled={isLiking}
               className={`flex items-center gap-2 p-2 rounded-full hover:bg-gray-800 transition-colors duration-200 ${
-                userLiked ? 'text-red-500' : 'hover:text-red-500'
+                userLiked ? 'text-pink-500' : 'hover:text-pink-500'
               } ${isLiking ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              <LikeIcon />
+              <LikeIcon filled={userLiked} />
             </button>
             <button className="flex items-center gap-2 hover:text-green-500 p-2 rounded-full hover:bg-gray-800 transition-colors duration-200">
               <RepostIcon />

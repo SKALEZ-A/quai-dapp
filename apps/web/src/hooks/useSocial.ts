@@ -18,7 +18,18 @@ export interface SocialPost {
     avatarUrl?: string;
   };
   createdAt: string;
-  likes?: Array<{ id: string; profileId: string; postId: string }>;
+  likes?: Array<{ 
+    id: string; 
+    profileId: string; 
+    postId: string;
+    profile?: {
+      id: string;
+      address: string;
+      qnsName?: string;
+      displayName?: string;
+      avatarUrl?: string;
+    }
+  }>;
   comments?: Array<{ id: string; textPreview?: string; authorId: string; postId: string }>;
   zone?: string;
 }
@@ -29,12 +40,56 @@ export interface CreatePostData {
   images?: File[];
 }
 
-export function useSocial() {
+export function useSocial(filterByFollowing: boolean = false, currentUserAddress?: string) {
   const [posts, setPosts] = useState<SocialPost[]>([]);
+  const [allPosts, setAllPosts] = useState<SocialPost[]>([]);
+  const [followingAddresses, setFollowingAddresses] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreatingPost, setIsCreatingPost] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { address } = useAccount();
+
+  // Fetch following list
+  useEffect(() => {
+    const fetchFollowing = async () => {
+      if (!currentUserAddress) return;
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api-production-af00.up.railway.app'}/follows/following/${currentUserAddress}`);
+        if (response.ok) {
+          const data = await response.json();
+          const addresses = data.following?.map((f: any) => f.following.address.toLowerCase()) || [];
+          setFollowingAddresses(addresses);
+        }
+      } catch (err) {
+        console.error('Failed to fetch following list:', err);
+      }
+    };
+    fetchFollowing();
+  }, [currentUserAddress]);
+
+  // Apply filter to posts
+  useEffect(() => {
+    if (filterByFollowing) {
+      if (followingAddresses.length > 0) {
+        const filtered = allPosts.filter(post => 
+          followingAddresses.includes(post.author.address.toLowerCase())
+        );
+        console.log('📊 Following filter active:', {
+          totalPosts: allPosts.length,
+          filteredPosts: filtered.length,
+          followingCount: followingAddresses.length
+        });
+        setPosts(filtered);
+      } else {
+        // No following addresses yet, show empty
+        console.log('📊 Following tab but no following addresses yet');
+        setPosts([]);
+      }
+    } else {
+      console.log('📊 For You tab - showing all posts:', allPosts.length);
+      setPosts(allPosts);
+    }
+  }, [filterByFollowing, followingAddresses, allPosts]);
 
   // Fetch posts from API with retry logic
   const fetchPosts = useCallback(async (retryCount = 0) => {
@@ -47,6 +102,8 @@ export function useSocial() {
       
       if (response && response.posts) {
         console.log('✅ Posts loaded successfully:', response.posts.length);
+        setAllPosts(response.posts);
+        // Initial set of posts (will be filtered by useEffect)
         setPosts(response.posts);
       } else {
         console.warn('⚠️ No posts in response:', response);
@@ -149,15 +206,69 @@ export function useSocial() {
     }
   };
 
-  // Like a post
+  // Like a post with optimistic UI update
   const likePost = async (profileAddress: string, postId: string) => {
     try {
+      // Optimistic update: immediately update the UI before API call
+      const updatePosts = (currentPosts: SocialPost[]) => {
+        return currentPosts.map(post => {
+          if (post.id === postId) {
+            // Check if already liked
+            const alreadyLiked = post.likes?.some(like => 
+              like.profile?.address?.toLowerCase() === profileAddress.toLowerCase()
+            );
+            
+            if (alreadyLiked) {
+              // Unlike: remove the like
+              return {
+                ...post,
+                likes: post.likes?.filter(like => 
+                  like.profile?.address?.toLowerCase() !== profileAddress.toLowerCase()
+                ) || []
+              };
+            } else {
+              // Like: add new like with optimistic data
+              return {
+                ...post,
+                likes: [
+                  ...(post.likes || []),
+                  {
+                    id: `temp-${Date.now()}`,
+                    profileId: profileAddress,
+                    postId: postId,
+                    profile: {
+                      id: profileAddress,
+                      address: profileAddress,
+                      qnsName: undefined,
+                      displayName: undefined,
+                      avatarUrl: undefined
+                    }
+                  }
+                ]
+              };
+            }
+          }
+          return post;
+        });
+      };
+      
+      // Update both posts arrays optimistically
+      setPosts(prevPosts => updatePosts(prevPosts));
+      setAllPosts(prevPosts => updatePosts(prevPosts));
+      
+      // Then make the API call
       await api.likePost(profileAddress, postId);
-      // Refresh posts to get updated like count
-      await fetchPosts();
+      
+      // Wait a bit for the backend to process the like before refreshing
+      // This prevents overwriting the optimistic update with stale data
+      setTimeout(() => {
+        fetchPosts();
+      }, 1000);
     } catch (err) {
       console.error('Failed to like post:', err);
       setError('Failed to like post');
+      // Revert optimistic update on error
+      await fetchPosts();
     }
   };
 

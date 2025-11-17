@@ -14,10 +14,15 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useSocial } from '@/hooks/useSocial';
 import { useProfile, UpdateProfileData } from '@/hooks/useProfile';
 import { stripDomainSuffix } from '@/lib/qns';
+import { formatTimeAgo } from '@/utils/timeFormat';
 
 const CommentIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 const RepostIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
-const LikeIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+const LikeIcon = ({ filled }: { filled?: boolean }) => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} xmlns="http://www.w3.org/2000/svg">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+);
 const ShareIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8m-4-6-4-4-4 4m4-4v13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 
 const SocialProfile: React.FC = () => {
@@ -208,7 +213,7 @@ const SocialProfile: React.FC = () => {
                 <div className="w-full">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="font-bold">{currentUser.username}</span>
-                    <span className="text-gray-400 text-sm">{new Date(post.createdAt).toLocaleTimeString()}</span>
+                    <span className="text-gray-400 text-sm">{formatTimeAgo(post.createdAt)}</span>
                   </div>
                   <p className="leading-relaxed mb-4 whitespace-pre-line">{post.textPreview}</p>
                   {post.imageCids && post.imageCids.length > 0 && (
@@ -231,7 +236,13 @@ const SocialProfile: React.FC = () => {
                   )}
                   <div className="flex gap-6 text-gray-400">
                     <button 
-                      className="flex items-center gap-2 hover:text-red-500"
+                      className={`flex items-center gap-2 transition-colors ${
+                        post.likes?.some(like => 
+                          like.profile?.address?.toLowerCase() === currentUser.address?.toLowerCase()
+                        ) 
+                        ? 'text-pink-500 hover:text-pink-600' 
+                        : 'hover:text-pink-500'
+                      }`}
                       onClick={(e) => {
                         e.stopPropagation();
                         if (currentUser.address) {
@@ -239,7 +250,9 @@ const SocialProfile: React.FC = () => {
                         }
                       }}
                     >
-                      <LikeIcon /> {post.likes?.length || 0}
+                      <LikeIcon filled={post.likes?.some(like => 
+                        like.profile?.address?.toLowerCase() === currentUser.address?.toLowerCase()
+                      )} /> {post.likes?.length || 0}
                     </button>
                     <button className="flex items-center gap-2 hover:text-green-500"><RepostIcon /> 0</button>
                     <button className="flex items-center gap-2 hover:text-blue-500"><CommentIcon /> {post.comments?.length || 0}</button>
