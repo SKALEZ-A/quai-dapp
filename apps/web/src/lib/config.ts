@@ -12,10 +12,10 @@ const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '0e5376d27
 
 // 3. DApp metadata
 const metadata = {
-  name: 'Quai Superapp',
-  description: 'Social + QNS + Bridge on Quai',
-  url: 'http://localhost:3001', // Use localhost for development
-  icons: ['https://app.quai.network/icon.png'],
+  name: "Synq - Social DApp on Quai",
+  description: "Social DApp + QNS + Bridge on Quai",
+  url: "http://localhost:3001", // Use localhost for development
+  icons: ["/favicon-16x16.png"],
 };
 
 // 4. Create wagmiConfig - focus on injected wallets (Pelagus)
@@ -39,8 +39,8 @@ createWeb3Modal({
   enableOnramp: false,
   themeMode: 'dark',
   themeVariables: {
-    '--w3m-color-mix': '#8B1E3F',
-    '--w3m-color-mix-strength': 40,
+    '--w3m-color-mix': '#111928',
+    '--w3m-color-mix-strength': 50,
   },
   // Custom wallet configuration for Pelagus
   featuredWalletIds: [], // Don't feature any wallets

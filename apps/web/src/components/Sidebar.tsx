@@ -101,7 +101,7 @@ const Sidebar = () => {
       {/* Mobile Menu Button */}
       <button
         onClick={toggleMobileMenu}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-black border border-border rounded-lg text-white hover:bg-surface transition-colors"
+        className="lg:hidden fixed top-4 right-4 z-50 p-[5px] bg-black/70 border rounded text-white hover:bg-black transition-colors text-xs"
       >
         <MenuIcon />
       </button>
@@ -121,28 +121,30 @@ const Sidebar = () => {
         transform transition-transform duration-300 ease-in-out
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
-      <div className="">
-        <img src="/assets/logo.png" alt="Synq Logo" className="h-8 mb-12 px-2" />
+      <div>
+        <Link href="/" onClick={closeMobileMenu}>
+          <img src="/assets/logo.png" alt="Synq Logo" className="h-8 mb-12 px-2" />
+        </Link>
         <nav className="space-y-8"> {/* Added space-y for consistent margin */}
           <div className="mb-8"> {/* Grouping for dashboard nav */}
             <h2 className="text-xs text-text-secondary font-medium tracking-wider mb-4 px-2">DASHBOARD</h2>
-            <Link href="/dashboard/social" onClick={closeMobileMenu} className={`flex items-center gap-3 py-3 px-2 rounded-lg text-text-secondary font-medium transition-all duration-200 ease-in-out hover:bg-surface hover:text-text-primary ${isActive('/dashboard/social') ? 'bg-primary text-text-primary' : ''}`}>
+            <Link href="/dashboard/social" onClick={closeMobileMenu} className={`flex items-center gap-3 py-3 px-2 rounded-lg text-text-secondary font-medium transition-all duration-200 ease-in-out hover:bg-surface hover:text-text-primary ${isActive('/dashboard/social') ? 'bg-primary text-white' : ''}`}>
               <ActivityIcon className="w-5 h-5" />
               <span>Social Activity</span>
             </Link>
-            <Link href="/dashboard/leaderboard" onClick={closeMobileMenu} className={`flex items-center gap-3 py-3 px-2 rounded-lg text-text-secondary font-medium transition-all duration-200 ease-in-out hover:bg-surface hover:text-text-primary ${isActive('/dashboard/leaderboard') ? 'bg-primary text-text-primary' : ''}`}>
+            <Link href="/dashboard/leaderboard" onClick={closeMobileMenu} className={`flex items-center gap-3 py-3 px-2 rounded-lg text-text-secondary font-medium transition-all duration-200 ease-in-out hover:bg-surface hover:text-text-primary ${isActive('/dashboard/leaderboard') ? 'bg-primary text-white' : ''}`}>
               <LeaderboardIcon className="w-5 h-5" />
               <span>Leaderboard</span>
             </Link>
-            <Link href="/qns/profile" onClick={closeMobileMenu} className={`flex items-center gap-3 py-3 px-2 rounded-lg text-text-secondary font-medium transition-all duration-200 ease-in-out hover:bg-surface hover:text-text-primary ${isActive('/qns/profile') ? 'bg-primary text-text-primary' : ''}`}>
+            <Link href="/qns/profile" onClick={closeMobileMenu} className={`flex items-center gap-3 py-3 px-2 rounded-lg text-text-secondary font-medium transition-all duration-200 ease-in-out hover:bg-surface hover:text-text-primary ${isActive('/qns/profile') ? 'bg-primary text-white' : ''}`}>
               <QnsIcon className="w-5 h-5" />
               <span>QNS</span>
             </Link>
-            <Link href="/dashboard/bridge" onClick={closeMobileMenu} className={`flex items-center gap-3 py-3 px-2 rounded-lg text-text-secondary font-medium transition-all duration-200 ease-in-out hover:bg-surface hover:text-text-primary ${isActive('/dashboard/bridge') ? 'bg-primary text-text-primary' : ''}`}>
+            <Link href="/dashboard/bridge" onClick={closeMobileMenu} className={`flex items-center gap-3 py-3 px-2 rounded-lg text-text-secondary font-medium transition-all duration-200 ease-in-out hover:bg-surface hover:text-text-primary ${isActive('/dashboard/bridge') ? 'bg-primary text-white' : ''}`}>
               <BridgeIcon className="w-5 h-5" />
               <span>Bridge</span>
             </Link>
-            <Link href="/dashboard/overview" onClick={closeMobileMenu} className={`flex items-center gap-3 py-3 px-2 rounded-lg text-text-secondary font-medium transition-all duration-200 ease-in-out hover:bg-surface hover:text-text-primary ${isActive('/dashboard/overview') ? 'bg-primary text-text-primary' : ''}`}>
+            <Link href="/dashboard/overview" onClick={closeMobileMenu} className={`flex items-center gap-3 py-3 px-2 rounded-lg text-text-secondary font-medium transition-all duration-200 ease-in-out hover:bg-surface hover:text-text-primary ${isActive('/dashboard/overview') ? 'bg-primary text-white' : ''}`}>
               <UserIcon className="w-5 h-5" />
               <span>User Overview</span>
             </Link>

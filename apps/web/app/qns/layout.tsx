@@ -8,13 +8,10 @@ export default function QNSLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="grid grid-cols-[280px_1fr] h-screen bg-background">
+    <div className="flex h-screen bg-background">
       <Sidebar />
-      <main className="overflow-y-auto">
-        <QnsHeader />
-        <div className="max-w-5xl mx-auto px-6">
+      <main className="flex-1 overflow-y-auto p-4 pt-0 lg:pt-8">
           {children}
-        </div>
       </main>
     </div>
   );

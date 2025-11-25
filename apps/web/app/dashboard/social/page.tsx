@@ -140,9 +140,9 @@ const SocialActivity = () => {
                 </div>
                 
                 <div className="flex items-center gap-3 lg:gap-4 bg-black p-3 lg:p-4 rounded-lg cursor-pointer" onClick={() => setIsModalOpen(true)}>
-                            <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-gray-600 flex-shrink-0 overflow-hidden">
-                                <img src={getImageUrl(currentUser.profileImg)} className="w-auto h-full" alt="Your Profile Image" />
-                            </div>
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-gray-600 flex-shrink-0 overflow-hidden">
+                        <img src={getImageUrl(currentUser.profileImg)} className="w-auto h-full" alt="Your Profile Image" />
+                    </div>
                     <div className="flex-grow flex items-center rounded-lg px-2">
                        <span className="py-3 text-gray-400 text-sm lg:text-base">Got an Alpha?</span>
                        <div className="ml-auto text-gray-400">
@@ -152,7 +152,7 @@ const SocialActivity = () => {
                     <button className="bg-gradient-to-r from-[#8B1E3F] to-[#6C3B9E] text-white py-2 px-3 lg:px-5 rounded-full font-medium text-xs lg:text-sm">Post</button>
                 </div>
 
-                <div className="flex flex-col gap-px bg-gray-700 rounded-lg overflow-y-scroll scrollbar-hide">
+                <div className="flex flex-col gap-px bg-gray-700 rounded-lg overflow-y-scroll overflow-x-hidden scrollbar-hide">
                     {isLoading ? (
                         <PostSkeletonList count={3} />
                     ) : error ? (
@@ -176,7 +176,7 @@ const SocialActivity = () => {
                         posts.map(post => (
                             <div className="flex gap-3 lg:gap-4 bg-black p-4 lg:p-6" key={post.id}>
                                 <div 
-                                    className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-gray-600 flex-shrink-0 overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
+                                    className="w-8 h-8 lg:w-12 lg:h-12 rounded-full bg-gray-600 flex-shrink-0 overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
                                     onClick={(e) => { 
                                         e.stopPropagation(); 
                                         router.push(`/dashboard/profile/${post.author.address}`); 
@@ -186,7 +186,7 @@ const SocialActivity = () => {
                                 </div>
                                 <div className="w-full">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <span 
+                                        <span
                                             className="font-bold text-sm lg:text-base cursor-pointer hover:underline transition-colors"
                                             onClick={(e) => { 
                                                 e.stopPropagation(); 
@@ -201,8 +201,8 @@ const SocialActivity = () => {
                                         className="cursor-pointer"
                                         onClick={() => router.push(`/dashboard/post/${post.id}`)}
                                     >
-                                        <p className="leading-relaxed mb-4 text-sm lg:text-base">{post.textPreview}</p>
-                                    {post.imageCids && post.imageCids.length > 0 && (
+                                        <p className="leading-relaxed mb-4 text-sm lg:text-base w-[85%] break-words whitespace-pre-wrap">{post.textPreview}</p>
+                                        {post.imageCids && post.imageCids.length > 0 && (
                                         <div className={`grid ${getImageGridClasses(post.imageCids.length)} gap-2 rounded-xl overflow-hidden mb-4`}>
                                             {post.imageCids.map((cid, index) => {
                                                 // Handle both IPFS CIDs and local fallback CIDs
@@ -250,7 +250,7 @@ onError={(e) => {
                                                 );
                                             })}
                                         </div>
-                                    )}
+                                        )}
                                     </div>
                                     <div className="flex gap-4 lg:gap-6 text-gray-400">
                                         <button 
@@ -356,7 +356,7 @@ onError={(e) => {
                 </div>
             </aside>
             
-            <div className={`fixed bottom-4 right-4 lg:bottom-6 lg:right-12 flex flex-col-reverse items-center gap-4 ${isFabOpen ? 'open' : ''}`}>
+            <div className={`fixed bottom-4 right-4 lg:bottom-6 lg:right-12 flex flex-col items-center gap-4 ${isFabOpen ? 'open' : ''}`}>
                  <div className={`flex flex-col-reverse gap-4 transition-all duration-300 ease-in-out ${isFabOpen ? 'opacity-100 translate-y-0 visible' : 'opacity-0 translate-y-2 invisible'}`}>
                     <button className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-gray-800 text-white border border-gray-700 flex items-center justify-center shadow-lg hover:bg-gray-700" title="Create Post" onClick={() => { setIsModalOpen(true); setIsFabOpen(false); }}>
                         <AddIcon />

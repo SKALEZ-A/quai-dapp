@@ -4,7 +4,7 @@ import React from 'react';
 
 export default function DashboardBridgePage() {
   return (
-    <div className="relative flex flex-col gap-6">
+    <div className="relative flex flex-col gap-6 h-[89.5vh] overflow-y-hidden rounded-xl">
       {/* Header */}
       <div className="text-left mb-2">
         <h1 className="text-4xl font-extrabold font-space-grotesk mb-2 text-white">
@@ -286,21 +286,28 @@ export default function DashboardBridgePage() {
       </div>
 
       {/* Coming Soon Overlay */}
-      <div className="absolute inset-0 backdrop-blur-md bg-black/60 flex items-center justify-center z-50 rounded-xl">
-        <div className="text-center px-6">
-          <div className="mb-6">
-            <svg className="w-24 h-24 mx-auto text-[#8B1E3F] opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="absolute inset-0 backdrop-blur-md bg-black/60 flex items-center justify-center z-20 rounded-xl">
+        <div className="text-center px-4 sm:px-6 py-8 md:py-12">
+          <div className="mb-6 sm:mb-8">
+            {/* Icon: w-16 (mobile) -> w-20 (tablet) -> w-24 (desktop) */}
+            <svg className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto text-[#8B1E3F] opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h2 className="text-5xl font-bold text-white mb-4 font-space-grotesk">
+          
+          {/* Heading: text-3xl (mobile) -> text-4xl (tablet) -> text-5xl (desktop) */}
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 sm:mb-4 font-space-grotesk">
             Coming Soon
           </h2>
-          <p className="text-xl text-gray-300 max-w-md mx-auto mb-6">
+          
+          {/* Text: text-base (mobile) -> text-lg (tablet) -> text-xl (desktop) */}
+          <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-xs sm:max-w-md mx-auto mb-6 sm:mb-8 leading-relaxed">
             Bridge functionality will be available in an upcoming release
           </p>
-          <div className="inline-block px-6 py-3 bg-gradient-to-r from-[#8B1E3F] to-[#6C3B9E] rounded-lg">
-            <p className="text-white font-medium">Stay tuned for updates</p>
+          
+          {/* Badge: Adjusted padding for mobile vs desktop */}
+          <div className="inline-block px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-[#8B1E3F] to-[#6C3B9E] rounded-lg shadow-lg shadow-[#8B1E3F]/20">
+            <p className="text-sm sm:text-base text-white font-medium">Stay tuned for updates</p>
           </div>
         </div>
       </div>

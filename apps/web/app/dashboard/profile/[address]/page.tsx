@@ -223,7 +223,7 @@ const UserProfilePage: React.FC = () => {
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-semibold text-white">{userProfile.name}</span>
+                      <span className="font-semibold text-white">{userProfile.name}f</span>
                       <span className="text-gray-400 text-sm">{userProfile.username}</span>
                       <span className="text-gray-500 text-sm">•</span>
                       <span className="text-gray-500 text-sm">{new Date(post.createdAt).toLocaleDateString()}</span>

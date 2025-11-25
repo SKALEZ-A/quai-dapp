@@ -3,8 +3,13 @@ import { Providers } from './providers';
 import './globals.css';
 
 export const metadata = {
-  title: "Quai Superapp",
-  description: "Social + QNS + Bridge on Quai"
+  title: "Synq - Social Dapp on Quai",
+  description: "Social Dapp + QNS + Bridge on Quai",
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon-16x16.png',
+    apple: '/apple-touch-icon.png',
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

@@ -65,6 +65,7 @@ const LandingPage = () => {
             </div>
           </div>
 
+          {/* Background visuals */}
           <div className="relative overflow-hidden w-[2000px] h-[1300px] transform -translate-y-1/4 mt-0">
             {/* Very large centered background pattern */}
             <img src="/assets/pattern.png" alt="Pattern" className="absolute top-1/2 left-1/2 w-[220vw] h-[180vh] -translate-x-1/2 -translate-y-1/3 pointer-events-none select-none z-1" />
@@ -94,7 +95,7 @@ const LandingPage = () => {
           </div>
         </section>
 
-        <section className="text-center text-white mt-0 px-4">
+        <section className="text-center text-white mt-0 px-4 py-16">
           <h2 className="font-space-grotesk text-4xl mb-4 font-bold">
             You are in <span className="text-gradient">Good</span> Company
           </h2>

@@ -207,7 +207,7 @@ const SocialProfile: React.FC = () => {
           ) : (
             (activeTab === 'Posts' ? userPosts : activeTab === 'Media' ? mediaPosts : userPosts).map(post => (
               <div className="flex gap-4 bg-black p-6 cursor-pointer" key={post.id} onClick={() => router.push(`/dashboard/post/${post.id}`)}>
-                <div className="w-12 h-12 rounded-full bg-gray-600 flex-shrink-0 overflow-hidden">
+                <div className="w-8 h-8 rounded-full bg-gray-600 flex-shrink-0 overflow-hidden">
                   <img src={getImageUrl(currentUser.profileImg)} className="w-auto h-full" alt="Your Profile" />
                 </div>
                 <div className="w-full">
@@ -215,7 +215,7 @@ const SocialProfile: React.FC = () => {
                     <span className="font-bold">{currentUser.username}</span>
                     <span className="text-gray-400 text-sm">{formatTimeAgo(post.createdAt)}</span>
                   </div>
-                  <p className="leading-relaxed mb-4 whitespace-pre-line">{post.textPreview}</p>
+                  <p className="leading-relaxed mb-4 break-words whitespace-pre-wrap w-[85%]">{post.textPreview}</p>
                   {post.imageCids && post.imageCids.length > 0 && (
                     <div className={`grid ${getImageGridClasses(post.imageCids.length)} gap-2 rounded-xl overflow-hidden mb-4`}>
                       {post.imageCids.map((cid, index) => {

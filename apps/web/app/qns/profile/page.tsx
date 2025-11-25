@@ -430,7 +430,7 @@ export default function QNSProfilePage() {
   }
 
   return (
-    <main className="py-6 max-w-6xl mx-auto">
+    <main className="py-6 max-w-5xl mx-auto px-4 sm:px-6">
       <div className="mb-8">
         <h1 className="font-space-grotesk text-4xl font-bold text-text-primary mb-2">Quai Name Service (QNS)</h1>
         <p className="font-manrope text-gray-400">Register human-readable names on Quai Network</p>
@@ -438,18 +438,18 @@ export default function QNSProfilePage() {
 
       <div className="mb-8 bg-surface border border-border rounded-xl p-6">
         {finalConnected && finalAddress ? (
-          <div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="text-text-primary font-manrope">
               <span className="text-gray-400">Connected:</span> <span className="font-mono text-primary">{finalAddress.slice(0, 10)}...{finalAddress.slice(-8)}</span>
             </div>
-            <div className="mt-3 text-sm text-gray-400">
-              <span className="font-medium">Your .quai domains:</span> {ownedDomains.length > 0 ? ownedDomains.map(d => formatDomainName(d)).join(", ") : "None"}
+            <div className="text-sm text-gray-400">
+              <span className="font-medium">Your .quai domains:</span> <span className="block sm:inline">{ownedDomains.length > 0 ? ownedDomains.map(d => formatDomainName(d)).join(", ") : "None"}</span>
             </div>
           </div>
         ) : (
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <p className="text-gray-400">Connect your wallet to manage and register domains</p>
-            <button onClick={connect} className="px-6 py-2.5 bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white font-space-grotesk font-medium rounded-lg transition-all">
+            <button onClick={connect} className="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white font-space-grotesk font-medium rounded-lg transition-all">
               Connect Wallet
             </button>
           </div>
@@ -458,19 +458,19 @@ export default function QNSProfilePage() {
 
       <div className="mb-10">
         <h2 className="font-space-grotesk text-2xl font-bold text-text-primary mb-4">Search Domain</h2>
-        <div className="flex gap-3 mb-6">
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <input 
             type="text" 
             placeholder="skalez" 
             value={searchQuery} 
             onChange={(e) => setSearchQuery(e.target.value)} 
-            className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-text-primary placeholder:text-gray-500 outline-none focus:border-primary transition-colors" 
+            className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-text-primary placeholder:text-gray-500 outline-none focus:border-primary transition-colors w-full"
             onKeyDown={(e) => e.key === "Enter" && searchDomain()} 
           />
           <button 
             onClick={searchDomain} 
             disabled={loading || !searchQuery.trim()}
-            className="px-8 py-3 bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white font-space-grotesk font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full sm:w-auto px-6 sm:px-8 py-3 bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white font-space-grotesk font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Searching..." : "Search"}
           </button>
@@ -483,10 +483,10 @@ export default function QNSProfilePage() {
               : 'border-red-500/30 bg-red-500/5'
           }`}>
             <div className="mb-4">
-              <h3 className="font-space-grotesk text-3xl font-bold text-text-primary mb-2">
+              <h3 className="font-space-grotesk text-2xl sm:text-3xl font-bold text-text-primary mb-2">
                 {domainInfo.name}
               </h3>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                 <span className="text-gray-400 font-medium">Status:</span>
                 <span className={`font-semibold ${
                   domainInfo.available ? 'text-green-400' : 'text-red-400'
@@ -499,15 +499,15 @@ export default function QNSProfilePage() {
             {domainInfo.available ? (
               <div>
                 <div className="bg-surface/50 rounded-lg p-4 mb-4 space-y-2">
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
                     <span className="text-gray-400">Registration Type:</span>
                     <span className="text-text-primary font-medium flex items-center gap-2">
                       <span className="text-green-400">⚡</span> Instant Purchase
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
                     <span className="text-gray-400">Price:</span>
-                    <span className="text-primary font-bold text-2xl">{domainInfo.onchainPriceDisplay || domainInfo.priceDisplay}</span>
+                    <span className="text-primary font-bold text-xl sm:text-2xl">{domainInfo.onchainPriceDisplay || domainInfo.priceDisplay}</span>
                   </div>
                   <div className="pt-2 border-t border-border">
                     <p className="text-xs text-gray-400">
@@ -586,8 +586,8 @@ export default function QNSProfilePage() {
       </div>
 
       <div className="mb-10">
-        <h2 className="font-space-grotesk text-2xl font-bold text-text-primary mb-4">⚡ Simple Pricing</h2>
-        <div className="bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/20 rounded-xl p-6 mb-6">
+        <h2 className="font-space-grotesk text-xl sm:text-2xl font-bold text-text-primary mb-4">⚡ Simple Pricing</h2>
+        <div className="bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/20 rounded-xl p-4 sm:p-6 mb-6">
           <p className="text-text-primary mb-4 flex items-center gap-2">
             <span className="text-2xl">💎</span>
             <span className="font-semibold">Instant Purchase - No Auctions, No Waiting!</span>
@@ -598,39 +598,39 @@ export default function QNSProfilePage() {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-surface border border-border rounded-xl p-5 hover:border-primary transition-colors">
+          <div className="bg-surface border border-border rounded-xl p-4 sm:p-5 hover:border-primary transition-colors">
             <div className="text-center">
-              <div className="text-3xl mb-2">💎</div>
+              <div className="text-2xl sm:text-3xl mb-2">💎</div>
               <h3 className="font-space-grotesk text-lg font-bold text-primary mb-2">3 Characters</h3>
               <p className="text-3xl font-bold text-text-primary mb-1">1,000</p>
               <p className="text-sm text-gray-400">QI</p>
-              <p className="text-xs text-gray-500 mt-3">Ultra premium</p>
+              <p className="text-xs text-gray-500 mt-3">Premium +</p>
             </div>
           </div>
           
-          <div className="bg-surface border border-border rounded-xl p-5 hover:border-primary transition-colors">
+          <div className="bg-surface border border-border rounded-xl p-4 sm:p-5 hover:border-[#00C853] transition-colors">
             <div className="text-center">
-              <div className="text-3xl mb-2">💠</div>
-              <h3 className="font-space-grotesk text-lg font-bold text-primary mb-2">4 Characters</h3>
+              <div className="text-2xl sm:text-3xl mb-2">💠</div>
+              <h3 className="font-space-grotesk text-lg font-bold text-[#00C853] mb-2">4 Characters</h3>
               <p className="text-3xl font-bold text-text-primary mb-1">500</p>
               <p className="text-sm text-gray-400">QI</p>
               <p className="text-xs text-gray-500 mt-3">Premium</p>
             </div>
           </div>
           
-          <div className="bg-surface border border-border rounded-xl p-5 hover:border-primary transition-colors">
+          <div className="bg-surface border border-border rounded-xl p-4 sm:p-5 hover:border-[#2962FF] transition-colors">
             <div className="text-center">
-              <div className="text-3xl mb-2">⭐</div>
-              <h3 className="font-space-grotesk text-lg font-bold text-primary mb-2">5-7 Characters</h3>
+              <div className="text-2xl sm:text-3xl mb-2">⭐</div>
+              <h3 className="font-space-grotesk text-lg font-bold text-[#2962FF] mb-2">5-7 Characters</h3>
               <p className="text-3xl font-bold text-text-primary mb-1">200</p>
               <p className="text-sm text-gray-400">QI</p>
               <p className="text-xs text-gray-500 mt-3">Standard</p>
             </div>
           </div>
           
-          <div className="bg-surface border border-border rounded-xl p-5 hover:border-secondary transition-colors">
+          <div className="bg-surface border border-border rounded-xl p-4 sm:p-5 hover:border-secondary transition-colors">
             <div className="text-center">
-              <div className="text-3xl mb-2">⚡</div>
+              <div className="text-2xl sm:text-3xl mb-2">⚡</div>
               <h3 className="font-space-grotesk text-lg font-bold text-secondary mb-2">8+ Characters</h3>
               <p className="text-3xl font-bold text-text-primary mb-1">100</p>
               <p className="text-sm text-gray-400">QI</p>
@@ -667,7 +667,7 @@ export default function QNSProfilePage() {
       </div>
 
       {/* Payment-to-Domain Section */}
-      <div className="bg-surface border border-border rounded-lg p-6">
+      <div className="bg-surface border border-border rounded-lg p-6 mt-6">
         <h2 className="font-space-grotesk text-2xl font-bold text-text-primary mb-4">Send QUAI to .quai Domain</h2>
         <p className="text-gray-400 mb-6">
           Send QUAI directly to any .quai domain name - just like sending to an address!
