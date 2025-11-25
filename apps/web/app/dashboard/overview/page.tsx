@@ -295,7 +295,7 @@ const UserOverview = () => {
                   onClick={() => router.push('/dashboard/social')} 
                   className="group w-full h-20 flex flex-row items-center justify-center gap-3 px-4 rounded-lg bg-[#b12c5b] hover:bg-[#c9356b] text-gray-50 font-medium transition-all active:scale-[0.98]"
                 >
-                  <PostIcon className="w-7 h-7 mt-2 sm:w-8 sm:h-8 text-white/90 group-hover:text-white transition-colors" />
+                  <PostIcon className="w-7 h-7 sm:w-8 sm:h-8 text-white/90 group-hover:text-white transition-colors" />
                   <span className="text-base sm:text-lg font-semibold">Create Post</span>
                 </button>
               </div>
@@ -304,7 +304,7 @@ const UserOverview = () => {
                   onClick={() => router.push('/dashboard/bridge')} 
                   className="group w-full h-20 flex flex-row items-center justify-center gap-2 px-3 rounded-lg bg-black border border-gray-800 hover:border-gray-600 text-gray-50 font-medium transition-all active:scale-[0.98]"
                 >
-                  <BridgeIcon className="w-6 h-6 mt-2 sm:w-7 sm:h-7 text-gray-300 group-hover:text-white transition-colors" />
+                  <BridgeIcon className="w-6 h-6 sm:w-7 sm:h-7 text-gray-300 group-hover:text-white transition-colors" />
                   <span className="text-base sm:text-lg font-semibold">Bridge</span>
                 </button>
               </div>

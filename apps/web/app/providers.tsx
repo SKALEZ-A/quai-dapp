@@ -29,11 +29,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
     setMounted(true);
   }, []);
 
-  // Prevent hydration mismatch by not rendering until mounted
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+      <div className="min-h-screen bg-black flex flex-col items-center justify-center">
+          <img src="/assets/logo.png" alt="Synq Logo" className="h-6 md:h-8" />
+          <p className="text-white text-3xl fw-extrabold mt-4">Loading...</p>
       </div>
     );
   }
