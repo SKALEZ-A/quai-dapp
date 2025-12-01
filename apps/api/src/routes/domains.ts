@@ -4,12 +4,13 @@ import { JsonRpcProvider } from 'quais';
 
 const router = express.Router();
 
-// Contract configuration - using the deployed addresses
+// Contract configuration - using the deployed addresses (synced with frontend contracts.ts)
+// IMPORTANT: These must match the frontend contracts in apps/web/src/lib/contracts.ts
 const CONTRACTS = {
-  QNS_REGISTRY: '0x0047904d94645A46BA56Cf7E8c064cB823746cFf',
-  QNS_NFT: '0x005382DebE72ee74d5D6E5a2D97Dc7bA2C16be12',
-  QNS_REGISTRAR: '0x00204d553264Bdb39f4A6C6c1325d9B4553E427b',
-  QNS_RESERVED_NAMES: '0x0023272C07514D2D236f6c6895507DFd26442471',
+  QNS_REGISTRY: process.env.QNS_REGISTRY_ADDRESS || '0x001AB937c039d0d5c0dC6760275720f89C87fCdE',
+  QNS_NFT: process.env.QNS_NFT_ADDRESS || '0x00106c60fF55A0D264A481C5bB46bADF19342144',
+  QNS_REGISTRAR: process.env.QNS_REGISTRAR_ADDRESS || '0x0054100a03BE551B4a39f0Fea5cC83699171BFDE',
+  QNS_RESERVED_NAMES: process.env.QNS_RESERVED_NAMES_ADDRESS || '0x00629264745465e0A56A9EdAaEB0B4B9DE719aff',
 };
 
 const RPC_URL = 'https://orchard.rpc.quai.network';

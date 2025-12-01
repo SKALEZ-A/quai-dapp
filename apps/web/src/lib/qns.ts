@@ -101,9 +101,9 @@ export async function checkDomainAvailability(name: string): Promise<{
     const node = nameToNode(name);
     console.log('Node hash:', node);
     
-    // Add timeout to contract calls
+    // Add timeout to contract calls (increased to 30 seconds for Quai network)
     const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Contract call timeout')), 10000); // 10 second timeout
+      setTimeout(() => reject(new Error('Contract call timeout - please try again')), 30000); // 30 second timeout
     });
 
     // Primary: use registrar.available

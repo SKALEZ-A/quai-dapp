@@ -1,7 +1,7 @@
 # Node
 node_modules
 .DS_Stor
-.env.local
+
 
 # Builds
 apps/**/.next
@@ -13,4 +13,4 @@ coverage
 # Turbo cache
 .turbo
 
-.env
+
