@@ -19,16 +19,16 @@ const LandingPage = () => {
 
   const testimonials = [
     {
-      name: 'Alice Chen',
-      handle: 'alex.quai',
-      avatar: '/assets/avatars/alice-chen.png',
-      quote: 'Synq made everything so seamless. I registered my QNS domain, bridged my assets, and started chatting with the community - all without leaving the platform.',
+      name: 'Kunms',
+      handle: 'BD Manager - Victus',
+      avatar: '/assets/kunms.jpg',
+      quote: 'SYNQ has a simplified the entire onboarding process into a super app which i think is amazing. Highly recommended for new users in the Quai ecosystem!',
     },
     {
-      name: 'Bob Martinez',
-      handle: 'bob.quai',
-      avatar: '/assets/avatars/bob-martinez.png',
-      quote: "The bridge is incredibly fast and secure. I've moved assets between 5 different chains without any issues. The integration with social features is brilliant.",
+      name: 'Rocster',
+      handle: 'Founder - SYNQ',
+      avatar: '/assets/rocster.jpg',
+      quote: "SYNQ is very user friendly and easy to use. I believe what we've built would be the ost used DApp on Quai very sopon. We're a community focused super DApp that brings value to the ecosystem.",
     },
     {
       name: 'Bob Martinez',
@@ -95,15 +95,15 @@ const LandingPage = () => {
         <section className="bg-[#111928] py-12 md:py-20 px-4 text-center text-white relative z-20 mt-[-40px] md:mt-10 lg:mt-[-405px]">
           <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10">
             <div>
-              <p className="text-2xl md:text-3xl font-bold text-white">22K<span className="text-gradient">+</span></p>
-              <p className="mt-2 text-xs md:text-sm text-gray-400">GNS Domain</p>
+              <p className="text-2xl md:text-3xl font-bold text-white">50<span className="text-gradient">+</span></p>
+              <p className="mt-2 text-xs md:text-sm text-gray-400">QNS Domain</p>
             </div>
             <div>
-              <p className="text-2xl md:text-3xl font-bold text-white">64M<span className="text-gradient">+</span></p>
+              <p className="text-xl md:text-xl font-bold text-white">coming<span className="text-gradient"> soon</span></p>
               <p className="mt-2 text-xs md:text-sm text-gray-400">Bridge Transactions</p>
             </div>
             <div>
-              <p className="text-2xl md:text-3xl font-bold text-white">50K<span className="text-gradient">+</span></p>
+              <p className="text-2xl md:text-3xl font-bold text-white">100<span className="text-gradient">+</span></p>
               <p className="mt-2 text-xs md:text-sm text-gray-400">Active Users</p>
             </div>
             <div>
@@ -206,11 +206,11 @@ const LandingPage = () => {
             {testimonials.map((testimonial, index) => (
               <div
                 key={index}
-                className={`rounded-lg border border-neutral-500 h-full flex flex-col justify-between ${
+                className={`rounded-lg border border-neutral-500 h-50 flex flex-col justify-between ${
                   index === 0
                     ? 'p-6 md:p-8'
                     : index === 1
-                    ? 'p-6 py-10 md:px-8 md:py-16'
+                    ? 'p-6 py-4 md:px-8 md:py-16'
                     : 'p-6 py-8 md:px-8 md:py-14'
                 }`}
               >
