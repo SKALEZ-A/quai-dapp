@@ -175,6 +175,18 @@ export default function QNSProfilePage() {
         throw new Error('Wallet provider not found. Please ensure Pelagus wallet is installed and unlocked.');
       }
 
+      // Explicitly request account access so Pelagus authorizes this dapp for transactions
+      setPaymentStatus('🔄 Requesting wallet authorization...');
+      try {
+        const accounts = await eth.request({ method: 'eth_requestAccounts' });
+        if (!accounts || !accounts.length) {
+          throw new Error('Wallet not authorized. Please connect and approve this site in Pelagus.');
+        }
+      } catch (authError: any) {
+        console.error('Wallet authorization failed:', authError);
+        throw new Error(authError?.message || 'Wallet authorization failed');
+      }
+
       console.log('🔵 Creating provider and getting signer...');
       const provider = new BrowserProvider(eth);
       
