@@ -21,6 +21,13 @@ export type CurrentUser = {
 const DEFAULT_PROFILE_IMG = "/assets/avatars/alice-chen.png";
 const DEFAULT_COVER_IMG = "/assets/pattern.png";
 
+const isLocalhost = typeof window !== 'undefined' && (
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1' ||
+  window.location.hostname.includes('localhost')
+);
+const API_BASE_URL = isLocalhost ? '/api/proxy' : (process.env.NEXT_PUBLIC_API_URL || 'https://api-production-af00.up.railway.app');
+
 // Helper function to convert IPFS CIDs to full URLs
 const getImageUrl = (url?: string | null): string => {
   // Handle null, undefined, or empty string
@@ -60,7 +67,7 @@ export function useCurrentUser(): CurrentUser & { refreshProfile: () => void } {
         if (profile && !profile.qnsName && finalAddress) {
           try {
             console.log('🔄 Auto-syncing QNS domains for address:', finalAddress);
-            const syncResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api-production-af00.up.railway.app'}/profiles/sync-qns`, {
+            const syncResponse = await fetch(`${API_BASE_URL}/profiles/sync-qns`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ address: finalAddress })

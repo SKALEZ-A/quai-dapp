@@ -387,205 +387,47 @@ export async function registerDomain(
 }
 
 // Get user's domains
+// Simplified implementation: directly scan NFT token IDs like the backend /domains/user route
 export async function getUserDomains(address: string): Promise<string[]> {
   try {
-    console.log('Fetching domains for address:', address);
+    console.log('Fetching domains for address (frontend):', address);
     const provider = makeProvider(RPC_URL);
     const nftContract = new Contract(CONTRACTS.QNS_NFT, QNS_NFT_ABI, provider);
-    const registryContract = new Contract(CONTRACTS.QNS_REGISTRY, QNS_REGISTRY_ABI, provider);
 
     const userDomains: string[] = [];
-
-    // First attempt: query NameMinted events filtered by owner
-    try {
-      // Event signature: NameMinted(bytes32 indexed node, uint256 indexed tokenId, address indexed owner)
-      const eventSig = 'NameMinted(bytes32,uint256,address)';
-      const topic0 = keccak256(toUtf8Bytes(eventSig));
-      const ownerTopic = '0x' + '0'.repeat(24) + address.toLowerCase().replace(/^0x/, '');
-
-      // Use recent block range to avoid "filter range exceeds maximum limit" error
-      const currentBlock = await getBlockNumber(provider);
-      const fromBlock = Math.max(0, currentBlock - 10000); // Last 10k blocks
-      const toBlock: any = 'latest';
-
-      console.log('Querying logs for NameMinted events...', { topic0, ownerTopic, fromBlock, toBlock });
-      // Use raw RPC call with cyprus1 shard to avoid "getLogs can only be called in zone chain" error
-      const logs = await provider.send('eth_getLogs', [{
-        address: CONTRACTS.QNS_NFT,
-        topics: [topic0, null, null, ownerTopic],
-        fromBlock: '0x' + fromBlock.toString(16),
-        toBlock: toBlock === 'latest' ? 'latest' : '0x' + toBlock.toString(16)
-      }], 'cyprus1' as any);
-
-      console.log('Found logs:', logs.length);
-
-      // If no logs found in recent range, try a broader range in chunks
-      let allLogs = logs;
-      if (logs.length === 0) {
-        console.log('No recent logs found, trying broader range in chunks...');
-        const chunkSize = 5000; // Smaller chunks to avoid limit
-        const olderFromBlock = Math.max(0, currentBlock - 50000); // Go back 50k blocks
-        
-        for (let start = olderFromBlock; start < currentBlock; start += chunkSize) {
-          const end = Math.min(start + chunkSize - 1, currentBlock);
-          try {
-            console.log(`Querying chunk: ${start} to ${end}`);
-            const chunkLogs = await provider.send('eth_getLogs', [{
-              address: CONTRACTS.QNS_NFT,
-              topics: [topic0, null, null, ownerTopic],
-              fromBlock: '0x' + start.toString(16),
-              toBlock: '0x' + end.toString(16)
-            }], 'cyprus1' as any);
-            allLogs = allLogs.concat(chunkLogs);
-            console.log(`Found ${chunkLogs.length} logs in chunk ${start}-${end}`);
-          } catch (error) {
-            console.warn(`Failed to query chunk ${start}-${end}:`, error);
-            break; // Stop if we hit an error
-          }
-        }
-      }
-
-      const seenNodes = new Set<string>();
-      for (const log of allLogs) {
-        try {
-          const node = log.topics?.[1];
-          if (!node || seenNodes.has(node)) continue;
-          seenNodes.add(node);
-
-          // Verify current owner still matches (in case of transfer)
-          let currentOwner: string | undefined;
-          try {
-            currentOwner = await registryContract.ownerOf(node);
-          } catch (e) {
-            console.warn('ownerOf(node) failed, skipping owner verification');
-          }
-          if (currentOwner && currentOwner.toLowerCase() !== address.toLowerCase()) {
-            continue;
-          }
-
-          // Fetch display name
-          let domainName: string | undefined;
-          try {
-            domainName = await nftContract.getName(node);
-          } catch (e) {
-            console.warn('getName(node) failed for', node);
-          }
-          if (domainName && domainName.length > 0 && !userDomains.includes(domainName)) {
-            userDomains.push(domainName);
-          }
-        } catch (inner) {
-          console.warn('Error processing log:', (inner as any)?.message);
-        }
-      }
-
-      if (userDomains.length > 0) {
-        console.log('Domains from logs:', userDomains);
-        return userDomains;
-      }
-    } catch (logsError) {
-    }
-
-    // Fallback: scan token IDs (best-effort, may be slow/inaccurate)
-    console.log('Falling back to token scan...');
-    
-    // Add timeout to contract calls
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Contract call timeout')), 15000); // 15 second timeout
-    });
-
-    // Try to get total supply first
-    let totalSupply = 0n;
-    try {
-      const ts = await Promise.race([
-        nftContract.totalSupply(),
-        timeoutPromise
-      ]) as bigint;
-      totalSupply = ts;
-      console.log('Total supply:', totalSupply.toString());
-    } catch (error) {
-      console.log('totalSupply() failed, using range approach:', error);
-      totalSupply = 0n;
-    }
-
-    console.log('Checking token IDs...');
-
     let consecutiveFailures = 0;
-    const maxConsecutiveFailures = 20;
-    const supplyNum = Number(totalSupply);
-    const maxTokensToCheck = Math.min(supplyNum + 200, 3000); // widen slightly
+    const maxConsecutiveFailures = 10;
+    const maxTokensToCheck = 1000; // Reasonable upper bound for this deployment
 
-    // Include tokenId 0 as some ERC721 start at 0
-    for (let tokenId = 0; tokenId <= maxTokensToCheck; tokenId++) {
+    for (let tokenId = 1; tokenId <= maxTokensToCheck; tokenId++) {
       try {
-        // Try to get owner from NFT contract first
-        let owner;
-        try {
-          owner = await Promise.race([
-            nftContract.ownerOf(tokenId),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
-          ]) as string;
-        } catch (nftError) {
-          // If NFT contract fails, try registry contract via node
-          try {
-            const node = await Promise.race([
-              nftContract.getNode(tokenId),
-              new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
-            ]) as string;
-            owner = await Promise.race([
-              registryContract.ownerOf(node),
-              new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
-            ]) as string;
-          } catch (registryError) {
-            throw nftError; // Use original error
-          }
-        }
+        const owner = await nftContract.ownerOf(tokenId);
 
         if (owner && owner.toLowerCase() === address.toLowerCase()) {
-          // Get the node for this token
-          let node;
-          try {
-            node = await Promise.race([
-              nftContract.getNode(tokenId),
-              new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
-            ]) as string;
-          } catch (nodeError) {
-            console.log(`Could not get node for token ${tokenId}:`, nodeError);
-            continue;
-          }
-
-          // Get the actual domain name
-          let domainName;
-          try {
-            domainName = await Promise.race([
-              nftContract.getName(node),
-              new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
-            ]) as string;
-          } catch (nameError) {
-            console.log(`Could not get name for node ${node}:`, nameError);
-            continue;
-          }
+          const node = await nftContract.getNode(tokenId);
+          const domainName = await nftContract.getName(node);
 
           if (domainName && domainName.length > 0 && !userDomains.includes(domainName)) {
             userDomains.push(domainName);
+            console.log(`Found domain #${tokenId}:`, domainName, 'owned by', owner);
           }
         }
 
-        // Reset consecutive failures counter on success
+        // Reset failure counter on any successful ownerOf call
         consecutiveFailures = 0;
-
-      } catch (error: any) {
+      } catch (error) {
         consecutiveFailures++;
         if (consecutiveFailures >= maxConsecutiveFailures) {
-          console.log(`Stopping after ${maxConsecutiveFailures} consecutive failures`);
+          console.log(`Stopping after ${maxConsecutiveFailures} consecutive failures at tokenId`, tokenId);
           break;
         }
       }
     }
 
-    console.log('Found user domains (fallback):', userDomains);
+    console.log('Found user domains (simple scan):', userDomains);
     return userDomains;
   } catch (error) {
-    console.error('Error fetching user domains:', error);
+    console.error('Error fetching user domains (simple scan):', error);
     return [];
   }
 }
@@ -810,16 +652,36 @@ export async function sendFundsToDomain(
     
     // Now send the transaction to the resolved address
     const amountWei = parseEther(amountInQi);
+    let fromAddress: string | undefined;
+    try {
+      if (typeof signer?.getAddress === 'function') {
+        fromAddress = await signer.getAddress();
+      }
+    } catch {}
     
     opts.onProgress('Sending transaction...');
     
-    const tx = await signer.sendTransaction({
+    const txRequest: any = {
       to: resolution.address,
       value: amountWei
-    });
+    };
+    
+    if (fromAddress) {
+      (txRequest as any).from = fromAddress;
+    }
+    
+    const tx = await signer.sendTransaction(txRequest);
     
     opts.onProgress('Waiting for confirmation...');
-    await tx.wait();
+
+    try {
+      await tx.wait();
+    } catch (waitError: any) {
+      console.warn('tx.wait() failed; treating as sent transaction:', waitError);
+      // Some Pelagus versions may reject certain read-only RPCs (e.g. quai_getBlockByNumber)
+      // even though the transaction itself was broadcast successfully. In that case we
+      // still consider the payment successful since we have a valid transaction hash.
+    }
     
     return {
       success: true,

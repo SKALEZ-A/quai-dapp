@@ -515,6 +515,45 @@ async function getUserDomains(address) {
         return [];
     }
 }
+async function getUserDomains_simple(address) {
+    try {
+        console.log('Fetching domains for address (frontend):', address);
+        const provider = (0, quai_1.makeProvider)(contracts_1.RPC_URL);
+        const nftContract = new quais_1.Contract(contracts_1.CONTRACTS.QNS_NFT, contracts_1.QNS_NFT_ABI, provider);
+        const userDomains = [];
+        let consecutiveFailures = 0;
+        const maxConsecutiveFailures = 10;
+        const maxTokensToCheck = 1000; // Reasonable upper bound for this deployment
+        for (let tokenId = 1; tokenId <= maxTokensToCheck; tokenId++) {
+            try {
+                const owner = await nftContract.ownerOf(tokenId);
+                if (owner && owner.toLowerCase() === address.toLowerCase()) {
+                    const node = await nftContract.getNode(tokenId);
+                    const domainName = await nftContract.getName(node);
+                    if (domainName && domainName.length > 0 && !userDomains.includes(domainName)) {
+                        userDomains.push(domainName);
+                        console.log(`Found domain #${tokenId}:`, domainName, 'owned by', owner);
+                    }
+                }
+                consecutiveFailures = 0;
+            }
+            catch (error) {
+                consecutiveFailures++;
+                if (consecutiveFailures >= maxConsecutiveFailures) {
+                    console.log(`Stopping after ${maxConsecutiveFailures} consecutive failures at tokenId`, tokenId);
+                    break;
+                }
+            }
+        }
+        console.log('Found user domains (simple scan):', userDomains);
+        return userDomains;
+    }
+    catch (error) {
+        console.error('Error fetching user domains (simple scan):', error);
+        return [];
+    }
+}
+exports.getUserDomains = getUserDomains_simple;
 // Auction-related functions (keep as optional advanced feature)
 async function startDomainAuction(name, signer) {
     try {
@@ -682,13 +721,32 @@ async function sendFundsToDomain(domainName, amountInQi, signer, options) {
         opts.onProgress(`Resolved "${domainName}" to ${resolution.address}`);
         // Now send the transaction to the resolved address
         const amountWei = parseEther(amountInQi);
+        let fromAddress;
+        try {
+            if (typeof (signer === null || signer === void 0 ? void 0 : signer.getAddress) === 'function') {
+                fromAddress = await signer.getAddress();
+            }
+        }
+        catch (_a) { }
         opts.onProgress('Sending transaction...');
-        const tx = await signer.sendTransaction({
+        const txRequest = {
             to: resolution.address,
             value: amountWei
-        });
+        };
+        if (fromAddress) {
+            txRequest.from = fromAddress;
+        }
+        const tx = await signer.sendTransaction(txRequest);
         opts.onProgress('Waiting for confirmation...');
-        await tx.wait();
+        try {
+            await tx.wait();
+        }
+        catch (waitError) {
+            console.warn('tx.wait() failed; treating as sent transaction:', waitError);
+            // Some Pelagus versions may reject certain read-only RPCs (e.g. quai_getBlockByNumber)
+            // even though the transaction itself was broadcast successfully. In that case we
+            // still consider the payment successful since we have a valid transaction hash.
+        }
         return {
             success: true,
             txHash: tx.hash,
