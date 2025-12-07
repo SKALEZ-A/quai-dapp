@@ -31,10 +31,10 @@ const LandingPage = () => {
       quote: "SYNQ is very user friendly and easy to use. I believe what we've built would be the ost used DApp on Quai very sopon. We're a community focused super DApp that brings value to the ecosystem.",
     },
     {
-      name: 'Bob Martinez',
-      handle: 'bob.quai',
-      avatar: '/assets/avatars/bob-martinez.png',
-      quote: "The bridge is incredibly fast and secure. I've moved assets between 5 different chains without any issues. The integration with social features is brilliant.",
+      name: 'Skalez',
+      handle: 'CTO - SYNQ',
+      avatar: '/assets/skalez.jpg',
+      quote: "The protocol is incredibly fast and secure. We have established a seamless identity layer on Quai. The integration with our social features is absolutely brilliant",
     },
   ];
 
