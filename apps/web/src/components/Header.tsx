@@ -11,8 +11,8 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 const Header: React.FC = () => {
   const { open } = useWeb3Modal();
   const { isConnected } = useAccount();
-  const { disconnect } = useDisconnect();
   const currentUser = useCurrentUser();
+  const { disconnect } = useDisconnect();
 
   const navItems = [
     { label: "Dashboard", path: "/dashboard" },

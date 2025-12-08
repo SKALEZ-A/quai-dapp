@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import CountUp from '@/components/CountUp';
+import AnimatedBadge from '@/components/AnimatedBadge';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWallet } from '@fortawesome/free-solid-svg-icons';
@@ -95,19 +97,19 @@ const LandingPage = () => {
         <section className="bg-[#111928] py-12 md:py-20 px-4 text-center text-white relative z-20 mt-[-40px] md:mt-10 lg:mt-[-405px]">
           <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10">
             <div>
-              <p className="text-2xl md:text-3xl font-bold text-white">50<span className="text-gradient">+</span></p>
+              <CountUp end={50} decimals={0} duration={1500} className="text-2xl md:text-3xl font-bold text-white" suffix="+" />
               <p className="mt-2 text-xs md:text-sm text-gray-400">QNS Domain</p>
             </div>
             <div>
-              <p className="text-xl md:text-xl font-bold text-white">coming<span className="text-gradient"> soon</span></p>
+              <AnimatedBadge className="text-xl md:text-xl font-bold text-white" text="coming" accent="soon" />
               <p className="mt-2 text-xs md:text-sm text-gray-400">Bridge Transactions</p>
             </div>
             <div>
-              <p className="text-2xl md:text-3xl font-bold text-white">100<span className="text-gradient">+</span></p>
+              <CountUp end={100} decimals={0} duration={1500} className="text-2xl md:text-3xl font-bold text-white" suffix="+" />
               <p className="mt-2 text-xs md:text-sm text-gray-400">Active Users</p>
             </div>
             <div>
-              <p className="text-2xl md:text-3xl font-bold text-white">99.9<span className="text-gradient">%</span></p>
+              <CountUp end={99.9} decimals={1} duration={1500} className="text-2xl md:text-3xl font-bold text-white" suffix={<span className="text-gradient">%</span>} />
               <p className="mt-2 text-xs md:text-sm text-gray-400">Uptime</p>
             </div>
           </div>
