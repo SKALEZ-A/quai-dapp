@@ -1,5 +1,16 @@
 import React from 'react';
 
+export const metadata = {
+  title: 'Security — Synq',
+  description: 'Security practices and responsible disclosure for Synq.',
+  openGraph: {
+    title: 'Security — Synq',
+    description: 'Security practices and responsible disclosure for Synq.',
+    url: 'https://synqdapp.com/security',
+    images: [{ url: '/opengraph-image.png', alt: 'Synq Security' }],
+  },
+};
+
 export default function SecurityPage() {
   return (
     <main className="min-h-screen bg-white text-gray-900 py-16 px-6 sm:px-12 lg:px-28">
@@ -29,7 +40,7 @@ export default function SecurityPage() {
 
           <h2>Reporting Vulnerabilities</h2>
           <p>
-            If you discover a security issue, please email <a href="mailto:synqafrica1.0@gmail.com">security@synq.example</a>
+            If you discover a security issue, please email <a href="mailto:synqafrica1.0@gmail.com">synqafrica1.0@gmail.com</a>
             with details. We appreciate responsible disclosure and will respond promptly.
           </p>
 

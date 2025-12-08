@@ -1,5 +1,16 @@
 import React from 'react';
 
+export const metadata = {
+  title: 'Privacy Policy — Synq',
+  description: 'Learn how Synq collects, uses, and protects your data.',
+  openGraph: {
+    title: 'Privacy Policy — Synq',
+    description: 'Learn how Synq collects, uses, and protects your data.',
+    url: 'https://synqdapp.com/privacy',
+    images: [{ url: '/opengraph-image.png', alt: 'Synq Privacy' }],
+  },
+};
+
 export default function PrivacyPage() {
   return (
     <main className="min-h-screen bg-white text-gray-900 py-16 px-6 sm:px-12 lg:px-28">
@@ -46,7 +57,7 @@ export default function PrivacyPage() {
           <p>You can manage account settings and opt out of certain communications in your profile settings.</p>
 
           <h2>Contact Us</h2>
-          <p>If you have questions about this policy, contact us at <a href="mailto:synqafrica1.0@gmail.com">privacy@synq.example</a>.</p>
+          <p>If you have questions about this policy, contact us at <a href="mailto:synqafrica1.0@gmail.com">synqafrica1.0@gmail.com</a>.</p>
         </section>
       </div>
     </main>

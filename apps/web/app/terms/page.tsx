@@ -1,5 +1,16 @@
 import React from 'react';
 
+export const metadata = {
+  title: 'Terms of Service — Synq',
+  description: 'Terms and conditions for using Synq services.',
+  openGraph: {
+    title: 'Terms of Service — Synq',
+    description: 'Terms and conditions for using Synq services.',
+    url: 'https://synqdapp.com/terms',
+    images: [{ url: '/opengraph-image.png', alt: 'Synq Terms' }],
+  },
+};
+
 export default function TermsPage() {
   return (
     <main className="min-h-screen bg-white text-gray-900 py-16 px-6 sm:px-12 lg:px-28">
@@ -42,7 +53,7 @@ export default function TermsPage() {
           <p>These terms are governed by applicable laws in the jurisdictions where Synq operates.</p>
 
           <h2>Contact</h2>
-          <p>Questions about these terms? Email <a href="mailto:synqafrica1.0@gmail.com">legal@synq.example</a>.</p>
+          <p>Questions about these terms? Email <a href="mailto:synqafrica1.0@gmail.com">synqafrica1.0@gmail.com</a>.</p>
         </section>
       </div>
     </main>
