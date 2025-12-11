@@ -47,6 +47,8 @@ export function useSocial(filterByFollowing: boolean = false, currentUserAddress
   const [isLoading, setIsLoading] = useState(true);
   const [isCreatingPost, setIsCreatingPost] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const { address } = useAccount();
 
   // Fetch following list
@@ -105,9 +107,11 @@ export function useSocial(filterByFollowing: boolean = false, currentUserAddress
         setAllPosts(response.posts);
         // Initial set of posts (will be filtered by useEffect)
         setPosts(response.posts);
+        setNextCursor(response.nextCursor ?? null);
       } else {
         console.warn('⚠️ No posts in response:', response);
         setPosts([]);
+        setNextCursor(null);
       }
     } catch (err) {
       console.error('❌ Failed to fetch posts:', err);
@@ -124,10 +128,40 @@ export function useSocial(filterByFollowing: boolean = false, currentUserAddress
       }
       
       setError(`Failed to load posts: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setNextCursor(null);
     } finally {
       setIsLoading(false);
     }
   }, []);
+
+  // Load more posts using cursor-based pagination
+  const loadMorePosts = useCallback(async () => {
+    if (!nextCursor || isLoadingMore) {
+      return;
+    }
+
+    try {
+      setIsLoadingMore(true);
+      setError(null);
+
+      console.log('🔄 Loading more posts with cursor:', nextCursor);
+      const response = await api.getPosts(20, nextCursor);
+
+      if (response && response.posts && response.posts.length > 0) {
+        console.log('✅ Loaded more posts:', response.posts.length);
+        setAllPosts(prev => [...prev, ...response.posts]);
+        setNextCursor(response.nextCursor ?? null);
+      } else {
+        console.log('ℹ️ No more posts to load');
+        setNextCursor(null);
+      }
+    } catch (err) {
+      console.error('❌ Failed to load more posts:', err);
+      setError(`Failed to load more posts: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [nextCursor, isLoadingMore]);
 
   // Create a new post
   const createPost = async (postData: CreatePostData, authorAddress: string) => {
@@ -335,6 +369,9 @@ export function useSocial(filterByFollowing: boolean = false, currentUserAddress
     createPost,
     likePost,
     commentOnPost,
+    hasMore: !!nextCursor,
+    isLoadingMore,
+    loadMorePosts,
   };
 }
 

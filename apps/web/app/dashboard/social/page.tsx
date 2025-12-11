@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useSocial } from '@/hooks/useSocial';
@@ -41,9 +41,11 @@ const SocialActivity = () => {
     const [lightboxImages, setLightboxImages] = useState<string[]>([]);
     const [lightboxIndex, setLightboxIndex] = useState(0);
     const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+    const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+    const loadMoreRef = useRef<HTMLDivElement | null>(null);
     const router = useRouter();
     const currentUser = useCurrentUser();
-    const { posts, isLoading, isCreatingPost, error, createPost, likePost, commentOnPost, fetchPosts } = useSocial(
+    const { posts, isLoading, isCreatingPost, error, createPost, likePost, commentOnPost, fetchPosts, hasMore, isLoadingMore, loadMorePosts } = useSocial(
         activeTab === 'Following',
         currentUser.address || undefined
     );
@@ -107,6 +109,33 @@ const SocialActivity = () => {
         }
     }
 
+    // Automatically load more posts when the sentinel comes into view
+    useEffect(() => {
+        if (!loadMoreRef.current) return;
+
+        const sentinel = loadMoreRef.current;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const entry = entries[0];
+                if (entry.isIntersecting && hasMore && !isLoadingMore && !isLoading) {
+                    loadMorePosts();
+                }
+            },
+            {
+                root: null, // viewport
+                rootMargin: '200px 0px 0px 0px',
+                threshold: 0.1,
+            }
+        );
+
+        observer.observe(sentinel);
+
+        return () => {
+            observer.disconnect();
+        };
+    }, [hasMore, isLoadingMore, isLoading, loadMorePosts]);
+
     const openImageLightbox = (images: string[], index: number = 0) => {
         setLightboxImages(images);
         setLightboxIndex(index);
@@ -121,7 +150,10 @@ const SocialActivity = () => {
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-6 h-[calc(100vh-60px)] mt-[-20px]">
-            <main className="flex flex-col gap-4 overflow-y-scroll pr-0 lg:pr-6 scrollbar-hide relative">
+            <main
+                ref={scrollContainerRef}
+                className="flex flex-col gap-4 overflow-y-scroll pr-0 lg:pr-6 scrollbar-hide relative"
+            >
                 <div className="flex border-b border-gray-700">
                     <button 
                         className={`py-4 px-6 text-base font-medium relative ${activeTab === 'For You' ? 'text-white' : 'text-gray-400'}`} 
@@ -279,6 +311,19 @@ onError={(e) => {
                                 </div>
                             </div>
                         ))
+                    )}
+                    {hasMore && !isLoading && posts.length > 0 && (
+                        <div
+                            ref={loadMoreRef}
+                            className="flex items-center justify-center p-4 text-gray-400 text-sm"
+                        >
+                            {isLoadingMore ? 'Loading more posts...' : 'Scroll to load more posts'}
+                        </div>
+                    )}
+                    {!hasMore && !isLoading && posts.length > 0 && (
+                        <div className="flex items-center justify-center p-4 text-gray-500 text-xs">
+                            You have reached the end of the feed.
+                        </div>
                     )}
                 </div>
             </main>
