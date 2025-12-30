@@ -29,7 +29,7 @@ export const prisma = new PrismaClient({
 });
 
 // Add connection error handling
-prisma.$connect().catch((error) => {
+prisma.$connect().catch((error: Error) => {
   console.error('❌ Failed to connect to database:', error.message);
   if (error.message.includes('self-signed certificate')) {
     console.error('💡 SSL Certificate issue detected. This is common with Supabase.');
