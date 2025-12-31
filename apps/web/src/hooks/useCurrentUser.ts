@@ -22,9 +22,8 @@ const DEFAULT_PROFILE_IMG = "/assets/avatars/alice-chen.png";
 const DEFAULT_COVER_IMG = "/assets/pattern.png";
 
 const isLocalhost = typeof window !== 'undefined' && (
-  window.location.hostname === 'localhost' ||
-  window.location.hostname === '127.0.0.1' ||
-  window.location.hostname.includes('localhost')
+  window.location.hostname === 'localhost' || 
+  window.location.hostname === '127.0.0.1'
 );
 const API_BASE_URL = isLocalhost ? '/api/proxy' : (process.env.NEXT_PUBLIC_API_URL || 'https://api-production-af00.up.railway.app');
 
