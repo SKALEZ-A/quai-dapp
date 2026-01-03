@@ -11,7 +11,12 @@ const isLocalhost = typeof window !== 'undefined' && (
   window.location.hostname === 'localhost' || 
   window.location.hostname === '127.0.0.1'
 );
-const API_URL = isLocalhost ? '/api/proxy' : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000');
+
+// Fallback to Railway URL if env var is not set (ensures production always works)
+const RAILWAY_API_URL = 'https://api-production-af00.up.railway.app';
+const API_URL = isLocalhost 
+  ? '/api/proxy' 
+  : (process.env.NEXT_PUBLIC_API_URL || RAILWAY_API_URL);
 
 // Debug: Log the API URL being used
 console.log('🔧 API_URL configured as:', API_URL, 'isLocalhost:', isLocalhost);
